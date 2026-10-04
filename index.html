@@ -11,9 +11,7 @@
 *{box-sizing:border-box;margin:0}
 body{font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);-webkit-tap-highlight-color:transparent;padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom))}
 header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--ln);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.s-bar{flex:1;position:relative;margin:0 10px}.s-bar input{margin:0;padding:6px 12px;width:100%;border-radius:20px;background:var(--in);color:var(--tx);border:0}
-#s-res{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--br);border-radius:12px;margin-top:4px;padding:8px;display:none;max-height:60vh;overflow-y:auto;box-shadow:0 10px 25px #0005}
-h1{font-size:18px;font-weight:800;color:var(--br);cursor:pointer}h2{font-size:17px}h3{margin-bottom:6px}h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:8px}
+h1{font-size:18px;font-weight:800;color:var(--br)}h2{font-size:17px}h3{margin-bottom:6px}h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:8px}
 main{max-width:1000px;margin:auto;padding:14px}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--ln);padding:4px 4px calc(4px + env(safe-area-inset-bottom));z-index:5}
 nav button{flex:1;border:0;background:none;color:var(--mu);font:inherit;font-size:11px;font-weight:700;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
@@ -44,12 +42,16 @@ input,select,textarea{width:100%;margin-top:4px;padding:10px;border:0;border-rad
 #ts .er{background:var(--er)}#ts .ok{background:var(--ok)}
 .tod{border-color:var(--br);box-shadow:0 0 0 1px var(--br)}
 :focus-visible{outline:3px solid var(--br);outline-offset:2px}
+.s-bar{flex:1;position:relative;margin:0 4px;min-width:0}.s-bar input{margin:0;padding:7px 12px;width:100%;border-radius:20px}
+#s-res{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--br);border-radius:12px;margin-top:4px;padding:8px;display:none;max-height:60vh;overflow-y:auto;box-shadow:0 10px 25px #0005}
+h1{cursor:pointer}.n3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;background:var(--in);padding:8px;border-radius:12px;margin:0 0 8px;font-size:11px}.n3 label{margin:0}.n3 input{padding:6px;margin-top:2px;background:var(--card)}
+input[type=color]{height:42px;padding:3px}
 </style>
 </head>
 <body>
 <header>
-  <h1 onclick="go('da')">🎓 EduVault</h1>
-  <div class="s-bar"><input type="search" id="sq" placeholder="Rechercher..." oninput="doSearch()"><div id="s-res"></div></div>
+  <h1 data-a="go" data-i="da">🎓 EduVault</h1>
+  <div class="s-bar"><input type="search" id="sq" placeholder="Rechercher..." oninput="doSearch()" aria-label="Rechercher"><div id="s-res"></div></div>
   <div style="display:flex;gap:6px;align-items:center">
     <button class="b" id="dv" data-a="drive" title="Google Drive">☁️ <span id="dd">●</span></button>
     <button class="b" data-a="theme" title="Thème">🌓</button>
@@ -69,11 +71,6 @@ input,select,textarea{width:100%;margin-top:4px;padding:10px;border:0;border-rad
 <div id="ts" aria-live="polite"></div>
 
 <script>
-/* ---------- PWA Installation (Offline & App Icon) ---------- */
-const mfest = {"name":"EduVault","short_name":"EduVault","start_url":".","display":"standalone","background_color":"#111827","theme_color":"#2563eb","icons":[{"src":"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>","sizes":"192x192","type":"image/svg+xml"}]};
-document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(mfest))}">`);
-if('serviceWorker' in navigator) navigator.serviceWorker.register(URL.createObjectURL(new Blob(["self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))))"],{type:'application/javascript'}))).catch(()=>{});
-
 const $=i=>document.getElementById(i);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LV={CP1:['S1','S2'],CP2:['S3','S4'],CI1:['S5','S6'],CI2:['S7','S8'],CI3:['S9','S10']};
@@ -82,15 +79,14 @@ const DAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const CATS=[['cours','📚 Cours'],['td','📝 TD / TP'],['examen','🎯 Examens'],['resume','⚡ Résumés']];
 const KEY='eduVaultData_vFinal3';
 const TOD=()=>DAYS[(new Date().getDay()+6)%7];
-const GEMINI_MODEL='gemini-2.5-flash';
-const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'qwen/qwen3.8-27b'}};
+const GEMINI_MODEL='gemini-3.8-flash'; /* verifie le nom actuel sur ai.google.dev/gemini-api/docs/models */
+const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'qwen/qwen3.8-27b'}}; /* modele vision : modifiable dans la fenetre d'import */
 const aiKey=p=>localStorage.getItem('eduVault_aiKey_'+p)||(p==='gemini'?localStorage.getItem('eduVault_aiKey'):'')||'';
-const aiModel=p=>localStorage.getItem('eduVault_aiModel_'+p)||AI[p].model;
+const aiModel=p=>{const m=localStorage.getItem('eduVault_aiModel_'+p);return(!m||m==='gemini-2.5-flash')?AI[p].model:m};
 const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.';
 const CLIENT_ID='786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com';
-
 let A={activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[]};
-let tab='da',filt='all',cardMod='all',q='',cur={},tok=null,tc=null;
+let tab='da',fcAll=false,filt='all',cardMod='all',q='',cur={},tok=null,tc=null;
 
 /* ---------- utils ---------- */
 const uid=p=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -99,7 +95,6 @@ const monday=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-(
 const sems=()=>LV[A.settings.level]||LV.CP1;
 const mods=()=>A.modules.filter(m=>m.semester===A.activeSemester);
 const modName=id=>A.modules.find(m=>m.id===id)?.name||'?';
-const modCol=id=>A.modules.find(m=>m.id===id)?.color||'var(--br)';
 function toast(m,t=''){const e=document.createElement('div');e.className=t;e.textContent=m;$('ts').append(e);setTimeout(()=>e.remove(),3500)}
 function notify(t,b){try{if(window.Notification&&Notification.permission==='granted')new Notification(t,{body:b})}catch(e){}toast(t+' : '+b);try{navigator.vibrate([200,100,200])}catch(e){}}
 const L={};const lib=s=>L[s]||(L[s]=new Promise((ok,ko)=>{const e=document.createElement('script');e.src=s;e.onload=ok;e.onerror=()=>{delete L[s];ko(new Error('Chargement impossible (connexion ?)'))};document.head.append(e)}));
@@ -112,14 +107,14 @@ function load(o){
   for(const k of ['modules','tasks','flashcards','timetable','notes'])if(!Array.isArray(A[k]))A[k]=[];
   A.settings=Object.assign({level:null,currentWeek:'A',weekRef:'',holidays:[]},A.settings);
   if(!Array.isArray(A.settings.holidays))A.settings.holidays=[];
-  
-  /* Initialisation des nouvelles variables (Absences, Coefs, Notes, Stats, Leitner) */
   A.modules.forEach(m=>{
-    m.absences=m.absences||0; m.pomo=m.pomo||0; m.color=m.color||'#2563eb';
-    m.ccc=m.ccc??0; m.ctp=m.ctp??0; m.cex=m.cex??1; 
-    m.ncc=m.ncc??null; m.ntp=m.ntp??null; m.nex=m.nex??null;
+    m.resources=m.resources||[];m.absences=m.absences||0;m.pomo=m.pomo||0;m.color=m.color||'#2563eb';m.coeff=m.coeff||1;
+    m.ccc=+m.ccc||0;m.ctp=+m.ctp||0;m.cex=m.cex==null?1:+m.cex;
+    m.ncc=m.ncc==null?null:+m.ncc;m.ntp=m.ntp==null?null:+m.ntp;m.nex=m.nex==null?null:+m.nex;
+    if(m.grade!=null&&m.nex==null&&m.ncc==null&&m.ntp==null){m.nex=+m.grade;m.cex=1;m.ccc=0;m.ctp=0}
+    delete m.grade;
   });
-  A.flashcards.forEach(f=>{ f.efactor=f.efactor||2.5; f.interval=f.interval||0; f.repetition=f.repetition||0; f.nextRev=f.nextRev||Date.now(); });
+  A.flashcards.forEach(f=>{f.efactor=f.efactor||2.5;f.interval=f.interval||0;f.repetition=f.repetition||0;f.nextRev=f.nextRev||Date.now()});
 }
 let syncT;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){toast('Stockage plein : supprimez des photos','er')}
@@ -146,48 +141,29 @@ function ask(title,fields,ok){
 /* ---------- views ---------- */
 const pills=()=>`<div class="pills">${ALLS.map(s=>`<button class="b${s===A.activeSemester?' p':''}" data-a="sem" data-i="${s}">${s}</button>`).join('')}</div>`;
 function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&new Date(t.dueDate)>n).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];if(!t)return'';const h=Math.floor((new Date(t.dueDate)-n)/36e5),d=Math.floor(h/24);return`<div class="up" data-a="goAg">⏰ ${t.type==='exam'?'Examen':'Devoir'} : ${esc(t.title)} (${d>0?'dans '+d+' j':h>0?'dans '+h+' h':'très bientôt'})</div>`}
-
-/* Fonction pour calculer la moyenne générale du semestre */
-function calcSem(){
-  const ms=mods(); let tt=0, cc=0;
-  ms.forEach(m=>{
-    const d=(m.ccc+m.ctp+m.cex);
-    if(d>0 && (m.ncc!=null||m.ntp!=null||m.nex!=null)){
-      const n= ((m.ncc||0)*m.ccc + (m.ntp||0)*m.ctp + (m.nex||0)*m.cex) / d;
-      tt+=n*(m.coeff||1); cc+=(m.coeff||1);
-    }
-  });
-  return cc>0 ? (tt/cc).toFixed(2) : '-';
-}
+const modCol=id=>A.modules.find(m=>m.id===id)?.color||'var(--br)';
+const mAvg=m=>{let t=0,d=0;[['ncc','ccc'],['ntp','ctp'],['nex','cex']].forEach(([n,c])=>{if(m[n]!=null&&m[c]>0){t+=m[n]*m[c];d+=m[c]}});return d?t/d:null};
+function calcSem(){let t=0,c=0;mods().forEach(m=>{const a=mAvg(m);if(a!=null){t+=a*(m.coeff||1);c+=m.coeff||1}});return c?(t/c).toFixed(2):'-'}
 
 function doSearch(){
-  const q=$('sq').value.toLowerCase(); const res=$('s-res');
-  if(!q){res.style.display='none';return;}
-  let html='';
-  A.modules.filter(m=>m.name.toLowerCase().includes(q)).forEach(m=>html+=`<div class="cl" onclick="go('mo');$('sq').value='';$('s-res').style.display='none'">📚 ${esc(m.name)}</div>`);
-  A.flashcards.filter(f=>f.q.toLowerCase().includes(q)||f.a.toLowerCase().includes(q)).forEach(f=>html+=`<div class="cl" onclick="go('fc');$('sq').value='';$('s-res').style.display='none'">🃏 ${esc(f.q)}</div>`);
-  A.tasks.filter(t=>t.title.toLowerCase().includes(q)).forEach(t=>html+=`<div class="cl" onclick="go('ag');$('sq').value='';$('s-res').style.display='none'">📝 ${esc(t.title)}</div>`);
-  res.innerHTML=html||'<small class="mu">Aucun résultat</small>'; res.style.display='block';
+  const k=$('sq').value.trim().toLowerCase(),res=$('s-res');
+  if(!k){res.style.display='none';return}
+  let h='';
+  A.modules.filter(m=>m.name.toLowerCase().includes(k)).forEach(m=>h+=`<div class="cl" data-a="sgo" data-i="mo|${m.semester}">📚 ${esc(m.name)} <small class="mu">${m.semester}</small></div>`);
+  A.flashcards.filter(f=>(f.q+' '+f.a).toLowerCase().includes(k)).slice(0,8).forEach(f=>h+=`<div class="cl" data-a="sgo" data-i="fc|${A.modules.find(m=>m.id===f.moduleId)?.semester||A.activeSemester}">🃏 ${esc(f.q)}</div>`);
+  A.tasks.filter(t=>t.title.toLowerCase().includes(k)).forEach(t=>h+=`<div class="cl" data-a="sgo" data-i="ag|${A.modules.find(m=>m.id===t.moduleId)?.semester||A.activeSemester}">📝 ${esc(t.title)}</div>`);
+  res.innerHTML=h||'<small class="mu">Aucun résultat</small>';res.style.display='block';
 }
 
-/* Dashboard (Aujourd'hui) */
 function rDa(){
-  const t=Date.now(), n=new Date();
-  const tdsCls=A.timetable.filter(c=>c.day===TOD() && (c.week==='all'||c.week===curWeek())).sort((a,b)=>a.startTime.localeCompare(b.startTime));
-  const dueTs=A.tasks.filter(x=>!x.completed && new Date(x.dueDate).getTime()<t+7*86400000).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
-  const dueFc=A.flashcards.filter(f=>mods().some(m=>m.id===f.moduleId) && (!f.nextRev || f.nextRev<=t));
-  
-  return `<div class="top"><h2>☀️ Aujourd'hui</h2><small class="br">${n.toLocaleDateString('fr-FR')} · Sem. ${curWeek()}</small></div>
-  <div class="g">
-    <div class="c tod"><h4>📚 Cours du jour</h4>
-      ${tdsCls.map(c=>`<div class="cl" data-a="cls" data-i="${c.id}" style="border-left:4px solid ${modCol(c.moduleId)}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}</small></div>`).join('') || '<p class="mu e">Aucun cours aujourd\'hui</p>'}
-    </div>
-    <div class="c"><h4>⚠️ Échéances (7 jours)</h4>
-      ${dueTs.map(t=>{const h=Math.floor((new Date(t.dueDate)-n)/36e5); return `<div class="cl" style="border-left:4px solid ${modCol(t.moduleId)}"><small class="br">${h<24?`Dans ${h}h`:`Dans ${Math.floor(h/24)}j`}</small><b>${t.type==='exam'?'🚨':'📝'} ${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))}</small></div>`}).join('') || '<p class="mu e">Rien dans les 7 jours</p>'}
-    </div>
-    <div class="c"><h4>🧠 Révision Spacée (SM-2)</h4>
-      <div class="e" style="padding:20px;cursor:pointer;border-color:var(--br)" onclick="go('fc')"><b style="font-size:32px;color:var(--br)">${dueFc.length}</b><br><small class="mu">Fiches à réviser aujourd'hui</small></div>
-    </div>
+  const t=Date.now(),n=new Date(),hol=isHol(iso(n));
+  const cls=hol?[]:A.timetable.filter(c=>c.day===TOD()&&(c.week==='all'||c.week===curWeek())).sort((a,b)=>a.startTime.localeCompare(b.startTime));
+  const due=A.tasks.filter(x=>!x.completed&&new Date(x.dueDate).getTime()<t+7*864e5).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  const nFc=A.flashcards.filter(f=>!f.nextRev||f.nextRev<=t).length;
+  return `<div class="top"><h2>☀️ Aujourd'hui</h2><small class="br">${n.toLocaleDateString('fr-FR')} · Sem. ${curWeek()}</small></div><div class="g">
+  <div class="c tod"><h4>📚 Cours du jour</h4>${cls.map(c=>`<div class="cl" data-a="cls" data-i="${c.id}" style="border-left:4px solid ${modCol(c.moduleId)}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}</small></div>`).join('')||`<p class="mu e">${hol?'🌴 Vacances aujourd\'hui':'Aucun cours aujourd\'hui'}</p>`}</div>
+  <div class="c"><h4>⚠️ Échéances (7 jours)</h4>${due.map(x=>{const h=Math.floor((new Date(x.dueDate)-n)/36e5);return`<div class="cl" data-a="go" data-i="ag" style="border-left:4px solid ${modCol(x.moduleId)}"><small class="br">${h<0?'En retard':h<24?'Dans '+h+' h':'Dans '+Math.floor(h/24)+' j'}</small><b>${x.type==='exam'?'🚨':'📝'} ${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div>`}).join('')||'<p class="mu e">Rien dans les 7 jours</p>'}</div>
+  <div class="c"><h4>🧠 Révision espacée</h4><div class="e" style="padding:20px;cursor:pointer;border-color:var(--br)" data-a="go" data-i="fc"><b style="font-size:32px;color:var(--br)">${nFc}</b><small class="mu">fiche(s) à réviser aujourd'hui</small></div></div>
   </div>`;
 }
 
@@ -199,58 +175,43 @@ function rTT(){
     const n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
     return`<div class="cl${n?' nt':''}" data-a="cls" data-i="${c.id}" style="border-left:4px solid ${modCol(c.moduleId)}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||'<p class="mu e">Aucune séance</p>')+'</div>').join('')+'</div>';
 }
-
 function rAg(){
   const ids=mods().map(m=>m.id),l=A.tasks.filter(t=>ids.includes(t.moduleId)&&(filt==='all'||t.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
   return pills()+`<div class="top"><h2>Examens & Devoirs</h2><div><button class="b p" data-a="addTask">+ Ajouter</button></div></div><div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${f[1]}</button>`).join('')}</div>`+
   (l.length?l.map(t=>`<div class="c t${t.type==='exam'?' x':''}${t.completed?' d':''}"><input type="checkbox" ${t.completed?'checked':''} data-a="done" data-i="${t.id}" aria-label="Terminé"><div><b>${t.type==='exam'?'🚨 ':'📝 '}${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))} • ${new Date(t.dueDate).toLocaleString('fr-FR')}</small></div><button class="x-btn" data-a="editTask" data-i="${t.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${t.id}" aria-label="Supprimer">🗑</button></div>`).join(''):'<p class="mu e">Aucune échéance</p>');
 }
-
 function mgrid(){
   const l=mods().filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
   return l.length?l.map(m=>{
-    const d=(m.ccc+m.ctp+m.cex);
-    const n=(d>0&& (m.ncc!=null||m.ntp!=null||m.nex!=null)) ? (((m.ncc||0)*m.ccc + (m.ntp||0)*m.ctp + (m.nex||0)*m.cex) / d).toFixed(2) : '-';
-    return `<div class="c" style="border-left:4px solid ${m.color||'var(--ln)'}"><div class="top" style="margin:0"><div><small class="br">${m.semester} · Coef ${m.coeff} · Absences: <span style="color:${m.absences>=3?'var(--er)':'inherit'}">${m.absences||0}</span></small><b>${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="abs" data-i="${m.id}|1" title="Ajouter absence">👨‍🦯</button><button class="x-btn" data-a="aiFc" data-i="${m.id}" title="Fiches IA">✨</button><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>
-    <div class="row" style="margin-bottom:8px;justify-content:space-between;align-items:center"><span class="chip" style="background:${n>=10?'var(--ok)':'var(--er)'};color:#fff;font-weight:bold;margin:0">Moy: ${n}/20</span><button class="b" data-a="chhal" data-i="${m.id}" style="padding:4px 8px;font-size:11px">🎯 Examen?</button></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;background:var(--in);padding:8px;border-radius:12px;margin-bottom:8px;font-size:11px">
-      <label style="margin:0">CC (c:${m.ccc||0})<input type="number" step="0.25" placeholder="-" value="${m.ncc!==null?m.ncc:''}" onchange="act.sNote('${m.id}','ncc',this.value)" style="padding:4px;margin-top:2px"></label>
-      <label style="margin:0">TP (c:${m.ctp||0})<input type="number" step="0.25" placeholder="-" value="${m.ntp!==null?m.ntp:''}" onchange="act.sNote('${m.id}','ntp',this.value)" style="padding:4px;margin-top:2px"></label>
-      <label style="margin:0">Examen (c:${m.cex||1})<input type="number" step="0.25" placeholder="-" value="${m.nex!==null?m.nex:''}" onchange="act.sNote('${m.id}','nex',this.value)" style="padding:4px;margin-top:2px"></label>
-    </div>`+
+    const a=mAvg(m),av=a==null?'-':a.toFixed(2);
+    const inp=(k,c,lab)=>`<label>${lab} (coef ${m[c]})<input type="number" min="0" max="20" step="0.25" placeholder="-" value="${m[k]!=null?m[k]:''}" ${m[c]>0?'':'disabled'} onchange="act.sNote('${m.id}','${k}',this.value)"></label>`;
+    return`<div class="c" style="border-left:4px solid ${esc(m.color||'#2563eb')}"><div class="top" style="margin:0"><div><small class="br">${m.semester} · coef ${m.coeff} · Absences : <span style="color:${m.absences>=3?'var(--er)':'inherit'}">${m.absences||0}</span></small><b>${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="abs" data-i="${m.id}|1" title="Ajouter une absence">🚫</button>${m.absences?`<button class="x-btn" data-a="abs" data-i="${m.id}|-1" title="Retirer une absence">➖</button>`:''}<button class="x-btn" data-a="aiFc" data-i="${m.id}" title="Fiches par IA">✨</button><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>
+    <div class="row" style="margin:6px 0;justify-content:space-between;align-items:center"><span class="chip" style="margin:0;font-weight:700${a==null?'':';background:'+(a>=10?'var(--ok)':'var(--er)')+';color:#fff'}">Moy : ${av}/20</span><button class="b" data-a="chhal" data-i="${m.id}" style="padding:4px 8px;font-size:11px">🎯 Note à viser</button></div>
+    <div class="n3">${inp('ncc','ccc','CC')}${inp('ntp','ctp','TP')}${inp('nex','cex','Examen')}</div>`+
     CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>`<div>${x.isLocal?`<button class="l" data-a="openRes" data-i="${esc(x.localFileId)}">📄 ${esc(x.title)}</button>`:`<a href="${esc(x.url)}" target="_blank" rel="noopener">🔗 ${esc(x.title)}</a>`}<button class="x-btn" data-a="delRes" data-i="${m.id}|${x.id}" aria-label="Supprimer">✕</button></div>`).join('')}</div>`}).join('')+'</div>'
   }).join(''):`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`;
 }
-
-function rMo(){
-  const avg=calcSem();
-  return pills()+`<div class="top"><div><h2>Modules & Cours</h2><small class="br">Moyenne estimée: ${avg}/20 ${avg>=10?'✅':'❌'}</small></div><div><button class="b p" data-a="addMod">+ Module</button></div></div><div class="g" id="mg">${mgrid()}</div>`
-}
-
+function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>Modules & Cours</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b p" data-a="addMod">+ Module</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
 function rFc(){
-  const t=Date.now(), ms=mods(), ids=ms.map(m=>m.id);
-  const l=A.flashcards.filter(f=>ids.includes(f.moduleId) && (cardMod==='all'||f.moduleId===cardMod) && (!f.nextRev||f.nextRev<=t));
-  return pills()+`<div class="top"><h2>Active Recall (A réviser lyoum)</h2><div><button class="b p" data-a="addFc">+ Créer</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
-  (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu" style="color:${modCol(f.moduleId)}">● ${esc(modName(f.moduleId))}</small><span><button class="x-btn" data-a="editFc" data-i="${f.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></span></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div>
-  <div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><div class="row" style="justify-content:center"><button class="b" style="background:#fecaca;color:#991b1b" data-a="sm2" data-i="${f.id}|1">Difficile</button><button class="b" style="background:#bbf7d0;color:#166534" data-a="sm2" data-i="${f.id}|2">Correct</button><button class="b p" data-a="sm2" data-i="${f.id}|3">Facile</button></div></div></div></div>`).join(''):'<p class="mu e" style="grid-column:1/-1">Aucune fiche prévue pour aujourd\'hui. Reposez-vous !</p>')+'</div>';
+  const t=Date.now(),ms=mods(),ids=ms.map(m=>m.id);
+  const all=A.flashcards.filter(f=>ids.includes(f.moduleId)&&(cardMod==='all'||f.moduleId===cardMod));
+  const l=fcAll?all:all.filter(f=>!f.nextRev||f.nextRev<=t);
+  return pills()+`<div class="top"><div><h2>Active Recall</h2><small class="br">${all.filter(f=>!f.nextRev||f.nextRev<=t).length} à réviser · ${all.length} au total</small></div><div><button class="b${fcAll?' p':''}" data-a="fcAll">${fcAll?'Toutes':'À réviser'}</button><button class="b p" data-a="addFc">+ Créer</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
+  (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu" style="color:${modCol(f.moduleId)}">● ${esc(modName(f.moduleId))}</small><span><button class="x-btn" data-a="editFc" data-i="${f.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></span></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div><div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><div class="row" style="justify-content:center;margin:0"><button class="b" style="background:#fecaca;color:#991b1b" data-a="sm2" data-i="${f.id}|1">Difficile</button><button class="b" style="background:#bbf7d0;color:#166534" data-a="sm2" data-i="${f.id}|2">Correct</button><button class="b p" data-a="sm2" data-i="${f.id}|3">Facile</button></div></div></div></div>`).join(''):'<p class="mu e" style="grid-column:1/-1">'+(all.length?'Rien à réviser aujourd\'hui. Bravo !':'Aucune fiche pour ce semestre')+'</p>')+'</div>';
 }
 
 /* ---------- pomodoro ---------- */
 const PM={work:[1500,'Concentration','Travail (25m)'],short:[300,'Pause','Pause (5m)'],long:[900,'Longue pause','Longue (15m)']};
-let P={mode:'work',left:1500,total:1500,end:0,t:null};
-function rPo(){return`<div class="c pm"><div class="row">${Object.keys(PM).map(k=>`<button class="b${P.mode===k?' p':''}" data-a="pmode" data-i="${k}">${PM[k][2]}</button>`).join('')}</div><select id="pms" style="margin-top:12px"><option value="">Focus libre</option>${mods().map(m=>`<option value="${m.id}">${esc(m.name)} (Total: ${Math.round(m.pomo/60)} min)</option>`).join('')}</select><div class="ring"><svg viewBox="0 0 100 100" width="220" height="220"><circle cx="50" cy="50" r="45" fill="none" stroke="var(--in)" stroke-width="5"/><circle id="pp" cx="50" cy="50" r="45" fill="none" stroke="var(--br)" stroke-width="5" stroke-linecap="round" stroke-dasharray="283"/></svg><div><b id="pt"></b><small class="mu" id="pl"></small></div></div><div class="row"><button class="b p" id="pb" data-a="ptoggle" style="min-width:56px">▶</button><button class="b" data-a="preset" aria-label="Réinitialiser">↻</button></div></div>`}
+let P={mode:'work',left:1500,total:1500,end:0,t:null,mod:''};
+function rPo(){return`<div class="c pm"><div class="row">${Object.keys(PM).map(k=>`<button class="b${P.mode===k?' p':''}" data-a="pmode" data-i="${k}">${PM[k][2]}</button>`).join('')}</div><select id="pms" onchange="P.mod=this.value" style="margin-top:12px"><option value="">Focus libre</option>${mods().map(m=>`<option value="${m.id}"${P.mod===m.id?' selected':''}>${esc(m.name)} (total : ${Math.round((m.pomo||0)/60)} min)</option>`).join('')}</select><div class="ring"><svg viewBox="0 0 100 100" width="220" height="220"><circle cx="50" cy="50" r="45" fill="none" stroke="var(--in)" stroke-width="5"/><circle id="pp" cx="50" cy="50" r="45" fill="none" stroke="var(--br)" stroke-width="5" stroke-linecap="round" stroke-dasharray="283"/></svg><div><b id="pt"></b><small class="mu" id="pl"></small></div></div><div class="row"><button class="b p" id="pb" data-a="ptoggle" style="min-width:56px">▶</button><button class="b" data-a="preset" aria-label="Réinitialiser">↻</button></div></div>`}
 function ppaint(){if(!$('pt'))return;$('pt').textContent=String(Math.floor(P.left/60)).padStart(2,'0')+':'+String(P.left%60).padStart(2,'0');$('pl').textContent=PM[P.mode][1];$('pp').style.strokeDashoffset=283-((P.total-P.left)/P.total)*283;$('pb').textContent=P.t?'⏸':'▶'}
-function ptick(){
-  P.left=Math.max(0,Math.round((P.end-Date.now())/1000));ppaint();
-  if(!P.left){
-    clearInterval(P.t);P.t=null;P.left=P.total;
-    if(P.mode==='work'&&$('pms').value){ const m=A.modules.find(x=>x.id===$('pms').value); if(m){m.pomo+=PM.work[0]; upd();} }
-    notify('Pomodoro','Session terminée !');ppaint()
-  }
-}
+function ptick(){P.left=Math.max(0,Math.round((P.end-Date.now())/1000));ppaint();
+  if(!P.left){clearInterval(P.t);P.t=null;P.left=P.total;
+    if(P.mode==='work'&&P.mod){const m=A.modules.find(x=>x.id===P.mod);if(m){m.pomo=(m.pomo||0)+PM.work[0];save()}}
+    notify('Pomodoro','Session terminée !');if(tab==='po')render();else ppaint()}}
 
 /* ---------- render ---------- */
-const R={da:rDa, tt:rTT,ag:rAg,mo:rMo,fc:rFc,po:rPo};
+const R={da:rDa,tt:rTT,ag:rAg,mo:rMo,fc:rFc,po:rPo};
 function render(){$('v').innerHTML=banner()+R[tab]();ppaint()}
 function go(t){tab=t;document.querySelectorAll('#nav [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render();
   try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission()}catch(e){}}
@@ -259,11 +220,11 @@ function go(t){tab=t;document.querySelectorAll('#nav [data-t]').forEach(b=>b.cla
 function modForm(m){ask(m?'Modifier le module':'Nouveau module',[
   {k:'semester',l:'Semestre',t:'select',o:ALLS.map(s=>[s,s]),v:m?.semester||A.activeSemester},
   {k:'name',l:'Nom du module',r:1,v:m?.name},{k:'prof',l:'Professeur (optionnel)',v:m?.prof},
-  {k:'color',l:'Couleur (code HEX)',v:m?.color||'#2563eb'},
-  {k:'coeff',l:'Coefficient Global',t:'number',a:' min="0.5" step="0.5"',v:m?.coeff??1},
-  {k:'ccc',l:'Coeff CC',t:'number',a:' step="0.5"',v:m?.ccc??0},{k:'ctp',l:'Coeff TP',t:'number',a:' step="0.5"',v:m?.ctp??0},{k:'cex',l:'Coeff Examen',t:'number',a:' step="0.5"',v:m?.cex??1}],v=>{
-  const o={semester:v.semester,name:v.name.trim(),prof:v.prof.trim(),color:v.color,coeff:+v.coeff||1,ccc:+v.ccc,ctp:+v.ctp,cex:+v.cex};
-  m?Object.assign(m,o):A.modules.push({id:uid('m'),resources:[],absences:0,pomo:0,...o});upd();toast('Module enregistré','ok')})}
+  {k:'color',l:'Couleur',t:'color',v:m?.color||'#2563eb'},
+  {k:'coeff',l:'Coefficient du module (pour la moyenne du semestre)',t:'number',a:' min="0.5" step="0.5"',v:m?.coeff??1},
+  {k:'ccc',l:'Poids du CC',t:'number',a:' min="0" step="0.5"',v:m?.ccc??0},{k:'ctp',l:'Poids du TP',t:'number',a:' min="0" step="0.5"',v:m?.ctp??0},{k:'cex',l:"Poids de l'examen",t:'number',a:' min="0" step="0.5"',v:m?.cex??1}],v=>{
+  const o={semester:v.semester,name:v.name.trim(),prof:v.prof.trim(),color:v.color||'#2563eb',coeff:+v.coeff||1,ccc:+v.ccc||0,ctp:+v.ctp||0,cex:+v.cex||0};
+  m?Object.assign(m,o):A.modules.push({id:uid('m'),resources:[],absences:0,pomo:0,ncc:null,ntp:null,nex:null,...o});upd();toast('Module enregistré','ok')})}
 const needMod=()=>mods().length?false:(toast("Ajoutez d'abord un module pour ce semestre",'er'),true);
 const modOpts=()=>mods().map(m=>[m.id,m.name]);
 
@@ -280,54 +241,12 @@ const act={
   delMod:i=>{if(!confirm('Supprimer ce module, ses séances, devoirs et fiches ?'))return;
     (A.modules.find(m=>m.id===i)?.resources||[]).forEach(r=>r.isLocal&&fst('delete',r.localFileId).catch(()=>{}));
     A.modules=A.modules.filter(x=>x.id!==i);for(const k of ['timetable','tasks','flashcards'])A[k]=A[k].filter(x=>x.moduleId!==i);upd()},
-  sNote:(id,k,v)=>{const m=A.modules.find(x=>x.id===id); if(m){m[k]=v!==''?+v:null; upd();} },
-  abs:(i)=>{const [id,v]=i.split('|'); const m=A.modules.find(x=>x.id===id); if(m){m.absences=Math.max(0,(m.absences||0)+(+v)); upd();} },
-  chhal:(i)=>{
-    const m=A.modules.find(x=>x.id===i); if(!m||m.cex===0) return toast("Coefficient examen invalide ou nul",'er');
-    const tot=(m.ccc+m.ctp+m.cex), act=(m.ncc||0)*m.ccc + (m.ntp||0)*m.ctp;
-    const req=((10*tot - act)/m.cex).toFixed(2);
-    alert(req>20 ? `Désolé, impossible d'avoir la moyenne (il te faut ${req}/20 à l'examen)` : req<=0 ? `Tu as déjà validé ! (Il te faut ${req}/20 à l'examen)` : `Il te faut ${req}/20 à l'examen pour valider à 10 de moyenne.`);
-  },
   addTask:()=>{if(needMod())return;ask('Ajouter une échéance',[{k:'title',l:'Titre',r:1},{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'type',l:'Type',t:'select',o:[['exam','🚨 Examen'],['homework','📝 Devoir']]},{k:'dueDate',l:'Date et heure',t:'datetime-local',r:1}],v=>{A.tasks.push({id:uid('t'),...v,title:v.title.trim(),completed:false});upd();toast('Échéance ajoutée','ok')})},
   done:i=>{const t=A.tasks.find(x=>x.id===i);if(t){t.completed=!t.completed;upd()}},
   delTask:i=>{A.tasks=A.tasks.filter(x=>x.id!==i);upd()},
-  addFc:()=>{if(needMod())return;ask('Nouvelle fiche',[{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'q',l:'Question (recto)',t:'textarea',r:1},{k:'a',l:'Réponse (verso)',t:'textarea',r:1}],v=>{A.flashcards.push({id:uid('f'),moduleId:v.moduleId,q:v.q.trim(),a:v.a.trim(),efactor:2.5,interval:0,repetition:0,nextRev:Date.now()});upd();toast('Fiche créée','ok')})},
+  addFc:()=>{if(needMod())return;ask('Nouvelle fiche',[{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'q',l:'Question (recto)',t:'textarea',r:1},{k:'a',l:'Réponse (verso)',t:'textarea',r:1}],v=>{A.flashcards.push({id:uid('f'),moduleId:v.moduleId,q:v.q.trim(),a:v.a.trim()});upd();toast('Fiche créée','ok')})},
   delFc:i=>{A.flashcards=A.flashcards.filter(x=>x.id!==i);upd()},
   flip:(i,b)=>b.classList.toggle('fl'),
-  sm2:(i,ev)=>{
-    ev.stopPropagation(); const [id,q]=i.split('|'); const c=A.flashcards.find(f=>f.id===id);
-    if(+q===1){c.repetition=0; c.interval=1;}
-    else{
-      if(c.repetition===0) c.interval=1;
-      else if(c.repetition===1) c.interval=6;
-      else c.interval=Math.round(c.interval*c.efactor);
-      c.repetition++;
-    }
-    c.efactor=Math.max(1.3, c.efactor+(0.1-(3-(+q))*(0.08+(3-(+q))*0.02)));
-    c.nextRev=Date.now()+c.interval*86400000;
-    toast(`Planifié dans ${c.interval} j`,'ok'); upd();
-  },
-  aiFc:async(id)=>{
-    const prov=localStorage.getItem('eduVault_aiProv')||'gemini';
-    const key=localStorage.getItem('eduVault_aiKey_'+prov) || (prov==='gemini'?localStorage.getItem('eduVault_aiKey'):'');
-    if(!key) return toast("Configurez d'abord l'IA dans les réglages (Importation IA) !",'er');
-    const txt = prompt("Collez le texte du cours pour générer les fiches (Active Recall) :"); if(!txt) return;
-    toast("Génération par IA en cours...");
-    try{
-      const model=localStorage.getItem('eduVault_aiModel_'+prov)||AI[prov].model;
-      let raw;
-      if(prov==='groq'){
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},body:JSON.stringify({model:model,temperature:0.2,messages:[{role:'user',content:`Génère 5 flashcards Q/R en JSON strict : [{"q":"Question","a":"Réponse"}]. Texte: ${txt}`}]})});
-        raw = (await res.json()).choices[0].message.content;
-      }else{
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:`Génère 5 flashcards Q/R en JSON strict : [{"q":"Question","a":"Réponse"}]. Texte: ${txt}`}]}],generationConfig:{temperature:0.2}})});
-        raw = (await res.json()).candidates[0].content.parts[0].text;
-      }
-      const cards = JSON.parse(raw.slice(raw.indexOf('['), raw.lastIndexOf(']')+1));
-      cards.forEach(c => A.flashcards.push({id:uid('f'),moduleId:id,q:c.q,a:c.a,efactor:2.5,interval:0,repetition:0,nextRev:Date.now()}));
-      toast(`${cards.length} fiches IA générées !`,'ok'); upd();
-    }catch(e){toast("Erreur IA: format inattendu",'er')}
-  },
   addRes:i=>{const m=A.modules.find(x=>x.id===i);ask('Ajouter un document',[{k:'type',l:'Catégorie',t:'select',o:CATS},{k:'title',l:'Titre',r:1},{k:'src',l:'Source',t:'select',o:[['local','Fichier local (sur cet appareil)'],['drive','Téléverser sur Google Drive'],['url','Lien web']]},{k:'file',l:'Fichier (local / Drive)',t:'file'},{k:'url',l:'Lien (si Lien web)',t:'url'}],async(v,fd)=>{
     try{const f=fd.get('file'),r={id:uid('r'),title:v.title.trim(),type:v.type};
       if(v.src==='url'){if(!v.url)throw Error('Saisissez une URL');r.url=v.url;r.isLocal=false}
@@ -352,35 +271,72 @@ const act={
     ask('Importation IA',[{k:'prov',l:'Fournisseur',t:'select',o:Object.keys(AI).map(k=>[k,AI[k].n]),v:p0},{k:'key',l:'Clé API (Gemini : aistudio.google.com/apikey · Groq : console.groq.com/keys)',t:'password',r:1,v:aiKey(p0)},{k:'model',l:'Modèle avec vision',r:1,v:aiModel(p0)},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport);
     const f=$('dlg').querySelector('form'),sel=f.elements.prov;sel.onchange=()=>{f.elements.key.value=aiKey(sel.value);f.elements.model.value=aiModel(sel.value)}},
   drive:async()=>{if(tok){tok=null;paintDrive();return toast('Drive déconnecté')}
-    try{await lib('https://accounts.google.com/gsi/client');tc=tc||google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.file',callback:r=>{if(r.error)return toast('Échec authentification Drive','er');tok=r.access_token;paintDrive();toast('Connecté à Google Drive','ok');if(!A.modules.length)drvLoad().catch(()=>{})}});tc.requestAccessToken()}catch(e){toast(e.message,'er')}},
+    try{await lib('https://accounts.google.com/gsi/client');tc=tc||google.accounts.oauth2.initTokenClient({client_id:cid(),scope:'https://www.googleapis.com/auth/drive.file',callback:r=>{if(r.error)return toast('Échec authentification Drive','er');tok=r.access_token;paintDrive();toast('Connecté à Google Drive','ok');if(!A.modules.length)drvLoad().catch(()=>{})}});tc.requestAccessToken()}catch(e){toast(e.message,'er')}},
   set:()=>settings(),
   addHol:()=>{const a=$('h1').value,b=$('h2').value||a;if(!a||b<a)return toast('Dates invalides','er');const d=new Date(a+'T00:00');for(let n=0;iso(d)<=b&&n<400;n++){const s=iso(d);if(!isHol(s))A.settings.holidays.push(s);d.setDate(d.getDate()+1)}upd();settings()},
   delHol:i=>{const[a,b]=i.split('|');A.settings.holidays=A.settings.holidays.filter(d=>d<a||d>b);upd();settings()},
   exp:()=>{dlBlob('EduVault_Sauvegarde_'+iso(new Date())+'.json',new Blob([JSON.stringify(A,null,2)],{type:'application/json'}));toast('Sauvegarde exportée','ok')},
-  imp:()=>$('jf').click(),
-  expics:()=>{
-    let ics="BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//EduVault//FR\n";
-    const p=(n)=>String(n).padStart(2,'0');
-    A.timetable.forEach(c=>{
-      const d=DAYS.indexOf(c.day)+1; const dt=`202610${p(4+d)}`;
-      ics+=`BEGIN:VEVENT\nSUMMARY:${modName(c.moduleId)}\nRRULE:FREQ=WEEKLY;BYDAY=${c.day.substring(0,2).toUpperCase()}\nDTSTART;TZID=Europe/Paris:${dt}T${c.startTime.replace(':','')}00\nDTEND;TZID=Europe/Paris:${dt}T${c.endTime.replace(':','')}00\nEND:VEVENT\n`;
-    });
-    ics+="END:VCALENDAR";
-    dlBlob('EmploiDuTemps.ics',new Blob([ics],{type:'text/calendar'})); toast("Calendrier ICS exporté !",'ok');
-  }
+  imp:()=>$('jf').click()
 };
 function clsForm(c){ask(c?'Modifier la séance':'Séance',[{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:c?.moduleId},{k:'day',l:'Jour',t:'select',o:DAYS.map(d=>[d,d]),v:c?.day},{k:'week',l:'Semaine',t:'select',o:[['all','Toutes les semaines'],['A','Semaine A'],['B','Semaine B']],v:c?.week},{k:'startTime',l:'Début',t:'time',r:1,v:c?.startTime},{k:'endTime',l:'Fin',t:'time',r:1,v:c?.endTime},{k:'room',l:'Salle ou amphi',r:1,v:c?.room}],v=>{
   if(v.endTime<=v.startTime)return toast("L'heure de fin doit être après le début",'er');c?Object.assign(c,v):A.timetable.push({id:uid('c'),...v});upd();toast('Séance enregistrée','ok')})}
 function taskForm(t){ask(t?"Modifier l'échéance":'Ajouter une échéance',[{k:'title',l:'Titre',r:1,v:t?.title},{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:t?.moduleId},{k:'type',l:'Type',t:'select',o:[['exam','🚨 Examen'],['homework','📝 Devoir']],v:t?.type},{k:'dueDate',l:'Date et heure',t:'datetime-local',r:1,v:t?.dueDate}],v=>{
   v.title=v.title.trim();if(t){Object.assign(t,v);fired.delete(t.id+'h');fired.delete(t.id+'d')}else A.tasks.push({id:uid('t'),...v,completed:false});upd();toast('Échéance enregistrée','ok')})}
 function fcForm(f){ask(f?'Modifier la fiche':'Nouvelle fiche',[{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:f?.moduleId},{k:'q',l:'Question (recto)',t:'textarea',r:1,v:f?.q},{k:'a',l:'Réponse (verso)',t:'textarea',r:1,v:f?.a}],v=>{
-  v.q=v.q.trim();v.a=v.a.trim();f?Object.assign(f,v):A.flashcards.push({id:uid('f'),efactor:2.5,interval:0,repetition:0,nextRev:Date.now(),...v});upd();toast('Fiche enregistrée','ok')})}
+  v.q=v.q.trim();v.a=v.a.trim();f?Object.assign(f,v):A.flashcards.push(newCard(v));upd();toast('Fiche enregistrée','ok')})}
 Object.assign(act,{
   addCls:()=>{if(!needMod())clsForm()},editCls:i=>{$('dlg').close();clsForm(A.timetable.find(x=>x.id===i))},
   addTask:()=>{if(!needMod())taskForm()},editTask:i=>taskForm(A.tasks.find(x=>x.id===i)),
   addFc:()=>{if(!needMod())fcForm()},editFc:i=>fcForm(A.flashcards.find(x=>x.id===i)),
   dsave:()=>drvSave().catch(e=>toast(e.message,'er')),dload:()=>drvLoad().catch(e=>toast(e.message,'er'))});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&act[b.dataset.a])act[b.dataset.a](b.dataset.i,b)});
+const newCard=o=>({id:uid('f'),efactor:2.5,interval:0,repetition:0,nextRev:Date.now(),...o});
+const cid=()=>localStorage.getItem('eduVault_cid')||CLIENT_ID;
+Object.assign(act,{
+  go:i=>go(i),
+  sgo:i=>{const[t,sm]=i.split('|');if(sm)A.activeSemester=sm;$('sq').value='';$('s-res').style.display='none';go(t)},
+  fcAll:()=>{fcAll=!fcAll;render()},
+  sNote:(id,k,v)=>{const m=A.modules.find(x=>x.id===id);if(m){m[k]=v===''?null:Math.min(20,Math.max(0,+v));upd()}},
+  abs:i=>{const[id,d]=i.split('|'),m=A.modules.find(x=>x.id===id);if(m){m.absences=Math.max(0,(m.absences||0)+(+d));upd()}},
+  chhal:i=>{const m=A.modules.find(x=>x.id===i);if(!m)return;
+    if(!(m.cex>0))return toast("Le poids de l'examen est nul : modifiez le module",'er');
+    let t=m.cex,s=0;[['ncc','ccc'],['ntp','ctp']].forEach(([n,c])=>{if(m[n]!=null&&m[c]>0){t+=m[c];s+=m[n]*m[c]}});
+    const req=(10*t-s)/m.cex;
+    alert(req>20?'Impossible de valider à 10 : il faudrait '+req.toFixed(2)+'/20 à l\'examen.':req<=0?'Module déjà validé : même 0/20 à l\'examen suffit.':'Il te faut '+req.toFixed(2)+'/20 à l\'examen pour avoir 10 de moyenne.')},
+  sm2:i=>{const[id,qs]=i.split('|'),q=+qs,c=A.flashcards.find(f=>f.id===id);if(!c)return;
+    c.efactor=c.efactor||2.5;c.repetition=c.repetition||0;c.interval=c.interval||0;
+    if(q===1){c.repetition=0;c.interval=1}
+    else{c.interval=c.repetition===0?1:c.repetition===1?(q===3?8:6):Math.max(1,Math.round(c.interval*c.efactor*(q===3?1.3:1)));c.repetition++}
+    c.efactor=Math.max(1.3,+(c.efactor+(q===3?.15:q===2?0:-.2)).toFixed(2));
+    c.nextRev=Date.now()+c.interval*864e5;toast('Prochaine révision dans '+c.interval+' j','ok');upd()},
+  aiFc:async id=>{
+    const prov=localStorage.getItem('eduVault_aiProv')||'gemini',key=aiKey(prov);
+    if(!key)return toast("Configurez d'abord l'IA : bouton ✨ IA dans Horaires",'er');
+    const txt=prompt('Collez le texte du cours pour générer les fiches :');if(!txt||!txt.trim())return;
+    toast('Génération des fiches...');
+    try{
+      const raw=(await aiCall(prov,key,aiModel(prov),[],'Génère 5 à 8 flashcards question/réponse en français à partir de ce cours. Réponds STRICTEMENT avec un tableau JSON valide, sans markdown : [{"q":"Question","a":"Réponse"}].\n\nCours :\n'+txt.slice(0,12000))).replace(/<think>[\s\S]*?<\/think>/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
+      if(a<0||b<a)throw Error("réponse sans JSON valide");
+      const cards=JSON.parse(raw.slice(a,b+1)).filter(c=>c.q&&c.a);
+      if(!cards.length)throw Error('aucune fiche générée');
+      cards.forEach(c=>A.flashcards.push(newCard({moduleId:id,q:String(c.q),a:String(c.a)})));
+      upd();toast(cards.length+' fiches créées','ok');
+    }catch(e){toast(e instanceof TypeError?'Connexion impossible (internet, Brave Shields, VPN)':'Erreur IA : '+e.message,'er')}},
+  expics:()=>{
+    const p=n=>String(n).padStart(2,'0'),BY=['MO','TU','WE','TH','FR','SA','SU'],ie=x=>String(x||'').replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n'),
+      mon=monday(new Date()),stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+    const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//EduVault//FR','CALSCALE:GREGORIAN'];
+    A.timetable.forEach(c=>{const di=DAYS.indexOf(c.day);if(di<0)return;
+      const d=new Date(mon);d.setDate(mon.getDate()+di+(c.week!=='all'&&c.week!==curWeek()?7:0));
+      const ds=d.getFullYear()+p(d.getMonth()+1)+p(d.getDate()),t=x=>String(x).replace(':','')+'00';
+      L.push('BEGIN:VEVENT','UID:'+c.id+'@eduvault','DTSTAMP:'+stamp,'DTSTART:'+ds+'T'+t(c.startTime),'DTEND:'+ds+'T'+t(c.endTime),
+        'RRULE:FREQ=WEEKLY;'+(c.week==='all'?'':'INTERVAL=2;')+'BYDAY='+BY[di]+';COUNT='+(c.week==='all'?20:10),
+        'SUMMARY:'+ie(modName(c.moduleId)),'LOCATION:'+ie(c.room),'BEGIN:VALARM','TRIGGER:-PT30M','ACTION:DISPLAY','DESCRIPTION:Cours dans 30 min','END:VALARM','END:VEVENT')});
+    L.push('END:VCALENDAR');
+    dlBlob('EmploiDuTemps.ics',new Blob([L.join('\r\n')+'\r\n'],{type:'text/calendar'}));toast('Calendrier .ics exporté','ok')},
+  setCid:()=>ask('Client ID Google (OAuth)',[{k:'cid',l:"Client ID (…apps.googleusercontent.com). L'adresse de cette page doit être une origine autorisée dans Google Cloud.",v:localStorage.getItem('eduVault_cid')||''}],v=>{
+    v.cid.trim()?localStorage.setItem('eduVault_cid',v.cid.trim()):localStorage.removeItem('eduVault_cid');tc=null;tok=null;paintDrive();toast('Client ID enregistré','ok')})
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.s-bar'))$('s-res').style.display='none';const b=e.target.closest('[data-a]');if(b&&act[b.dataset.a])act[b.dataset.a](b.dataset.i,b)});
 $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)go(b.dataset.t)});
 
 /* ---------- class details (notes + photos) ---------- */
@@ -398,11 +354,11 @@ function settings(){
   d.innerHTML=`<h3>⚙️ Réglages</h3><label>Niveau actuel<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
   <label>Semaine actuelle (l'alternance A/B est automatique)<select onchange="chgWk(this.value)"><option value="A"${curWeek()==='A'?' selected':''}>Semaine A</option><option value="B"${curWeek()==='B'?' selected':''}>Semaine B</option></select></label>
   <label>Vacances & jours chômés (du / au)<span class="row" style="margin:4px 0 0"><input type="date" id="h1" aria-label="Du"><input type="date" id="h2" aria-label="Au"><button class="b p" data-a="addHol">+</button></span></label>
-  <div>${ranges().map(r=>`<span class="chip">${r[0]===r[1]?r[0]:r[0]+' → '+r[1]}<button class="x-btn" data-a="delHol" data-i="${r[0]}\vert{}${r[1]}" aria-label="Supprimer">✕</button></span>`).join('')}</div>
+  <div>${ranges().map(r=>`<span class="chip">${r[0]===r[1]?r[0]:r[0]+' → '+r[1]}<button class="x-btn" data-a="delHol" data-i="${r[0]}|${r[1]}" aria-label="Supprimer">✕</button></span>`).join('')}</div>
   <label>☁️ Google Drive <small class="mu">${tok?'Connecté':'Non connecté'}${localStorage.getItem('eduVault_lastSync')?' · dernière sauvegarde '+new Date(localStorage.getItem('eduVault_lastSync')).toLocaleString('fr-FR'):''}</small></label>
-  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="expics">📅 Exporter ICS</button><button class="b" data-a="drive">${tok?'Déconnecter':'Se connecter'}</button><button class="b" data-a="dsave">⬆ Sauvegarder</button><button class="b" data-a="dload">⬇ Restaurer</button></div>
-  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${localStorage.getItem('eduVault_auto')==='1'?'checked':''} onchange="localStorage.setItem('eduVault_auto',this.checked?'1':'0');if(this.checked&&tok)drvSave(true).catch(e=>toast(e.message,'er'))"> Sauvegarde automatique Drive</label>
-  <div class="row"><button class="b" data-a="exp">⬇ Exporter JSON</button><button class="b" data-a="imp">⬆ Importer JSON</button><button class="b p" onclick="$('dlg').close()">Fermer</button></div><input type="file" id="jf" accept=".json,application/json" hidden>`;
+  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="expics">📅 Export .ics</button><button class="b" data-a="drive">${tok?'Déconnecter':'Se connecter'}</button><button class="b" data-a="setCid" title="Client ID Google">🔑</button><button class="b" data-a="dsave">⬆ Sauvegarder</button><button class="b" data-a="dload">⬇ Restaurer</button></div>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${localStorage.getItem('eduVault_auto')==='1'?'checked':''} onchange="localStorage.setItem('eduVault_auto',this.checked?'1':'0');if(this.checked&&tok)drvSave(true).catch(e=>toast(e.message,'er'))"> Sauvegarde automatique après chaque modification</label>
+  <div class="row"><button class="b" data-a="exp">⬇ Exporter</button><button class="b" data-a="imp">⬆ Importer</button><button class="b p" onclick="$('dlg').close()">Fermer</button></div><input type="file" id="jf" accept=".json,application/json" hidden>`;
   $('jf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||!Array.isArray(o.modules))throw 0;if(!confirm('Remplacer toutes vos données par cette sauvegarde ?'))return;load(o);upd();$('dlg').close();toast('Sauvegarde restaurée','ok')}catch(x){toast('Format JSON invalide','er')}};r.readAsText(f)};
   d.oncancel=null;d.showModal();
 }
@@ -416,7 +372,7 @@ const fst=async(m,...a)=>{const d=await idb();return new Promise((ok,ko)=>{const
 /* ---------- AI import ---------- */
 async function toImages(f){
   if(f.type==='application/pdf'||/\.pdf$/i.test(f.name)){
-    await lib(PDFJS+'min.js');pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'worker.min.js';
+    await lib(PDFJS+'min.js');await lib(PDFJS+'worker.min.js').catch(()=>{});pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'worker.min.js';
     const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,out=[];
     for(let i=1;i<=Math.min(pdf.numPages,3);i++){const pg=await pdf.getPage(i),vp=pg.getViewport({scale:1.5}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;out.push(c.toDataURL('image/jpeg',.85))}
     return out}
@@ -424,13 +380,24 @@ async function toImages(f){
 }
 const normDay=s=>{const x=String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return DAYS.find(d=>d.toLowerCase()===x)};
 const AI_PROMPT='Extrais l\'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"jour":"LUNDI","debut":"08:30","fin":"10:30","matiere":"Nom du module","salle":"Amphi A"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI).';
-async function aiCall(prov,key,model,imgs){
+async function postJSON(url,headers,body){
+  let r,j;
+  for(let t=1;t<=5;t++){
+    r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify(body)});
+    j=await r.json().catch(()=>({}));
+    if(r.ok||![429,500,503,504].includes(r.status)||t===5)break;
+    toast('IA occupée, nouvelle tentative '+t+'/4...');await new Promise(z=>setTimeout(z,t*3000));
+  }
+  return{ok:r.ok,status:r.status,j};
+}
+async function aiCall(prov,key,model,imgs,prompt=AI_PROMPT){
+  imgs=imgs||[];
   if(prov==='groq'){
-    const call=async m=>{const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},
-      body:JSON.stringify({model:m,temperature:.1,max_completion_tokens:4096,messages:[{role:'user',content:[{type:'text',text:AI_PROMPT},...imgs.map(u=>({type:'image_url',image_url:{url:u}}))]}]})});
-      return{ok:res.ok,status:res.status,j:await res.json().catch(()=>({}))}};
+    const content=imgs.length?[{type:'text',text:prompt},...imgs.map(u=>({type:'image_url',image_url:{url:u}}))]:prompt;
+    const call=m=>postJSON('https://api.groq.com/openai/v1/chat/completions',{Authorization:'Bearer '+key},{model:m,temperature:.1,max_completion_tokens:4096,messages:[{role:'user',content}]});
     let r=await call(model);
     if(!r.ok&&/model|not exist|access/i.test(r.j.error?.message||'')){
+      /* modele inconnu pour cette cle : on liste les modeles du compte et on essaie les modeles vision */
       const ml=await fetch('https://api.groq.com/openai/v1/models',{headers:{Authorization:'Bearer '+key}}).then(x=>x.json()).catch(()=>({})),
         ids=(ml.data||[]).map(x=>x.id),alt=ids.filter(i=>i!==model&&/llama-4|scout|maverick|vision|-vl|qwen/i.test(i)).slice(0,4);
       for(const m of alt){r=await call(m);if(r.ok){localStorage.setItem('eduVault_aiModel_groq',m);toast('Modèle utilisé : '+m,'ok');break}}
@@ -439,11 +406,12 @@ async function aiCall(prov,key,model,imgs){
     if(!r.ok)throw Error(r.j.error?.message||'Erreur Groq HTTP '+r.status);
     return r.j.choices?.[0]?.message?.content||'';
   }
-  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{parts:[{text:AI_PROMPT},...imgs.map(i=>({inline_data:{mime_type:'image/jpeg',data:i.split(',')[1]}}))]}],generationConfig:{temperature:.1}})});
-  const j=await res.json().catch(()=>({}));if(!res.ok)throw Error(j.error?.message||'Erreur Gemini HTTP '+res.status);
-  return(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+  const r=await postJSON(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,{},
+    {contents:[{parts:[{text:prompt},...imgs.map(i=>({inline_data:{mime_type:'image/jpeg',data:i.split(',')[1]}}))]}],generationConfig:{temperature:.1}});
+  if(!r.ok)throw Error(r.j.error?.message||'Erreur Gemini HTTP '+r.status);
+  return(r.j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
 }
+const hm=t=>{const m=String(t||'').match(/(\d{1,2})\s*[:hH]\s*(\d{2})/);return m?m[1].padStart(2,'0')+':'+m[2]:null};
 async function aiImport(v,fd){
   const f=fd.get('file');if(!f||!f.size)return toast('Sélectionnez un document','er');
   const prov=AI[v.prov]?v.prov:'gemini',key=v.key.trim(),model=v.model.trim();
@@ -452,17 +420,19 @@ async function aiImport(v,fd){
   try{
     const raw=(await aiCall(prov,key,model,await toImages(f))).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```(?:json)?/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
     if(a<0||b<a)throw Error("L'IA n'a pas renvoyé de JSON valide.");
-    const ss=JSON.parse(raw.slice(a,b+1)).filter(s=>s.matiere&&s.debut&&s.fin&&normDay(s.jour));
+    const ss=JSON.parse(raw.slice(a,b+1)).map(s=>({...s,debut:hm(s.debut),fin:hm(s.fin)})).filter(s=>s.matiere&&s.debut&&s.fin&&s.fin>s.debut&&normDay(s.jour));
     if(!ss.length)throw Error('Aucun cours trouvé dans ce document.');
-    ss.forEach(s=>{let m=A.modules.find(x=>x.semester===A.activeSemester&&x.name.toLowerCase()===String(s.matiere).toLowerCase());
-      if(!m){m={id:uid('m'),semester:A.activeSemester,name:String(s.matiere),prof:s.prof||'',coeff:1,grade:null,color:'#2563eb',ccc:0,ctp:0,cex:1,absences:0,pomo:0,resources:[]};A.modules.push(m)}
-      A.timetable.push({id:uid('c'),moduleId:m.id,day:normDay(s.jour),week:'all',startTime:s.debut,endTime:s.fin,room:s.salle||'Salle'})});
-    upd();toast(ss.length+' séances importées !','ok');
-  }catch(e){toast('Erreur IA : '+e.message,'er')}
+    let added=0;
+    ss.forEach(s=>{const name=String(s.matiere).trim(),day=normDay(s.jour);
+      let m=A.modules.find(x=>x.semester===A.activeSemester&&x.name.toLowerCase()===name.toLowerCase());
+      if(!m){m={id:uid('m'),semester:A.activeSemester,name,prof:s.prof||'',coeff:1,color:'#2563eb',ccc:0,ctp:0,cex:1,ncc:null,ntp:null,nex:null,absences:0,pomo:0,resources:[]};A.modules.push(m)}
+      if(!A.timetable.some(c=>c.moduleId===m.id&&c.day===day&&c.startTime===s.debut&&c.endTime===s.fin)){A.timetable.push({id:uid('c'),moduleId:m.id,day,week:'all',startTime:s.debut,endTime:s.fin,room:s.salle||'Salle'});added++}});
+    upd();toast(added+' séances importées'+(added<ss.length?' ('+(ss.length-added)+' déjà présentes)':'')+' !','ok');
+  }catch(e){toast(e instanceof TypeError?'Connexion impossible (internet, Brave Shields, VPN)':'Erreur IA : '+e.message,'er')}
 }
 
 /* ---------- Google Drive : sauvegarde / restauration ---------- */
-const GAPI='[https://www.googleapis.com/',DFILE='EduVault_backup.json](https://www.googleapis.com/',DFILE='EduVault_backup.json)';
+const GAPI='https://www.googleapis.com/',DFILE='EduVault_backup.json';
 async function dfetch(url,opt={}){
   if(!tok)throw Error('Connectez-vous d\'abord à Google Drive (bouton ☁️)');
   const r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+tok}});
