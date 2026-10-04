@@ -1,1467 +1,297 @@
 <!DOCTYPE html>
 <html lang="fr" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1e3a8a">
-  <title>EduVault - Academic App</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: { extend: { colors: { brand: { 50: '#f0f7ff', 100: '#e0effe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a' } } } }
-    }
-  </script>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <style>
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
-    .perspective-1000 { perspective: 1000px; }
-    .transform-style-3d { transform-style: preserve-3d; }
-    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-    .rotate-y-180 { transform: rotateY(180deg); }
-    main { padding-bottom: 85px; }
-    @media (min-width: 1024px) { main { padding-bottom: 10px; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1e3a8a">
+<title>EduVault</title>
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--tx:#111827;--mu:#6b7280;--ln:#e5e7eb;--br:#2563eb;--bs:#e0edff;--er:#dc2626;--ok:#059669;--in:#f3f4f6}
+.dark{--bg:#111827;--card:#1f2937;--tx:#f3f4f6;--mu:#9ca3af;--ln:#374151;--bs:#1e3a8a66;--in:#374151}
+*{box-sizing:border-box;margin:0}
+body{font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);-webkit-tap-highlight-color:transparent;padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--ln);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{font-size:18px;font-weight:800;color:var(--br)}h2{font-size:17px}h3{margin-bottom:6px}h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:8px}
+main{max-width:1000px;margin:auto;padding:14px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--ln);padding:4px 4px calc(4px + env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;border:0;background:none;color:var(--mu);font:inherit;font-size:11px;font-weight:700;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+nav button span{font-size:19px}nav .on{color:var(--br)}
+.b{border:0;border-radius:12px;padding:8px 12px;background:var(--in);color:var(--tx);font:inherit;font-weight:700;cursor:pointer}.p{background:var(--br);color:#fff}
+.c{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.top>div:last-child{display:flex;gap:6px}
+.br{color:var(--br);font-weight:700}.mu{color:var(--mu)}small{font-size:11px;display:block}
+.cl{background:var(--bs);border-radius:12px;padding:9px;margin-bottom:8px;cursor:pointer;border:1px solid transparent}.cl.nt{border-color:#f59e0b}.cl b{display:block}
+.e{text-align:center;border:1px dashed var(--ln);border-radius:12px;padding:10px;font-size:12px}
+.up{background:linear-gradient(90deg,#f59e0b,#ea580c);color:#fff;border-radius:16px;padding:12px;font-weight:700;margin-bottom:12px;cursor:pointer}
+.pills{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px}.pills .b.p{box-shadow:0 2px 8px #2563eb55}
+.row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.row input{flex:1;min-width:0;margin:0}
+.t{display:flex;align-items:center;gap:10px;margin-bottom:8px}.t>div{flex:1}.t.x{border-color:#f87171}.t.d>div{opacity:.5;text-decoration:line-through}.t input{width:18px;margin:0}
+.x-btn{border:0;background:none;color:var(--mu);cursor:pointer;font-size:15px}
+.rs{background:var(--in);border-radius:12px;padding:8px;margin-top:6px;font-size:12px}.rs div{display:flex;justify-content:space-between;gap:6px;background:var(--card);border-radius:8px;padding:5px 8px;margin-top:4px}.rs a,.rs button.l{color:var(--br);background:none;border:0;font:inherit;text-align:left;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.chip{display:inline-flex;gap:6px;background:var(--in);border-radius:8px;padding:3px 8px;font-size:11px;margin:3px 3px 0 0}
+.fc{perspective:900px;height:200px;cursor:pointer}.fi{position:relative;height:100%;transition:transform .5s;transform-style:preserve-3d}.fc.fl .fi{transform:rotateY(180deg)}
+.fa,.fb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:14px;border-radius:16px;border:1px solid var(--ln);background:var(--card);overflow:auto;display:flex;flex-direction:column;justify-content:space-between}
+.fb{transform:rotateY(180deg);background:var(--bs);border:2px solid var(--br)}
+.pm{max-width:420px;margin:auto;text-align:center}.pm .row{justify-content:center}.ring{position:relative;width:220px;height:220px;margin:18px auto}.ring svg{transform:rotate(-90deg)}.ring div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.ring b{font-size:44px}
+dialog{border:0;border-radius:20px;padding:18px;width:min(440px,94vw);max-height:88vh;background:var(--card);color:var(--tx)}dialog::backdrop{background:#0009}
+label{display:block;font-size:12px;font-weight:600;margin:8px 0;color:var(--mu)}
+input,select,textarea{width:100%;margin-top:4px;padding:10px;border:0;border-radius:12px;background:var(--in);color:var(--tx);font:inherit}
+.ph{display:flex;gap:8px;overflow-x:auto;margin:8px 0}.ph div{position:relative;flex:none}.ph img{width:64px;height:64px;object-fit:cover;border-radius:10px}.ph button{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;border:0;background:var(--er);color:#fff;font-size:11px}
+#ts{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99;display:grid;gap:6px;pointer-events:none;width:92%;max-width:420px}#ts div{color:#fff;border-radius:99px;padding:9px 14px;font-weight:700;font-size:12px;text-align:center;background:#111827}
+#ts .er{background:var(--er)}#ts .ok{background:var(--ok)}
+:focus-visible{outline:3px solid var(--br);outline-offset:2px}
+</style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
-
-  <!-- ONBOARDING MODAL -->
-  <div id="onboardingModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/90 backdrop-blur-md hidden p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl space-y-5">
-      <div class="w-14 h-14 bg-gradient-to-tr from-brand-500 to-indigo-500 text-white rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-lg shadow-brand-500/30">🎓</div>
-      <div>
-        <h2 class="text-xl font-black text-gray-900 dark:text-white">Bienvenue sur EduVault</h2>
-        <p class="text-xs text-gray-500 mt-1">Sélectionnez votre niveau actuel :</p>
-      </div>
-      <div class="grid grid-cols-2 gap-2.5 text-xs font-bold">
-        <button onclick="setLevel('CP1')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CP1 <span class="block text-[10px] font-normal text-gray-400">S1 & S2</span></button>
-        <button onclick="setLevel('CP2')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CP2 <span class="block text-[10px] font-normal text-gray-400">S3 & S4</span></button>
-        <button onclick="setLevel('CI1')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CI1 <span class="block text-[10px] font-normal text-gray-400">S5 & S6</span></button>
-        <button onclick="setLevel('CI2')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CI2 <span class="block text-[10px] font-normal text-gray-400">S7 & S8</span></button>
-        <button onclick="setLevel('CI3')" class="py-3 col-span-2 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CI3 <span class="block text-[10px] font-normal text-gray-400">S9 & S10</span></button>
-      </div>
-    </div>
+<body>
+<header>
+  <h1>🎓 EduVault</h1>
+  <div style="display:flex;gap:6px;align-items:center">
+    <small id="avg" class="br"></small>
+    <button class="b" id="dv" data-a="drive" title="Google Drive">☁️ <span id="dd">●</span></button>
+    <button class="b" data-a="theme" title="Thème">🌓</button>
   </div>
-
-  <!-- Header -->
-  <header class="sticky top-0 z-30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-md shadow-brand-500/30">
-          <i class="fa-solid fa-vault"></i>
-        </div>
-        <h1 class="font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent">EduVault</h1>
-      </div>
-      <div class="flex items-center space-x-2">
-        <button id="driveAuthBtn" onclick="toggleDriveAuth()" class="flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-xl border transition bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-200">
-          <i class="fa-brands fa-google-drive text-emerald-500"></i>
-          <span id="driveStatusText" class="hidden sm:inline">Drive Cloud</span>
-          <span id="driveDot" class="w-2 h-2 rounded-full bg-red-500"></span>
-        </button>
-        <button onclick="toggleTheme()" class="p-2 sm:p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">
-          <i id="themeIcon" class="fa-solid fa-moon"></i>
-        </button>
-        <button onclick="openModal('settingsModal')" class="p-2 sm:p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition hidden sm:inline-flex">
-          <i class="fa-solid fa-gear"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      
-      <!-- Desktop Sidebar -->
-      <nav class="hidden lg:block lg:col-span-3 space-y-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm space-y-1">
-          <button onclick="switchTab('timetableView')" id="tab-timetableView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:bg-brand-900/30 transition-colors">
-            <i class="fa-solid fa-table-cells-large w-5 text-center"></i><span>Emploi du Temps</span>
-          </button>
-          <button onclick="switchTab('plannerView')" id="tab-plannerView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <i class="fa-solid fa-bell w-5 text-center"></i><span>Examens & Devoirs</span>
-          </button>
-          <button onclick="switchTab('modulesView')" id="tab-modulesView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <i class="fa-solid fa-graduation-cap w-5 text-center"></i><span>Modules & Cours</span>
-          </button>
-          <button onclick="switchTab('flashcardsView')" id="tab-flashcardsView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <i class="fa-solid fa-layer-group w-5 text-center"></i><span>Active Recall</span>
-          </button>
-          <button onclick="switchTab('pomodoroView')" id="tab-pomodoroView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <i class="fa-solid fa-stopwatch w-5 text-center"></i><span>Pomodoro Focus</span>
-          </button>
-          <button onclick="openModal('settingsModal')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <i class="fa-solid fa-gear w-5 text-center"></i><span>Paramètres & Data</span>
-          </button>
-        </div>
-
-        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-4 shadow-md space-y-1">
-          <div class="flex justify-between items-center text-xs font-bold text-indigo-300 uppercase tracking-wider">
-            <span>Moyenne S.</span>
-            <i class="fa-solid fa-graduation-cap"></i>
-          </div>
-          <div class="text-2xl font-black mt-1" id="semAverageDisplay">-- / 20</div>
-          <div class="text-[10px] text-indigo-200 uppercase font-bold" id="currentLevelDisplay">Niveau: -</div>
-        </div>
-      </nav>
-
-      <!-- Mobile Bottom Navigation -->
-      <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-40 flex justify-around pb-1 pt-1.5 shadow-lg">
-        <button onclick="switchTab('timetableView')" id="mob-timetableView" class="mob-btn flex flex-col items-center p-2 text-brand-600 w-1/5">
-          <i class="fa-solid fa-table-cells-large text-lg mb-1"></i><span class="text-[9px] font-bold">Horaires</span>
-        </button>
-        <button onclick="switchTab('plannerView')" id="mob-plannerView" class="mob-btn flex flex-col items-center p-2 text-gray-400 w-1/5">
-          <i class="fa-solid fa-bell text-lg mb-1 relative"><span id="mobBadge" class="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] px-1 rounded-full hidden">!</span></i><span class="text-[9px] font-bold">Agenda</span>
-        </button>
-        <button onclick="switchTab('modulesView')" id="mob-modulesView" class="mob-btn flex flex-col items-center p-2 text-gray-400 w-1/5">
-          <i class="fa-solid fa-graduation-cap text-lg mb-1"></i><span class="text-[9px] font-bold">Cours</span>
-        </button>
-        <button onclick="switchTab('pomodoroView')" id="mob-pomodoroView" class="mob-btn flex flex-col items-center p-2 text-gray-400 w-1/5">
-          <i class="fa-solid fa-stopwatch text-lg mb-1"></i><span class="text-[9px] font-bold">Focus</span>
-        </button>
-        <button onclick="openModal('settingsModal')" class="flex flex-col items-center p-2 text-gray-400 w-1/5">
-          <i class="fa-solid fa-gear text-lg mb-1"></i><span class="text-[9px] font-bold">Plus</span>
-        </button>
-      </nav>
-
-      <!-- Main Area -->
-      <main class="lg:col-span-9 space-y-4 sm:space-y-6">
-
-        <!-- WIDGET: COMING UP -->
-        <div id="comingUpWidget" class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 shadow-md text-white flex items-center justify-between hidden cursor-pointer" onclick="switchTab('plannerView')">
-          <div class="flex items-center space-x-3">
-            <div class="bg-white/20 p-2.5 rounded-xl"><i class="fa-solid fa-clock text-xl"></i></div>
-            <div>
-              <h3 class="font-black text-xs uppercase tracking-wider text-amber-100">À Venir Prochainement</h3>
-              <p class="font-bold text-sm" id="comingUpText">-</p>
-            </div>
-          </div>
-          <i class="fa-solid fa-chevron-right opacity-70"></i>
-        </div>
-
-        <!-- VIEW: EMPLOI DU TEMPS -->
-        <section id="timetableView" class="view-content space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-lg font-black text-gray-900 dark:text-white">Emploi du Temps</h2>
-              <p class="text-xs text-brand-600 font-bold" id="weekTypeIndicator">Semaine A</p>
-            </div>
-            <div class="flex space-x-2">
-              <button onclick="openAiImportModal()" class="px-3 py-2 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl text-xs font-bold flex items-center space-x-1 shadow-sm">
-                <i class="fa-solid fa-wand-magic-sparkles"></i><span class="hidden sm:inline">Importer IA</span>
-              </button>
-              <button onclick="openAddClassModal()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow flex items-center space-x-1">
-                <i class="fa-solid fa-plus"></i><span class="hidden sm:inline">Ajouter</span>
-              </button>
-            </div>
-          </div>
-          <div id="timetableGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-        </section>
-
-        <!-- VIEW: EXAMENS & PLANNING -->
-        <section id="plannerView" class="view-content hidden space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-black text-gray-900 dark:text-white">Examens & Devoirs</h2>
-            <button onclick="openAddTaskModal()" class="px-3.5 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow flex items-center space-x-1">
-              <i class="fa-solid fa-plus"></i><span>Ajouter</span>
-            </button>
-          </div>
-          <div class="flex space-x-2 text-xs overflow-x-auto pb-1 custom-scrollbar">
-            <button onclick="setTaskFilter('all')" id="btnFilter-all" class="px-3 py-1.5 rounded-lg bg-brand-600 text-white font-bold whitespace-nowrap">Tous</button>
-            <button onclick="setTaskFilter('exam')" id="btnFilter-exam" class="px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap">Examens</button>
-            <button onclick="setTaskFilter('homework')" id="btnFilter-homework" class="px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap">Devoirs</button>
-          </div>
-          <div id="tasksList" class="space-y-2.5"></div>
-        </section>
-
-        <!-- VIEW: MODULES -->
-        <section id="modulesView" class="view-content hidden space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-1.5 overflow-x-auto w-full pb-1 custom-scrollbar" id="semesterPills"></div>
-            <button onclick="openAddModuleModal()" class="ml-2 px-3 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow shrink-0 flex items-center space-x-1">
-              <i class="fa-solid fa-plus"></i><span class="hidden sm:inline">Module</span>
-            </button>
-          </div>
-          <input type="text" id="moduleSearch" oninput="renderModules()" placeholder="Rechercher un module..." class="w-full px-4 py-2 text-xs rounded-xl bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-brand-500 text-gray-800 dark:text-gray-100 shadow-sm">
-          <div id="modulesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </section>
-
-        <!-- VIEW: FLASHCARDS -->
-        <section id="flashcardsView" class="view-content hidden space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-black text-gray-900 dark:text-white">Active Recall (Fiches 3D)</h2>
-            <button onclick="openAddFlashcardModal()" class="px-3.5 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow flex items-center space-x-1">
-              <i class="fa-solid fa-plus"></i><span>Créer</span>
-            </button>
-          </div>
-          <div class="flex items-center space-x-3 bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
-            <span class="text-xs font-medium text-gray-500">Filtrer par module:</span>
-            <select id="flashcardModuleFilter" onchange="renderFlashcards()" class="bg-gray-100 dark:bg-gray-700 text-xs rounded-lg px-3 py-1.5 border-none focus:ring-2 focus:ring-brand-500 text-gray-800 dark:text-gray-100"></select>
-          </div>
-          <div id="flashcardsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-        </section>
-
-        <!-- VIEW: POMODORO -->
-        <section id="pomodoroView" class="view-content hidden space-y-6">
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700 shadow-xl max-w-xl mx-auto text-center space-y-6">
-            <div class="flex justify-center space-x-2">
-              <button onclick="setPomodoroMode('work')" id="pomoBtn-work" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-brand-600 text-white shadow-md">Travail (25m)</button>
-              <button onclick="setPomodoroMode('short')" id="pomoBtn-short" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Pause (5m)</button>
-              <button onclick="setPomodoroMode('long')" id="pomoBtn-long" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Longue (15m)</button>
-            </div>
-            <div class="max-w-xs mx-auto text-xs">
-              <select id="pomoModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl px-3 py-1.5 text-xs text-gray-800 dark:text-gray-100 border-none text-center font-medium"></select>
-            </div>
-            <div class="relative w-56 h-56 mx-auto flex items-center justify-center">
-              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" class="text-gray-200 dark:text-gray-700 stroke-current" stroke-width="5" fill="transparent"></circle>
-                <circle id="timerProgress" cx="50" cy="50" r="45" class="text-brand-600 stroke-current transition-all duration-1000 ease-linear" stroke-width="5" stroke-dasharray="283" stroke-dashoffset="0" stroke-linecap="round" fill="transparent"></circle>
-              </svg>
-              <div class="absolute flex flex-col items-center">
-                <span id="timerDisplay" class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white">25:00</span>
-                <span id="timerLabel" class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mt-2">Concentration</span>
-              </div>
-            </div>
-            <div class="flex items-center justify-center space-x-4">
-              <button onclick="togglePomodoro()" id="timerToggleBtn" class="w-12 h-12 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center text-lg shadow-lg shadow-brand-500/30 transition transform active:scale-95"><i class="fa-solid fa-play" id="timerPlayIcon"></i></button>
-              <button onclick="resetPomodoro()" class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-600 dark:text-gray-300 flex items-center justify-center text-sm transition"><i class="fa-solid fa-rotate-right"></i></button>
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <!-- ================= MODALS ================= -->
-
-  <!-- SETTINGS MODAL -->
-  <div id="settingsModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm hidden pb-0 sm:pb-4 modal-backdrop" onclick="backdropClose(event, 'settingsModal')">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
-      <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
-        <h3 class="font-bold text-base text-gray-900 dark:text-white"><i class="fa-solid fa-gear mr-2 text-brand-500"></i>Réglages</h3>
-        <button onclick="closeModal('settingsModal')" class="text-gray-400 bg-gray-100 dark:bg-gray-700 w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="space-y-4 text-xs font-medium">
-        <div class="flex items-center justify-between bg-brand-50 dark:bg-brand-900/30 p-3 rounded-xl border border-brand-100 dark:border-brand-800">
-          <div><p class="font-bold text-brand-700 dark:text-brand-300">Niveau Actuel</p><p class="text-[10px] text-gray-500">Bascule automatique des semestres</p></div>
-          <select id="setLevelSelect" onchange="changeLevelFromSettings()" class="bg-white dark:bg-gray-800 text-brand-700 dark:text-brand-300 rounded-lg text-xs border border-brand-200 dark:border-brand-700 font-bold py-1 px-2">
-            <option value="CP1">CP1</option><option value="CP2">CP2</option><option value="CI1">CI1</option><option value="CI2">CI2</option><option value="CI3">CI3</option>
-          </select>
-        </div>
-        <div class="flex items-center justify-between">
-          <div><p class="font-bold">Semaine A / B</p><p class="text-[10px] text-gray-500">Alterne l'affichage de l'emploi du temps</p></div>
-          <select id="setWeekType" onchange="changeWeekType()" class="bg-gray-100 dark:bg-gray-700 rounded-lg text-xs border-none font-bold py-1.5 px-3">
-            <option value="A">Semaine A</option><option value="B">Semaine B</option>
-          </select>
-        </div>
-        <div>
-          <p class="font-bold mb-1">Vacances & Jours Chômés</p>
-          <div class="flex space-x-2">
-            <input type="date" id="holidayDate" class="flex-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-2 text-xs border-none">
-            <button onclick="addHoliday()" class="px-3 bg-emerald-500 text-white rounded-xl text-xs font-bold">Ajouter</button>
-          </div>
-          <div id="holidaysList" class="flex flex-wrap gap-1.5 mt-2"></div>
-        </div>
-        <hr class="dark:border-gray-700">
-        <div>
-          <p class="font-bold mb-2">Sauvegarde & Restauration (JSON)</p>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="exportDataJSON()" class="py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded-xl font-bold flex items-center justify-center space-x-1.5"><i class="fa-solid fa-download"></i><span>Exporter</span></button>
-            <button onclick="document.getElementById('importFileInput').click()" class="py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded-xl font-bold flex items-center justify-center space-x-1.5"><i class="fa-solid fa-upload"></i><span>Importer</span></button>
-            <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importDataJSON(event)">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- AI IMPORT MODAL -->
-  <div id="aiImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'aiImportModal')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <div class="flex justify-between border-b pb-3 dark:border-gray-700">
-        <h3 class="font-bold text-gray-900 dark:text-white">Importation Emploi du Temps (IA)</h3>
-        <button onclick="closeModal('aiImportModal')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="space-y-3.5 text-xs">
-        <div>
-          <label class="block font-medium mb-1">Clé API (Google Gemini ou Groq)</label>
-          <input type="password" id="aiApiKey" placeholder="AIzaSy... (Gemini) ou gsk_... (Groq)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
-          <p class="text-[10px] text-gray-400 mt-1">Gratuit sur <a href="https://aistudio.google.com/apikey" target="_blank" class="text-brand-500 underline">Google AI Studio</a>.</p>
-        </div>
-        <div>
-          <label class="block font-medium mb-1">Document (PDF ou Image)</label>
-          <input type="file" id="aiFile" accept="application/pdf,image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-brand-50 file:text-brand-700 dark:file:bg-gray-700 dark:file:text-brand-300">
-        </div>
-        <button id="btnAiImport" onclick="startAiImport()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex justify-center items-center shadow-lg transition">
-          <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CLASS DETAILS MODAL -->
-  <div id="classDetailsModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm hidden pb-0 sm:pb-4 modal-backdrop" onclick="backdropClose(event, 'classDetailsModal')">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
-      <div class="flex justify-between items-start border-b pb-3 dark:border-gray-700">
-        <div>
-          <span id="cdTime" class="text-[10px] font-black text-brand-600 bg-brand-50 px-2 py-0.5 rounded"></span>
-          <h3 id="cdTitle" class="font-black text-lg text-gray-900 dark:text-white mt-1"></h3>
-          <p id="cdRoom" class="text-xs text-gray-500"></p>
-        </div>
-        <div class="flex space-x-2">
-          <button id="cdDeleteBtn" class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
-          <button onclick="closeModal('classDetailsModal')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-xs"></i></button>
-        </div>
-      </div>
-      <div class="flex-1 overflow-y-auto custom-scrollbar space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">Notes du cours</label>
-          <textarea id="cdNotes" rows="4" placeholder="Points importants, chapitres traités..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-3 border-none text-xs text-gray-900 dark:text-gray-100"></textarea>
-        </div>
-        <div>
-          <div class="flex justify-between items-center mb-1">
-            <label class="block text-xs font-bold text-gray-500">Tableau / Photos (Max 3)</label>
-            <button onclick="document.getElementById('cdPhotoInput').click()" class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg"><i class="fa-solid fa-camera mr-1"></i>Ajouter</button>
-            <input type="file" id="cdPhotoInput" accept="image/*" multiple class="hidden" onchange="handleClassPhotos(event)">
-          </div>
-          <div id="cdPhotosGrid" class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar"></div>
-        </div>
-      </div>
-      <button onclick="saveClassNotes()" class="w-full py-3 bg-brand-600 text-white rounded-xl font-bold shadow-lg">Sauvegarder</button>
-    </div>
-  </div>
-
-  <!-- ADD CLASS MODAL -->
-  <div id="classModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'classModal')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <h3 class="font-bold text-gray-900 dark:text-white">Séance (Emploi du temps)</h3>
-      <form id="classForm" onsubmit="saveClass(event)" class="space-y-3 text-xs font-medium">
-        <select id="classModuleSelect" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
-        <div class="grid grid-cols-2 gap-3">
-          <select id="classDay" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-            <option value="Lundi">Lundi</option><option value="Mardi">Mardi</option><option value="Mercredi">Mercredi</option><option value="Jeudi">Jeudi</option><option value="Vendredi">Vendredi</option><option value="Samedi">Samedi</option>
-          </select>
-          <select id="classWeek" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-            <option value="all">Toutes semaines</option><option value="A">Semaine A</option><option value="B">Semaine B</option>
-          </select>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <input type="time" id="classStartTime" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-          <input type="time" id="classEndTime" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        </div>
-        <input type="text" id="classRoom" placeholder="Salle ou Amphi" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeModal('classModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADD MODULE MODAL -->
-  <div id="moduleModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'moduleModal')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <h3 class="font-bold text-gray-900 dark:text-white" id="moduleModalTitle">Nouveau Module</h3>
-      <form id="moduleForm" onsubmit="saveModule(event)" class="space-y-3 text-xs font-medium">
-        <input type="hidden" id="moduleId">
-        <select id="moduleSemester" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100"></select>
-        <input type="text" id="moduleName" required placeholder="Nom du Module (ex: Analyse 1)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <input type="text" id="moduleProf" placeholder="Professeur (Optionnel)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <div class="grid grid-cols-2 gap-3"><input type="number" step="0.25" min="0" max="20" id="moduleGrade" placeholder="Note /20" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><input type="number" step="1" min="1" id="moduleCoeff" placeholder="Coefficient" value="1" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white font-bold">Enregistrer</button></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADD TASK MODAL -->
-  <div id="taskModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'taskModal')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <h3 class="font-bold text-gray-900 dark:text-white">Ajouter une Échéance</h3>
-      <form id="taskForm" onsubmit="saveTask(event)" class="space-y-3 text-xs font-medium">
-        <input type="text" id="taskTitle" required placeholder="Titre (ex: Examen Final, Rendu TP)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <select id="taskModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
-        <div class="grid grid-cols-2 gap-3"><select id="taskType" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><option value="exam">🚨 Examen</option><option value="homework">📝 Devoir</option></select><input type="datetime-local" id="taskDueDate" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Créer</button></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADD FLASHCARD MODAL -->
-  <div id="flashcardModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'flashcardModal')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <h3 class="font-bold text-gray-900 dark:text-white">Nouvelle Fiche Active Recall</h3>
-      <form id="flashcardForm" onsubmit="saveFlashcard(event)" class="space-y-3 text-xs font-medium">
-        <select id="flashcardModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
-        <textarea id="cardQuestion" required rows="2" placeholder="Question (Recto)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
-        <textarea id="cardAnswer" required rows="3" placeholder="Réponse (Verso)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('flashcardModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADD RESOURCE MODAL -->
-  <div id="resourceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'resourceModal')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-      <div class="flex justify-between border-b pb-3 dark:border-gray-700"><h3 class="font-bold text-gray-900 dark:text-white">Ajouter un Document</h3><button onclick="closeModal('resourceModal')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button></div>
-      <div class="flex border-b border-gray-200 dark:border-gray-700 text-xs">
-        <button type="button" onclick="switchResourceTab('local')" id="resTab-local" class="flex-1 py-2 font-bold border-b-2 border-brand-600 text-brand-600">Local (PDF)</button>
-        <button type="button" onclick="switchResourceTab('drive')" id="resTab-drive" class="flex-1 py-2 font-bold border-b-2 border-transparent text-gray-400">Drive Direct</button>
-        <button type="button" onclick="switchResourceTab('manual')" id="resTab-manual" class="flex-1 py-2 font-bold border-b-2 border-transparent text-gray-400">Lien Web</button>
-      </div>
-      <form id="resourceForm" onsubmit="saveResource(event)" class="space-y-3 text-xs">
-        <input type="hidden" id="resModuleId">
-        <select id="resCategory" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><option value="cours">📚 Cours</option><option value="td">📝 TD / TP</option><option value="examen">🎯 Examen</option><option value="resume">⚡ Résumé</option></select>
-        <input type="text" id="resTitle" required placeholder="Titre du document" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <div id="resPanel-local" class="space-y-2 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-xl border dark:border-gray-700"><input type="file" id="resLocalFileInput" class="w-full text-xs"></div>
-        <div id="resPanel-drive" class="hidden space-y-2 bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800"><input type="file" id="resDriveFileInput" class="w-full text-xs"></div>
-        <div id="resPanel-manual" class="hidden space-y-2"><input type="url" id="resUrlInput" placeholder="https://drive.google.com/..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('resourceModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700">Annuler</button><button type="submit" id="saveResBtn" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toastContainer" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] space-y-2 pointer-events-none w-11/12 sm:w-auto text-center"></div>
-
-  <script>
-    const LEVEL_SEMESTERS = {
-      'CP1': ['S1', 'S2'],
-      'CP2': ['S3', 'S4'],
-      'CI1': ['S5', 'S6'],
-      'CI2': ['S7', 'S8'],
-      'CI3': ['S9', 'S10']
-    };
-
-    let appState = {
-      activeSemester: 'S1',
-      activeTab: 'timetableView',
-      taskFilter: 'all',
-      settings: { level: null, currentWeek: 'A', holidays: [] },
-      modules: [],
-      tasks: [],
-      flashcards: [],
-      timetable: [],
-      notes: []
-    };
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      await initIndexedDB().catch(console.warn);
-      loadData();
-      initTheme();
-      initDriveClient();
-
-      if (!appState.settings.level) {
-        document.getElementById('onboardingModal').classList.remove('hidden');
-      } else {
-        renderSemesterPills();
-        switchTab('timetableView');
-        setInterval(checkReminders, 60000);
-      }
-    });
-
-    function setLevel(lvl) {
-      appState.settings.level = lvl;
-      appState.activeSemester = LEVEL_SEMESTERS[lvl][0];
-      saveData();
-      document.getElementById('onboardingModal').classList.add('hidden');
-      document.getElementById('setLevelSelect').value = lvl;
-      renderSemesterPills();
-      switchTab('timetableView');
-      showToast(`Niveau ${lvl} configuré !`, 'success');
-      setInterval(checkReminders, 60000);
-    }
-
-    function changeLevelFromSettings() {
-      const newLvl = document.getElementById('setLevelSelect').value;
-      appState.settings.level = newLvl;
-      appState.activeSemester = LEVEL_SEMESTERS[newLvl][0];
-      saveData();
-      renderSemesterPills();
-      renderTimetable();
-      renderModules();
-      showToast(`Niveau configuré sur ${newLvl}`, 'info');
-    }
-
-    function loadData() {
-      const saved = localStorage.getItem('eduVaultData_vFixed');
-      if (saved) {
-        try {
-          appState = Object.assign(appState, JSON.parse(saved));
-        } catch(e) {}
-      }
-      
-      if (!appState.modules) appState.modules = [];
-      if (!appState.tasks) appState.tasks = [];
-      if (!appState.flashcards) appState.flashcards = [];
-      if (!appState.timetable) appState.timetable = [];
-      if (!appState.notes) appState.notes = [];
-      if (!appState.settings) appState.settings = { level: null, currentWeek: 'A', holidays: [] };
-
-      if (appState.settings.level) {
-        document.getElementById('setLevelSelect').value = appState.settings.level;
-        document.getElementById('currentLevelDisplay').innerText = `Niveau: ${appState.settings.level}`;
-      }
-
-      document.getElementById('setWeekType').value = appState.settings.currentWeek || 'A';
-      calculateSemesterAverage();
-      renderHolidays();
-      checkComingUp();
-    }
-
-    function saveData() {
-      localStorage.setItem('eduVaultData_vFixed', JSON.stringify(appState));
-      calculateSemesterAverage();
-      checkComingUp();
-      if (appState.settings.level) {
-        document.getElementById('currentLevelDisplay').innerText = `Niveau: ${appState.settings.level}`;
-      }
-    }
-
-    function switchTab(tabId) {
-      document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
-      const target = document.getElementById(tabId);
-      if (target) target.classList.remove('hidden');
-
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors';
-      });
-      const deskBtn = document.getElementById('tab-' + tabId);
-      if (deskBtn) {
-        deskBtn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:bg-brand-900/30 transition-colors';
-      }
-
-      document.querySelectorAll('.mob-btn').forEach(btn => {
-        btn.className = 'mob-btn flex flex-col items-center p-2 text-gray-400 w-1/5';
-      });
-      const mobBtn = document.getElementById('mob-' + tabId);
-      if (mobBtn) {
-        mobBtn.className = 'mob-btn flex flex-col items-center p-2 text-brand-600 w-1/5';
-      }
-
-      appState.activeTab = tabId;
-      if (tabId === 'timetableView') renderTimetable();
-      if (tabId === 'plannerView') renderTasks();
-      if (tabId === 'modulesView') renderModules();
-      if (tabId === 'flashcardsView') renderFlashcards();
-      if (tabId === 'pomodoroView') updatePomoModuleDropdown();
-    }
-
-    function renderSemesterPills() {
-      const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1', 'S2'];
-      document.getElementById('semesterPills').innerHTML = sems.map(s => `
-        <button onclick="setSemester('${s}')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all ${appState.activeSemester === s ? 'bg-brand-600 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}">
-          ${s}
-        </button>
-      `).join('');
-    }
-
-    function setSemester(sem) {
-      appState.activeSemester = sem;
-      renderSemesterPills();
-      renderModules();
-      renderTimetable();
-      renderTasks();
-      renderFlashcards();
-      calculateSemesterAverage();
-    }
-
-    let notifiedTasks = new Set();
-    function checkComingUp() {
-      const now = new Date();
-      const upcoming = appState.tasks
-        .filter(t => !t.completed && new Date(t.dueDate) > now)
-        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
-
-      const widget = document.getElementById('comingUpWidget');
-      const mobBadge = document.getElementById('mobBadge');
-
-      if (upcoming) {
-        const diffMs = new Date(upcoming.dueDate) - now;
-        const diffHrs = Math.floor(diffMs / 3600000);
-        const diffDays = Math.floor(diffHrs / 24);
-        let timeTxt = diffDays > 0 ? `dans ${diffDays} jour(s)` : (diffHrs > 0 ? `dans ${diffHrs}h` : `très bientôt !`);
-        
-        document.getElementById('comingUpText').innerText = `${upcoming.type === 'exam' ? 'Examen' : 'Devoir'}: ${upcoming.title} (${timeTxt})`;
-        widget.classList.remove('hidden');
-        mobBadge.classList.remove('hidden');
-      } else {
-        widget.classList.add('hidden');
-        mobBadge.classList.add('hidden');
-      }
-    }
-
-    function checkReminders() {
-      const now = new Date();
-      appState.tasks.filter(t => !t.completed).forEach(t => {
-        const diff = new Date(t.dueDate) - now;
-        if (diff > 0 && diff <= 3600000 && !notifiedTasks.has(t.id + '_1h')) {
-          showNativeNotification(`Rappel : ${t.title}`, `Échéance dans moins d'une heure !`);
-          notifiedTasks.add(t.id + '_1h');
-        }
-        if (diff > 0 && diff <= 86400000 && now.getHours() === 18 && !notifiedTasks.has(t.id + '_1d')) {
-          showNativeNotification(`Demain : ${t.title}`, `Révisez ce soir !`);
-          notifiedTasks.add(t.id + '_1d');
-        }
-      });
-      checkComingUp();
-    }
-
-    function showNativeNotification(title, body) {
-      if (Notification.permission === 'granted') new Notification(title, { body });
-      showToast(`${title} : ${body}`, 'warning');
-      try { navigator.vibrate([200, 100, 200]); } catch(e) {}
-    }
-    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-      Notification.requestPermission();
-    }
-
-    const joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    let currentClassIdForNote = null;
-    let tempPhotos = [];
-
-    function renderTimetable() {
-      const container = document.getElementById('timetableGrid');
-      const isHoliday = (appState.settings.holidays || []).includes(new Date().toISOString().split('T')[0]);
-      document.getElementById('weekTypeIndicator').innerText = `Semaine ${appState.settings.currentWeek} ${isHoliday ? '(En Vacances)' : ''}`;
-
-      if (isHoliday) {
-        container.innerHTML = `<div class="col-span-full text-center p-8 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl text-emerald-600 font-bold"><i class="fa-solid fa-mug-hot text-3xl mb-2 block"></i>Vacances enregistrées pour aujourd'hui !</div>`;
-        return;
-      }
-
-      const modIds = appState.modules.filter(m => m.semester === appState.activeSemester).map(m => m.id);
-      const tt = appState.timetable.filter(c => modIds.includes(c.moduleId) && (c.week === 'all' || c.week === appState.settings.currentWeek));
-
-      container.innerHTML = joursSemaine.map(jour => {
-        const coursHtml = tt.filter(c => c.day === jour).sort((a,b) => a.startTime.localeCompare(b.startTime)).map(c => {
-          const mod = appState.modules.find(m => m.id === c.moduleId);
-          const hasNote = (appState.notes || []).some(n => n.classId === c.id);
-          return `
-            <div onclick="openClassDetails('${c.id}')" class="bg-brand-50 dark:bg-brand-900/30 border ${hasNote ? 'border-amber-400' : 'border-brand-100 dark:border-brand-800'} rounded-xl p-3 cursor-pointer active:scale-95 transition shadow-sm">
-              <div class="text-[10px] font-black text-brand-600 mb-0.5">${c.startTime} - ${c.endTime}</div>
-              <div class="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">${mod ? mod.name : 'Module Inconnu'}</div>
-              <div class="flex justify-between items-center mt-1.5 text-xs text-gray-500">
-                <span><i class="fa-solid fa-location-dot mr-1"></i>${c.room}</span>
-                ${hasNote ? '<i class="fa-solid fa-note-sticky text-amber-500"></i>' : ''}
-              </div>
-            </div>`;
-        }).join('');
-
-        return `
-          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm h-full">
-            <h3 class="font-black text-xs uppercase tracking-wider mb-3 border-b dark:border-gray-700 pb-1">${jour}</h3>
-            <div class="space-y-2">${coursHtml || '<p class="text-xs text-gray-400 italic p-2 text-center border border-dashed rounded-xl">Aucune séance</p>'}</div>
-          </div>`;
-      }).join('');
-    }
-
-    function changeWeekType() {
-      appState.settings.currentWeek = document.getElementById('setWeekType').value;
-      saveData();
-      renderTimetable();
-    }
-
-    function addHoliday() {
-      const d = document.getElementById('holidayDate').value;
-      if (d && !appState.settings.holidays.includes(d)) {
-        appState.settings.holidays.push(d);
-        saveData();
-        renderHolidays();
-        renderTimetable();
-      }
-    }
-
-    function renderHolidays() {
-      document.getElementById('holidaysList').innerHTML = (appState.settings.holidays || []).map(d => `
-        <span class="text-[10px] bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md flex items-center">
-          ${d} <button onclick="appState.settings.holidays=appState.settings.holidays.filter(x=>x!=='${d}');saveData();renderHolidays();renderTimetable()" class="ml-1.5 text-red-500"><i class="fa-solid fa-xmark"></i></button>
-        </span>`).join('');
-    }
-
-    function openAddClassModal() {
-      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
-      if (!mods.length) return showToast("Ajoutez d'abord un module pour ce semestre", "error");
-      
-      document.getElementById('classModuleSelect').innerHTML = mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
-      document.getElementById('classForm').reset();
-      openModal('classModal');
-    }
-
-    function saveClass(e) {
-      e.preventDefault();
-      appState.timetable.push({
-        id: 'c_' + Date.now(),
-        moduleId: document.getElementById('classModuleSelect').value,
-        day: document.getElementById('classDay').value,
-        week: document.getElementById('classWeek').value,
-        startTime: document.getElementById('classStartTime').value,
-        endTime: document.getElementById('classEndTime').value,
-        room: document.getElementById('classRoom').value
-      });
-      saveData();
-      renderTimetable();
-      closeModal('classModal');
-      showToast("Séance ajoutée", "success");
-    }
-
-    function openClassDetails(classId) {
-      currentClassIdForNote = classId;
-      const c = appState.timetable.find(x => x.id === classId);
-      if (!c) return;
-      const m = appState.modules.find(x => x.id === c.moduleId);
-
-      document.getElementById('cdTime').innerText = `${c.day} ${c.startTime} - ${c.endTime}`;
-      document.getElementById('cdTitle').innerText = m ? m.name : 'Séance';
-      document.getElementById('cdRoom').innerHTML = `<i class="fa-solid fa-location-dot mr-1"></i>${c.room}`;
-
-      document.getElementById('cdDeleteBtn').onclick = () => {
-        if (confirm("Supprimer ce cours de l'emploi du temps ?")) {
-          appState.timetable = appState.timetable.filter(x => x.id !== classId);
-          saveData();
-          renderTimetable();
-          closeModal('classDetailsModal');
-        }
-      };
-
-      const note = (appState.notes || []).find(n => n.classId === classId) || { text: '', photos: [] };
-      document.getElementById('cdNotes').value = note.text || '';
-      tempPhotos = [...(note.photos || [])];
-      renderCdPhotos();
-      openModal('classDetailsModal');
-    }
-
-    function handleClassPhotos(e) {
-      const files = Array.from(e.target.files);
-      if (tempPhotos.length + files.length > 3) return showToast("Maximum 3 photos autorisées", "warning");
-      files.forEach(f => {
-        const r = new FileReader();
-        r.onload = ev => {
-          tempPhotos.push(ev.target.result);
-          renderCdPhotos();
-        };
-        r.readAsDataURL(f);
-      });
-    }
-
-    function renderCdPhotos() {
-      document.getElementById('cdPhotosGrid').innerHTML = tempPhotos.map((src, i) => `
-        <div class="relative w-16 h-16 shrink-0">
-          <img src="${src}" class="w-full h-full object-cover rounded-lg border">
-          <button onclick="tempPhotos.splice(${i},1); renderCdPhotos()" class="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-[8px] flex items-center justify-center">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>`).join('');
-    }
-
-    function saveClassNotes() {
-      const text = document.getElementById('cdNotes').value.trim();
-      let n = appState.notes.find(x => x.classId === currentClassIdForNote);
-      if (!n) {
-        n = { classId: currentClassIdForNote, date: new Date().toISOString() };
-        appState.notes.push(n);
-      }
-      n.text = text;
-      n.photos = [...tempPhotos];
-      saveData();
-      renderTimetable();
-      closeModal('classDetailsModal');
-      showToast("Notes enregistrées", "success");
-    }
-
-    function openAddModuleModal() {
-      const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1', 'S2'];
-      document.getElementById('moduleSemester').innerHTML = sems.map(s => `<option value="${s}">${s}</option>`).join('');
-      document.getElementById('moduleForm').reset();
-      document.getElementById('moduleSemester').value = appState.activeSemester;
-      openModal('moduleModal');
-    }
-
-    function saveModule(e) {
-      e.preventDefault();
-      const sem = document.getElementById('moduleSemester').value;
-      const name = document.getElementById('moduleName').value.trim();
-      const prof = document.getElementById('moduleProf').value.trim();
-      const grade = document.getElementById('moduleGrade').value;
-      const coeff = Number(document.getElementById('moduleCoeff').value) || 1;
-
-      appState.modules.push({
-        id: 'm_' + Date.now(),
-        semester: sem,
-        name: name,
-        prof: prof,
-        grade: grade === '' ? null : Number(grade),
-        coeff: coeff,
-        resources: []
-      });
-
-      saveData();
-      renderModules();
-      renderTimetable();
-      closeModal('moduleModal');
-      showToast("Module ajouté avec succès", "success");
-    }
-
-    function renderModules() {
-      const query = (document.getElementById('moduleSearch')?.value || '').toLowerCase();
-      const filtered = appState.modules.filter(m => m.semester === appState.activeSemester && m.name.toLowerCase().includes(query));
-      
-      const container = document.getElementById('modulesGrid');
-      if (!filtered.length) {
-        container.innerHTML = `<div class="col-span-full text-center py-8 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 text-xs text-gray-400">Aucun module dans ${appState.activeSemester}</div>`;
-        return;
-      }
-
-      container.innerHTML = filtered.map(m => `
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm space-y-3">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="text-[10px] font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/40 px-2 py-0.5 rounded-md">${m.semester} | Note: ${m.grade !== null ? m.grade + '/20' : '-'}</span>
-              <h3 class="font-bold text-base mt-1 text-gray-900 dark:text-white">${m.name}</h3>
-              <p class="text-xs text-gray-400">${m.prof || 'Enseignant non spécifié'}</p>
-            </div>
-            <div class="flex space-x-1">
-              <button onclick="openAddResourceModal('${m.id}')" class="p-1.5 text-brand-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><i class="fa-solid fa-file-circle-plus"></i></button>
-              <button onclick="deleteModule('${m.id}')" class="p-1.5 text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>
-            </div>
-          </div>
-          <div class="space-y-1.5 text-xs">
-            ${renderResSection('📚 Cours', (m.resources||[]).filter(r=>r.type==='cours'), m.id)}
-            ${renderResSection('📝 TD / TP', (m.resources||[]).filter(r=>r.type==='td'), m.id)}
-            ${renderResSection('🎯 Examens', (m.resources||[]).filter(r=>r.type==='examen'), m.id)}
-          </div>
-        </div>`).join('');
-    }
-
-    function renderResSection(title, list, mid) {
-      return `
-        <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-2">
-          <span class="text-[10px] font-bold text-gray-400 uppercase">${title} (${list.length})</span>
-          ${list.map(r => `
-            <div class="flex justify-between items-center py-1 px-2 mt-1 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
-              ${r.isLocal 
-                ? `<button onclick="openLocalFile('${r.localFileId}')" class="text-brand-600 truncate text-left"><i class="fa-solid fa-file-pdf mr-1 text-red-500"></i>${r.title}</button>` 
-                : `<a href="${r.url}" target="_blank" class="text-brand-600 truncate"><i class="fa-solid fa-link mr-1"></i>${r.title}</a>`}
-              <button onclick="deleteResource('${mid}', '${r.id}')" class="text-gray-300 hover:text-red-500 ml-2"><i class="fa-solid fa-xmark"></i></button>
-            </div>`).join('')}
-        </div>`;
-    }
-
-    function deleteModule(id) {
-      if (confirm("Supprimer ce module et toutes ses séances associées ?")) {
-        appState.modules = appState.modules.filter(x => x.id !== id);
-        appState.timetable = appState.timetable.filter(x => x.moduleId !== id);
-        appState.tasks = appState.tasks.filter(x => x.moduleId !== id);
-        saveData();
-        renderModules();
-        renderTimetable();
-      }
-    }
-
-    function openAddTaskModal() {
-      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
-      if (!mods.length) return showToast("Ajoutez d'abord un module pour ce semestre", "error");
-      
-      document.getElementById('taskModuleSelect').innerHTML = mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
-      document.getElementById('taskForm').reset();
-      openModal('taskModal');
-    }
-
-    function saveTask(e) {
-      e.preventDefault();
-      appState.tasks.push({
-        id: 't_' + Date.now(),
-        title: document.getElementById('taskTitle').value.trim(),
-        moduleId: document.getElementById('taskModuleSelect').value,
-        type: document.getElementById('taskType').value,
-        dueDate: document.getElementById('taskDueDate').value,
-        completed: false
-      });
-      saveData();
-      renderTasks();
-      closeModal('taskModal');
-      showToast("Échéance ajoutée", "success");
-    }
-
-    function renderTasks() {
-      const modIds = appState.modules.filter(m => m.semester === appState.activeSemester).map(m => m.id);
-      const list = appState.tasks
-        .filter(t => modIds.includes(t.moduleId))
-        .filter(t => appState.taskFilter === 'all' || t.type === appState.taskFilter)
-        .sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-      const container = document.getElementById('tasksList');
-      if (!list.length) {
-        container.innerHTML = `<div class="text-center py-8 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 text-xs text-gray-400">Aucune échéance enregistrée</div>`;
-        return;
-      }
-
-      container.innerHTML = list.map(t => {
-        const mod = appState.modules.find(m => m.id === t.moduleId);
-        return `
-          <div class="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border ${t.type === 'exam' ? 'border-red-300 dark:border-red-900' : 'border-gray-200 dark:border-gray-700'} flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-              <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTaskDone('${t.id}')" class="w-4 h-4 rounded">
-              <div class="${t.completed ? 'line-through opacity-50' : ''}">
-                <p class="font-bold text-sm text-gray-900 dark:text-white">${t.type === 'exam' ? '🚨 ' : ''}${t.title}</p>
-                <p class="text-[10px] text-gray-400">${mod ? mod.name : ''} • Date : ${new Date(t.dueDate).toLocaleString('fr-FR')}</p>
-              </div>
-            </div>
-            <button onclick="deleteTask('${t.id}')" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
-          </div>`;
-      }).join('');
-    }
-
-    function toggleTaskDone(id) {
-      const t = appState.tasks.find(x => x.id === id);
-      if (t) {
-        t.completed = !t.completed;
-        saveData();
-        renderTasks();
-      }
-    }
-
-    function deleteTask(id) {
-      appState.tasks = appState.tasks.filter(x => x.id !== id);
-      saveData();
-      renderTasks();
-    }
-
-    function setTaskFilter(f) {
-      appState.taskFilter = f;
-      document.querySelectorAll('[id^=btnFilter-]').forEach(b => {
-        b.className = 'px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap';
-      });
-      document.getElementById('btnFilter-' + f).className = 'px-3 py-1.5 rounded-lg bg-brand-600 text-white font-bold whitespace-nowrap';
-      renderTasks();
-    }
-
-    function openAddFlashcardModal() {
-      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
-      if (!mods.length) return showToast("Ajoutez d'abord un module pour ce semestre", "error");
-      document.getElementById('flashcardModuleSelect').innerHTML = mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
-      document.getElementById('flashcardForm').reset();
-      openModal('flashcardModal');
-    }
-
-    function saveFlashcard(e) {
-      e.preventDefault();
-      appState.flashcards.push({
-        id: 'f_' + Date.now(),
-        moduleId: document.getElementById('flashcardModuleSelect').value,
-        q: document.getElementById('cardQuestion').value.trim(),
-        a: document.getElementById('cardAnswer').value.trim()
-      });
-      saveData();
-      renderFlashcards();
-      closeModal('flashcardModal');
-      showToast("Fiche créée", "success");
-    }
-
-    function renderFlashcards() {
-      const filter = document.getElementById('flashcardModuleFilter').value || 'all';
-      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
-      
-      document.getElementById('flashcardModuleFilter').innerHTML = `<option value="all">Tous les modules</option>` + mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
-      document.getElementById('flashcardModuleFilter').value = filter;
-
-      const modIds = mods.map(m => m.id);
-      const cards = appState.flashcards.filter(f => modIds.includes(f.moduleId)).filter(f => filter === 'all' || f.moduleId === filter);
-
-      const container = document.getElementById('flashcardsGrid');
-      if (!cards.length) {
-        container.innerHTML = `<div class="col-span-full text-center py-8 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 text-xs text-gray-400">Aucune fiche de révision</div>`;
-        return;
-      }
-
-      container.innerHTML = cards.map(f => `
-        <div class="perspective-1000 h-60">
-          <div id="fc_${f.id}" class="transform-style-3d relative w-full h-full duration-500 transition-transform cursor-pointer" onclick="document.getElementById('fc_${f.id}').classList.toggle('rotate-y-180')">
-            <div class="backface-hidden absolute inset-0 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 flex flex-col justify-between">
-              <div>
-                <div class="flex justify-end">
-                  <button onclick="event.stopPropagation();deleteFlashcard('${f.id}')" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
-                </div>
-                <span class="text-[10px] text-gray-400 font-bold uppercase">Question</span>
-                <p class="font-bold text-sm mt-1 text-gray-900 dark:text-white">${f.q}</p>
-              </div>
-              <div class="text-[11px] text-brand-600 font-bold"><i class="fa-solid fa-rotate mr-1"></i>Cliquer pour voir la réponse</div>
-            </div>
-            <div class="backface-hidden rotate-y-180 absolute inset-0 bg-brand-50 dark:bg-brand-950/80 border-2 border-brand-500 rounded-2xl p-5 flex flex-col justify-between">
-              <div>
-                <span class="text-[10px] text-brand-600 font-bold uppercase">Réponse</span>
-                <p class="text-xs font-medium mt-1 text-gray-800 dark:text-gray-100 overflow-y-auto max-h-36 custom-scrollbar">${f.a}</p>
-              </div>
-              <div class="text-[10px] text-gray-400 font-bold">Cliquer pour retourner</div>
-            </div>
-          </div>
-        </div>`).join('');
-    }
-
-    function deleteFlashcard(id) {
-      appState.flashcards = appState.flashcards.filter(x => x.id !== id);
-      saveData();
-      renderFlashcards();
-    }
-
-    let currentResTab = 'local';
-    function openAddResourceModal(id) {
-      document.getElementById('resModuleId').value = id;
-      document.getElementById('resourceForm').reset();
-      switchResourceTab('local');
-      openModal('resourceModal');
-    }
-
-    function switchResourceTab(t) {
-      currentResTab = t;
-      ['local', 'drive', 'manual'].forEach(tab => {
-        document.getElementById('resTab-' + tab).className = `flex-1 py-2 font-bold border-b-2 ${tab === t ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400'}`;
-        document.getElementById('resPanel-' + tab).classList.toggle('hidden', tab !== t);
-      });
-    }
-
-    async function saveResource(e) {
-      e.preventDefault();
-      const modId = document.getElementById('resModuleId').value;
-      const title = document.getElementById('resTitle').value.trim();
-      const cat = document.getElementById('resCategory').value;
-      const mod = appState.modules.find(m => m.id === modId);
-      if (!mod) return;
-
-      const btn = document.getElementById('saveResBtn');
-      btn.disabled = true;
-
-      try {
-        if (currentResTab === 'local') {
-          const f = document.getElementById('resLocalFileInput').files[0];
-          if (!f) throw new Error("Sélectionnez un fichier");
-          const lid = 'f_' + Date.now();
-          await storeLocalFile(lid, f);
-          if (!mod.resources) mod.resources = [];
-          mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: true, localFileId: lid });
-        } else if (currentResTab === 'drive') {
-          const f = document.getElementById('resDriveFileInput').files[0];
-          if (!f) throw new Error("Sélectionnez un fichier");
-          if (!driveAccessToken) throw new Error("Connectez-vous d'abord à Google Drive");
-          
-          const metadata = { name: `${title} - ${f.name}`, mimeType: f.type };
-          const form = new FormData();
-          form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-          form.append('file', f);
-
-          const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + driveAccessToken },
-            body: form
-          });
-          const data = await res.json();
-          if (!data.id) throw new Error("Échec du téléversement Google Drive");
-          if (!mod.resources) mod.resources = [];
-          mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: false, url: `https://drive.google.com/file/d/${data.id}/view` });
-        } else {
-          const u = document.getElementById('resUrlInput').value.trim();
-          if (!u) throw new Error("Saisissez une URL");
-          if (!mod.resources) mod.resources = [];
-          mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: false, url: u });
-        }
-
-        saveData();
-        renderModules();
-        closeModal('resourceModal');
-        showToast("Document enregistré", "success");
-      } catch(err) {
-        showToast(err.message, 'error');
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    function deleteResource(mid, rid) {
-      const m = appState.modules.find(x => x.id === mid);
-      if (m && m.resources) {
-        m.resources = m.resources.filter(x => x.id !== rid);
-        saveData();
-        renderModules();
-      }
-    }
-
-    let pTime = 25 * 60, pTotal = 25 * 60, pInt = null;
-
-    function updatePomoModuleDropdown() {
-      const select = document.getElementById('pomoModuleSelect');
-      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
-      select.innerHTML = `<option value="">Focus Libre (Général)</option>` + mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
-    }
-
-    function setPomodoroMode(m) {
-      clearInterval(pInt);
-      pInt = null;
-      document.getElementById('timerPlayIcon').className = 'fa-solid fa-play';
-      pTotal = m === 'work' ? 25 * 60 : (m === 'short' ? 5 * 60 : 15 * 60);
-      pTime = pTotal;
-      
-      ['work', 'short', 'long'].forEach(mode => {
-        document.getElementById('pomoBtn-' + mode).className = (mode === m) 
-          ? 'px-4 py-1.5 rounded-full text-xs font-bold transition bg-brand-600 text-white shadow-md' 
-          : 'px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
-      });
-      updPomo();
-    }
-
-    function togglePomodoro() {
-      if (pInt) {
-        clearInterval(pInt);
-        pInt = null;
-        document.getElementById('timerPlayIcon').className = 'fa-solid fa-play';
-      } else {
-        document.getElementById('timerPlayIcon').className = 'fa-solid fa-pause';
-        pInt = setInterval(() => {
-          pTime--;
-          updPomo();
-          if (pTime <= 0) {
-            clearInterval(pInt);
-            pInt = null;
-            document.getElementById('timerPlayIcon').className = 'fa-solid fa-play';
-            try { navigator.vibrate([300, 200, 300]); } catch(e) {}
-            showToast("Session Pomodoro terminée !", "success");
-          }
-        }, 1000);
-      }
-    }
-
-    function resetPomodoro() {
-      clearInterval(pInt);
-      pInt = null;
-      document.getElementById('timerPlayIcon').className = 'fa-solid fa-play';
-      pTime = pTotal;
-      updPomo();
-    }
-
-    function updPomo() {
-      const mins = Math.floor(pTime / 60);
-      const secs = pTime % 60;
-      document.getElementById('timerDisplay').innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-      const offset = 283 - ((pTotal - pTime) / pTotal) * 283;
-      document.getElementById('timerProgress').style.strokeDashoffset = offset;
-    }
-
-    /* ==========================================================================
-       IMPORTATION IA (GEMINI NATIVE MULTIMODAL & GROQ)
-       ========================================================================== */
-    function openAiImportModal() {
-      document.getElementById('aiApiKey').value = localStorage.getItem('eduVault_aiKey') || '';
-      openModal('aiImportModal');
-    }
-
-    const b64 = f => new Promise((ok, ko) => {
-      const r = new FileReader();
-      r.onload = () => ok(r.result.split(',')[1]);
-      r.onerror = ko;
-      r.readAsDataURL(f);
-    });
-
-    async function startAiImport() {
-      const key = document.getElementById('aiApiKey').value.trim();
-      const file = document.getElementById('aiFile').files[0];
-
-      if (!key) return showToast("Entrez votre clé API", "warning");
-      if (!file) return showToast("Sélectionnez un document (PDF ou Image)", "warning");
-
-      localStorage.setItem('eduVault_aiKey', key);
-      const btn = document.getElementById('btnAiImport');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Analyse en cours...';
-      btn.disabled = true;
-
-      try {
-        let rawText = "";
-        if (key.startsWith("AIzaSy")) {
-          rawText = await callGeminiAPI(key, file);
-        } else {
-          rawText = await callGroqAPI(key, file);
-        }
-
-        rawText = rawText.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/```(?:json)?/g, "").trim();
-        const start = rawText.indexOf('[');
-        const end = rawText.lastIndexOf(']');
-        if (start < 0 || end < start) {
-          throw new Error("L'IA n'a pas renvoyé de JSON valide: " + rawText.slice(0, 80));
-        }
-
-        const sessions = JSON.parse(rawText.slice(start, end + 1)).filter(s => s.matiere && s.debut && s.fin);
-        if (!sessions.length) throw new Error("Aucun cours trouvé dans ce document");
-
-        let count = 0;
-        sessions.forEach(s => {
-          let mod = appState.modules.find(m => m.semester === appState.activeSemester && m.name.toLowerCase() === s.matiere.toLowerCase());
-          if (!mod) {
-            mod = {
-              id: 'm_' + Date.now() + Math.random().toString(36).substr(2, 4),
-              semester: appState.activeSemester,
-              name: s.matiere,
-              prof: s.prof || "",
-              coeff: 1,
-              grade: null,
-              resources: []
-            };
-            appState.modules.push(mod);
-          }
-
-          const jour = s.jour ? (s.jour.charAt(0).toUpperCase() + s.jour.slice(1).toLowerCase()) : 'Lundi';
-          appState.timetable.push({
-            id: 'c_' + Date.now() + Math.random().toString(36).substr(2, 4),
-            moduleId: mod.id,
-            day: jour,
-            week: 'all',
-            startTime: s.debut,
-            endTime: s.fin,
-            room: s.salle || 'Salle'
-          });
-          count++;
-        });
-
-        saveData();
-        renderModules();
-        renderTimetable();
-        closeModal('aiImportModal');
-        showToast(`${count} séances importées avec succès !`, 'success');
-
-      } catch (err) {
-        showToast("Erreur IA: " + err.message, "error");
-      } finally {
-        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer';
-        btn.disabled = false;
-      }
-    }
-
-    async function callGeminiAPI(key, file) {
-      const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
-      const mimeType = isPdf ? "application/pdf" : (file.type || "image/jpeg");
-      const base64Data = await b64(file);
-      
-      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){encodeURIComponent(key)}`;
-      const payload = {
-        contents: [{
-          parts: [
-            { text: "Extrais l'emploi du temps. Réponds STRICTEMENT avec un tableau JSON sans markdown: [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]. Jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI)." },
-            { inline_data: { mime_type: mimeType, data: base64Data } }
-          ]
-        }],
-        generationConfig: { temperature: 0.1 }
-      };
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const textResponse = await res.text();
-      let jsonRes;
-      try {
-        jsonRes = JSON.parse(textResponse);
-      } catch (e) {
-        throw new Error("L'API Google a renvoyé du HTML. Vérifiez votre clé API.");
-      }
-
-      if (!res.ok) {
-        throw new Error(jsonRes.error?.message || `Erreur HTTP ${res.status}`);
-      }
-
-      return jsonRes.candidates[0].content.parts[0].text;
-    }
-
-    async function callGroqAPI(key, file) {
-      const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
-      if (isPdf) throw new Error("Groq ne supporte pas les PDFs directement. Utilisez une clé Gemini AI Studio.");
-
-      const base64Data = await b64(file);
-      const dataUrl = `data:${file.type || 'image/jpeg'};base64,${base64Data}`;
-      const endpoint = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${key}`
-        },
-        body: JSON.stringify({
-          model: "llama-3.2-11b-vision-preview",
-          temperature: 0.1,
-          messages: [{
-            role: "user",
-            content: [
-              { type: "text", text: "Extrais l'emploi du temps. Réponds UNIQUEMENT avec un tableau JSON: [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]" },
-              { type: "image_url", image_url: { url: dataUrl } }
-            ]
-          }]
-        })
-      });
-
-      const textResponse = await res.text();
-      let jsonRes;
-      try {
-        jsonRes = JSON.parse(textResponse);
-      } catch (e) {
-        throw new Error("Groq API a renvoyé du HTML. Vérifiez votre clé API Groq.");
-      }
-
-      if (!res.ok) {
-        throw new Error(jsonRes.error?.message || `Erreur HTTP ${res.status}`);
-      }
-
-      return jsonRes.choices[0].message.content;
-    }
-
-    /* ==========================================================================
-       STOCKAGE LOCAL & DRIVE
-       ========================================================================== */
-    const DB_NAME = 'EduVaultLocalFiles';
-    let dbInstance = null;
-
-    function initIndexedDB() {
-      return new Promise((ok, ko) => {
-        const req = indexedDB.open(DB_NAME, 1);
-        req.onupgradeneeded = e => {
-          if (!e.target.result.objectStoreNames.contains('files')) {
-            e.target.result.createObjectStore('files', { keyPath: 'id' });
-          }
-        };
-        req.onsuccess = () => ok(dbInstance = req.result);
-        req.onerror = () => ko(req.error);
-      });
-    }
-
-    async function storeLocalFile(id, file) {
-      if (!dbInstance) await initIndexedDB();
-      return new Promise((ok) => {
-        const tx = dbInstance.transaction('files', 'readwrite');
-        const reader = new FileReader();
-        reader.onload = e => {
-          tx.objectStore('files').put({ id, name: file.name, type: file.type, dataUrl: e.target.result });
-          ok();
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    async function openLocalFile(id) {
-      if (!dbInstance) await initIndexedDB();
-      const req = dbInstance.transaction('files', 'readonly').objectStore('files').get(id);
-      req.onsuccess = () => {
-        if (!req.result) return showToast("Fichier introuvable en base locale", "error");
-        const w = window.open();
-        if (w) {
-          w.document.write(`<iframe src="${req.result.dataUrl}" style="border:0;width:100%;height:100%;"></iframe>`);
-        } else {
-          showToast("Ouverture bloquée par le navigateur", "warning");
-        }
-      };
-    }
-
-    let tokenClient = null, driveAccessToken = null;
-    function initDriveClient() {
-      if (window.google?.accounts?.oauth2) {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: '786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com',
-          scope: '[https://www.googleapis.com/auth/drive.file](https://www.googleapis.com/auth/drive.file)',
-          callback: (res) => {
-            if (res.error) return showToast("Échec authentification Drive: " + res.error, "error");
-            driveAccessToken = res.access_token;
-            updateDriveUI(true);
-            showToast("Connecté à Google Drive", "success");
-          }
-        });
-      } else {
-        setTimeout(initDriveClient, 800);
-      }
-    }
-
-    function toggleDriveAuth() {
-      if (!tokenClient) return showToast("Initialisation de l'API Google...", "warning");
-      if (driveAccessToken) {
-        driveAccessToken = null;
-        updateDriveUI(false);
-        showToast("Déconnecté de Google Drive", "info");
-      } else {
-        tokenClient.requestAccessToken();
-      }
-    }
-
-    function updateDriveUI(connected) {
-      document.getElementById('driveStatusText').innerText = connected ? 'Drive Connecté' : 'Drive Cloud';
-      document.getElementById('driveDot').className = connected ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' : 'w-2 h-2 rounded-full bg-red-500';
-    }
-
-    function calculateSemesterAverage() {
-      const semsMods = appState.modules.filter(m => m.semester === appState.activeSemester && m.grade !== null && m.grade !== undefined);
-      const display = document.getElementById('semAverageDisplay');
-      if (!semsMods.length) {
-        display.innerText = '-- / 20';
-        return;
-      }
-      let total = 0, coefs = 0;
-      semsMods.forEach(m => {
-        total += (m.grade * m.coeff);
-        coefs += m.coeff;
-      });
-      display.innerText = (total / coefs).toFixed(2) + ' / 20';
-    }
-
-    function exportDataJSON() {
-      const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
-      const a = document.createElement('a');
-      a.href = str;
-      a.download = `EduVault_Sauvegarde_${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      showToast("Sauvegarde exportée", "success");
-    }
-
-    function importDataJSON(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const r = new FileReader();
-      r.onload = ev => {
-        try {
-          appState = Object.assign(appState, JSON.parse(ev.target.result));
-          saveData();
-          location.reload();
-        } catch(err) {
-          showToast("Format JSON invalide", "error");
-        }
-      };
-      r.readAsText(file);
-    }
-
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-    function backdropClose(e, id) { if (e.target.id === id) closeModal(id); }
-
-    function showToast(msg, type = 'info') {
-      const c = document.getElementById('toastContainer');
-      const t = document.createElement('div');
-      const bg = type === 'error' ? 'bg-red-600' : (type === 'success' ? 'bg-emerald-600' : (type === 'warning' ? 'bg-amber-600' : 'bg-gray-900'));
-      t.className = `inline-block px-4 py-2.5 rounded-full text-xs text-white shadow-2xl font-bold animate-bounce ${bg}`;
-      t.innerText = msg;
-      c.appendChild(t);
-      setTimeout(() => t.remove(), 3500);
-    }
-
-    function initTheme() {
-      if (localStorage.getItem('eduTheme') === 'light') {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-
-    function toggleTheme() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('eduTheme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    }
-  </script>
+</header>
+<main id="v"></main>
+<nav id="nav">
+  <button data-t="tt"><span>🗓</span>Horaires</button>
+  <button data-t="ag"><span>🔔</span>Agenda</button>
+  <button data-t="mo"><span>📚</span>Cours</button>
+  <button data-t="fc"><span>🃏</span>Fiches</button>
+  <button data-t="po"><span>⏱</span>Focus</button>
+  <button data-a="set"><span>⚙️</span>Plus</button>
+</nav>
+<dialog id="dlg"></dialog>
+<div id="ts" aria-live="polite"></div>
+
+<script>
+const $=i=>document.getElementById(i);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LV={CP1:['S1','S2'],CP2:['S3','S4'],CI1:['S5','S6'],CI2:['S7','S8'],CI3:['S9','S10']};
+const DAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const CATS=[['cours','📚 Cours'],['td','📝 TD / TP'],['examen','🎯 Examens'],['resume','⚡ Résumés']];
+const KEY='eduVaultData_vFinal3';
+const GEMINI_MODEL='gemini-2.5-flash'; /* verifie le nom actuel sur ai.google.dev/gemini-api/docs/models */
+const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.';
+const CLIENT_ID='786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com';
+let A={activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[]};
+let tab='tt',filt='all',cardMod='all',q='',cur={},tok=null,tc=null;
+
+/* ---------- utils ---------- */
+const uid=p=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const iso=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+const monday=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+const sems=()=>LV[A.settings.level]||LV.CP1;
+const mods=()=>A.modules.filter(m=>m.semester===A.activeSemester);
+const modName=id=>A.modules.find(m=>m.id===id)?.name||'?';
+function toast(m,t=''){const e=document.createElement('div');e.className=t;e.textContent=m;$('ts').append(e);setTimeout(()=>e.remove(),3500)}
+function notify(t,b){try{if(window.Notification&&Notification.permission==='granted')new Notification(t,{body:b})}catch(e){}toast(t+' : '+b);try{navigator.vibrate([200,100,200])}catch(e){}}
+const L={};const lib=s=>L[s]||(L[s]=new Promise((ok,ko)=>{const e=document.createElement('script');e.src=s;e.onload=ok;e.onerror=()=>{delete L[s];ko(new Error('Chargement impossible (connexion ?)'))};document.head.append(e)}));
+function dlBlob(n,b){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.append(a);a.click();a.remove()}
+function shrink(f,max=800,qa=.6){return new Promise((ok,ko)=>{const r=new FileReader();r.onerror=ko;r.onload=()=>{const im=new Image();im.onerror=ko;im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',qa))};im.src=r.result};r.readAsDataURL(f)})}
+
+/* ---------- data ---------- */
+function load(o){
+  try{Object.assign(A,o||JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+  for(const k of ['modules','tasks','flashcards','timetable','notes'])if(!Array.isArray(A[k]))A[k]=[];
+  A.settings=Object.assign({level:null,currentWeek:'A',weekRef:'',holidays:[]},A.settings);
+  if(!Array.isArray(A.settings.holidays))A.settings.holidays=[];
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){toast('Stockage plein : supprimez des photos','er')}}
+function upd(){save();render()}
+
+/* ---------- week A/B + holidays ---------- */
+function curWeek(){const s=A.settings,c=s.currentWeek||'A';if(!s.weekRef)return c;const k=Math.round((monday(new Date())-monday(new Date(s.weekRef+'T00:00')))/6048e5);return Math.abs(k)%2===0?c:(c==='A'?'B':'A')}
+const isHol=d=>A.settings.holidays.includes(d);
+function ranges(){const r=[];[...A.settings.holidays].sort().forEach(d=>{const l=r[r.length-1];if(l){const n=new Date(l[1]+'T00:00');n.setDate(n.getDate()+1);if(iso(n)===d){l[1]=d;return}}r.push([d,d])});return r}
+
+/* ---------- generic form dialog ---------- */
+function ask(title,fields,ok){
+  const d=$('dlg');
+  d.innerHTML=`<form><h3>${esc(title)}</h3>${fields.map(f=>`<label>${esc(f.l)}${
+    f.t==='select'?`<select name="${f.k}">${f.o.map(o=>`<option value="${esc(o[0])}"${o[0]==f.v?' selected':''}>${esc(o[1])}</option>`).join('')}</select>`:
+    f.t==='textarea'?`<textarea name="${f.k}" rows="3"${f.r?' required':''}>${esc(f.v)}</textarea>`:
+    `<input name="${f.k}" type="${f.t||'text'}" value="${esc(f.v)}"${f.r?' required':''}${f.a||''}>`}</label>`).join('')}
+    <div class="row"><button type="button" class="b" onclick="$('dlg').close()">Annuler</button><button class="b p">OK</button></div></form>`;
+  d.querySelector('form').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.target);d.close();ok(Object.fromEntries(fd),fd)};
+  d.oncancel=null;d.showModal();
+}
+
+/* ---------- views ---------- */
+const pills=()=>`<div class="pills">${sems().map(s=>`<button class="b${s===A.activeSemester?' p':''}" data-a="sem" data-i="${s}">${s}</button>`).join('')}</div>`;
+function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&new Date(t.dueDate)>n).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];if(!t)return'';const h=Math.floor((new Date(t.dueDate)-n)/36e5),d=Math.floor(h/24);return`<div class="up" data-a="goAg">⏰ ${t.type==='exam'?'Examen':'Devoir'} : ${esc(t.title)} (${d>0?'dans '+d+' j':h>0?'dans '+h+' h':'très bientôt'})</div>`}
+function avg(){const ms=mods().filter(m=>m.grade!==null&&m.grade!==undefined);let t=0,c=0;ms.forEach(m=>{t+=m.grade*m.coeff;c+=m.coeff});$('avg').textContent=ms.length?`Moy. ${A.activeSemester} : ${(t/c).toFixed(2)}`:''}
+
+function rTT(){
+  const wk=curWeek(),ids=mods().map(m=>m.id),tt=A.timetable.filter(c=>ids.includes(c.moduleId)&&(c.week==='all'||c.week===wk));
+  const days=DAYS.filter((d,i)=>i<6||tt.some(c=>c.day===d));
+  return pills()+`<div class="top"><div><h2>Emploi du temps</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">+ Séance</button></div></div><div class="g">`+
+  days.map(d=>`<div class="c"><h4>${d}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
+    const n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
+    return`<div class="cl${n?' nt':''}" data-a="cls" data-i="${c.id}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||'<p class="mu e">Aucune séance</p>')+'</div>').join('')+'</div>';
+}
+function rAg(){
+  const ids=mods().map(m=>m.id),l=A.tasks.filter(t=>ids.includes(t.moduleId)&&(filt==='all'||t.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  return pills()+`<div class="top"><h2>Examens & Devoirs</h2><div><button class="b p" data-a="addTask">+ Ajouter</button></div></div><div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${f[1]}</button>`).join('')}</div>`+
+  (l.length?l.map(t=>`<div class="c t${t.type==='exam'?' x':''}${t.completed?' d':''}"><input type="checkbox" ${t.completed?'checked':''} data-a="done" data-i="${t.id}" aria-label="Terminé"><div><b>${t.type==='exam'?'🚨 ':'📝 '}${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))} • ${new Date(t.dueDate).toLocaleString('fr-FR')}</small></div><button class="x-btn" data-a="delTask" data-i="${t.id}" aria-label="Supprimer">🗑</button></div>`).join(''):'<p class="mu e">Aucune échéance</p>');
+}
+function mgrid(){
+  const l=mods().filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
+  return l.length?l.map(m=>`<div class="c"><div class="top" style="margin:0"><div><small class="br">${m.semester} · Note : ${m.grade!=null?m.grade+'/20':'-'} · coef ${m.coeff}</small><b>${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>`+
+    CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>`<div>${x.isLocal?`<button class="l" data-a="openRes" data-i="${esc(x.localFileId)}">📄 ${esc(x.title)}</button>`:`<a href="${esc(x.url)}" target="_blank" rel="noopener">🔗 ${esc(x.title)}</a>`}<button class="x-btn" data-a="delRes" data-i="${m.id}|${x.id}" aria-label="Supprimer">✕</button></div>`).join('')}</div>`}).join('')+'</div>').join(''):`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`;
+}
+function rMo(){return pills()+`<div class="top"><h2>Modules & Cours</h2><div><button class="b p" data-a="addMod">+ Module</button></div></div><input type="search" placeholder="Rechercher un module..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
+function rFc(){
+  const ms=mods(),ids=ms.map(m=>m.id),l=A.flashcards.filter(f=>ids.includes(f.moduleId)&&(cardMod==='all'||f.moduleId===cardMod));
+  return pills()+`<div class="top"><h2>Active Recall</h2><div><button class="b p" data-a="addFc">+ Créer</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
+  (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu">QUESTION</small><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div><div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><small class="mu">Touchez pour retourner</small></div></div></div>`).join(''):'<p class="mu e" style="grid-column:1/-1">Aucune fiche</p>')+'</div>';
+}
+
+/* ---------- pomodoro ---------- */
+const PM={work:[1500,'Concentration','Travail (25m)'],short:[300,'Pause','Pause (5m)'],long:[900,'Longue pause','Longue (15m)']};
+let P={mode:'work',left:1500,total:1500,end:0,t:null};
+function rPo(){return`<div class="c pm"><div class="row">${Object.keys(PM).map(k=>`<button class="b${P.mode===k?' p':''}" data-a="pmode" data-i="${k}">${PM[k][2]}</button>`).join('')}</div><select id="pms" style="margin-top:12px"><option value="">Focus libre</option>${mods().map(m=>`<option>${esc(m.name)}</option>`).join('')}</select><div class="ring"><svg viewBox="0 0 100 100" width="220" height="220"><circle cx="50" cy="50" r="45" fill="none" stroke="var(--in)" stroke-width="5"/><circle id="pp" cx="50" cy="50" r="45" fill="none" stroke="var(--br)" stroke-width="5" stroke-linecap="round" stroke-dasharray="283"/></svg><div><b id="pt"></b><small class="mu" id="pl"></small></div></div><div class="row"><button class="b p" id="pb" data-a="ptoggle" style="min-width:56px">▶</button><button class="b" data-a="preset" aria-label="Réinitialiser">↻</button></div></div>`}
+function ppaint(){if(!$('pt'))return;$('pt').textContent=String(Math.floor(P.left/60)).padStart(2,'0')+':'+String(P.left%60).padStart(2,'0');$('pl').textContent=PM[P.mode][1];$('pp').style.strokeDashoffset=283-((P.total-P.left)/P.total)*283;$('pb').textContent=P.t?'⏸':'▶'}
+function ptick(){P.left=Math.max(0,Math.round((P.end-Date.now())/1000));ppaint();if(!P.left){clearInterval(P.t);P.t=null;P.left=P.total;notify('Pomodoro','Session terminée !');ppaint()}}
+
+/* ---------- render ---------- */
+const R={tt:rTT,ag:rAg,mo:rMo,fc:rFc,po:rPo};
+function render(){$('v').innerHTML=banner()+R[tab]();avg();ppaint()}
+function go(t){tab=t;document.querySelectorAll('#nav [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render();
+  try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission()}catch(e){}}
+
+/* ---------- actions ---------- */
+function modForm(m){ask(m?'Modifier le module':'Nouveau module',[
+  {k:'semester',l:'Semestre',t:'select',o:sems().map(s=>[s,s]),v:m?.semester||A.activeSemester},
+  {k:'name',l:'Nom du module',r:1,v:m?.name},{k:'prof',l:'Professeur (optionnel)',v:m?.prof},
+  {k:'grade',l:'Note /20',t:'number',a:' min="0" max="20" step="0.25"',v:m?.grade??''},
+  {k:'coeff',l:'Coefficient',t:'number',a:' min="0.5" step="0.5"',v:m?.coeff??1}],v=>{
+  const o={semester:v.semester,name:v.name.trim(),prof:v.prof.trim(),grade:v.grade===''?null:+v.grade,coeff:+v.coeff||1};
+  m?Object.assign(m,o):A.modules.push({id:uid('m'),resources:[],...o});upd();toast('Module enregistré','ok')})}
+const needMod=()=>mods().length?false:(toast("Ajoutez d'abord un module pour ce semestre",'er'),true);
+const modOpts=()=>mods().map(m=>[m.id,m.name]);
+
+const act={
+  sem:i=>{A.activeSemester=i;cardMod='all';upd()},
+  flt:i=>{filt=i;render()},
+  goAg:()=>go('ag'),
+  theme:()=>{document.documentElement.classList.toggle('dark');localStorage.setItem('eduTheme',document.documentElement.classList.contains('dark')?'dark':'light')},
+  lvl:i=>{A.settings.level=i;A.activeSemester=LV[i][0];$('dlg').oncancel=null;$('dlg').close();upd();toast('Niveau '+i+' configuré','ok')},
+  addCls:()=>{if(needMod())return;ask('Séance',[{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'day',l:'Jour',t:'select',o:DAYS.map(d=>[d,d])},{k:'week',l:'Semaine',t:'select',o:[['all','Toutes les semaines'],['A','Semaine A'],['B','Semaine B']]},{k:'startTime',l:'Début',t:'time',r:1},{k:'endTime',l:'Fin',t:'time',r:1},{k:'room',l:'Salle ou amphi',r:1}],v=>{
+    if(v.endTime<=v.startTime)return toast("L'heure de fin doit être après le début",'er');A.timetable.push({id:uid('c'),...v});upd();toast('Séance ajoutée','ok')})},
+  addMod:()=>modForm(),
+  editMod:i=>modForm(A.modules.find(m=>m.id===i)),
+  delMod:i=>{if(!confirm('Supprimer ce module, ses séances, devoirs et fiches ?'))return;
+    (A.modules.find(m=>m.id===i)?.resources||[]).forEach(r=>r.isLocal&&fst('delete',r.localFileId).catch(()=>{}));
+    A.modules=A.modules.filter(x=>x.id!==i);for(const k of ['timetable','tasks','flashcards'])A[k]=A[k].filter(x=>x.moduleId!==i);upd()},
+  addTask:()=>{if(needMod())return;ask('Ajouter une échéance',[{k:'title',l:'Titre',r:1},{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'type',l:'Type',t:'select',o:[['exam','🚨 Examen'],['homework','📝 Devoir']]},{k:'dueDate',l:'Date et heure',t:'datetime-local',r:1}],v=>{A.tasks.push({id:uid('t'),...v,title:v.title.trim(),completed:false});upd();toast('Échéance ajoutée','ok')})},
+  done:i=>{const t=A.tasks.find(x=>x.id===i);if(t){t.completed=!t.completed;upd()}},
+  delTask:i=>{A.tasks=A.tasks.filter(x=>x.id!==i);upd()},
+  addFc:()=>{if(needMod())return;ask('Nouvelle fiche',[{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'q',l:'Question (recto)',t:'textarea',r:1},{k:'a',l:'Réponse (verso)',t:'textarea',r:1}],v=>{A.flashcards.push({id:uid('f'),moduleId:v.moduleId,q:v.q.trim(),a:v.a.trim()});upd();toast('Fiche créée','ok')})},
+  delFc:i=>{A.flashcards=A.flashcards.filter(x=>x.id!==i);upd()},
+  flip:(i,b)=>b.classList.toggle('fl'),
+  addRes:i=>{const m=A.modules.find(x=>x.id===i);ask('Ajouter un document',[{k:'type',l:'Catégorie',t:'select',o:CATS},{k:'title',l:'Titre',r:1},{k:'src',l:'Source',t:'select',o:[['local','Fichier local (sur cet appareil)'],['drive','Téléverser sur Google Drive'],['url','Lien web']]},{k:'file',l:'Fichier (local / Drive)',t:'file'},{k:'url',l:'Lien (si Lien web)',t:'url'}],async(v,fd)=>{
+    try{const f=fd.get('file'),r={id:uid('r'),title:v.title.trim(),type:v.type};
+      if(v.src==='url'){if(!v.url)throw Error('Saisissez une URL');r.url=v.url;r.isLocal=false}
+      else{if(!f||!f.size)throw Error('Sélectionnez un fichier');
+        if(v.src==='local'){r.localFileId=uid('f');r.isLocal=true;await fst('put',{id:r.localFileId,name:f.name,type:f.type,blob:f})}
+        else{if(!tok)throw Error("Connectez-vous d'abord à Google Drive (bouton ☁️)");const form=new FormData();form.append('metadata',new Blob([JSON.stringify({name:v.title+' - '+f.name,mimeType:f.type})],{type:'application/json'}));form.append('file',f);
+          const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+tok},body:form}),d=await res.json();
+          if(!d.id)throw Error('Échec du téléversement Google Drive');r.url='https://drive.google.com/file/d/'+d.id+'/view';r.isLocal=false}}
+      (m.resources=m.resources||[]).push(r);upd();toast('Document enregistré','ok')}catch(e){toast(e.message,'er')}})},
+  delRes:i=>{const[mi,ri]=i.split('|'),m=A.modules.find(x=>x.id===mi),r=m?.resources.find(x=>x.id===ri);if(!r)return;if(r.isLocal)fst('delete',r.localFileId).catch(()=>{});m.resources=m.resources.filter(x=>x.id!==ri);upd()},
+  openRes:async i=>{try{const r=await fst('get',i);if(!r)return toast('Fichier introuvable','er');const b=r.blob||await(await fetch(r.dataUrl)).blob();
+    if(window.AndroidBridge)dlBlob(r.name,b);else window.open(URL.createObjectURL(new Blob([b],{type:r.type||b.type})),'_blank')}catch(e){toast(e.message,'er')}},
+  cls:i=>clsDlg(i),
+  pf:()=>$('pf').click(),
+  delPh:i=>{cur.ph.splice(+i,1);drawPh()},
+  saveNote:()=>{let n=A.notes.find(x=>x.classId===cur.id);if(!n){n={classId:cur.id};A.notes.push(n)}n.text=$('nt').value.trim();n.photos=[...cur.ph];n.date=new Date().toISOString();$('dlg').close();upd();toast('Notes enregistrées','ok')},
+  delCls:i=>{if(!confirm("Supprimer ce cours de l'emploi du temps ?"))return;A.timetable=A.timetable.filter(x=>x.id!==i);A.notes=A.notes.filter(x=>x.classId!==i);$('dlg').close();upd()},
+  pmode:i=>{clearInterval(P.t);P.t=null;P.mode=i;P.total=P.left=PM[i][0];render()},
+  ptoggle:()=>{if(P.t){clearInterval(P.t);P.t=null;P.left=Math.max(0,Math.round((P.end-Date.now())/1000))}else{P.end=Date.now()+P.left*1000;P.t=setInterval(ptick,300)}ppaint()},
+  preset:()=>{clearInterval(P.t);P.t=null;P.left=P.total;ppaint()},
+  ai:()=>ask('Importation IA',[{k:'key',l:'Clé API Google Gemini (aistudio.google.com/apikey)',t:'password',r:1,v:localStorage.getItem('eduVault_aiKey')||''},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport),
+  drive:async()=>{if(tok){tok=null;paintDrive();return toast('Drive déconnecté')}
+    try{await lib('https://accounts.google.com/gsi/client');tc=tc||google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.file',callback:r=>{if(r.error)return toast('Échec authentification Drive','er');tok=r.access_token;paintDrive();toast('Connecté à Google Drive','ok')}});tc.requestAccessToken()}catch(e){toast(e.message,'er')}},
+  set:()=>settings(),
+  addHol:()=>{const a=$('h1').value,b=$('h2').value||a;if(!a||b<a)return toast('Dates invalides','er');const d=new Date(a+'T00:00');for(let n=0;iso(d)<=b&&n<400;n++){const s=iso(d);if(!isHol(s))A.settings.holidays.push(s);d.setDate(d.getDate()+1)}upd();settings()},
+  delHol:i=>{const[a,b]=i.split('|');A.settings.holidays=A.settings.holidays.filter(d=>d<a||d>b);upd();settings()},
+  exp:()=>{dlBlob('EduVault_Sauvegarde_'+iso(new Date())+'.json',new Blob([JSON.stringify(A,null,2)],{type:'application/json'}));toast('Sauvegarde exportée','ok')},
+  imp:()=>$('jf').click()
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&act[b.dataset.a])act[b.dataset.a](b.dataset.i,b)});
+$('nav').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)go(b.dataset.t)});
+
+/* ---------- class details (notes + photos) ---------- */
+function drawPh(){$('ph').innerHTML=cur.ph.map((s,i)=>`<div><img src="${s}" alt="Photo ${i+1}"><button data-a="delPh" data-i="${i}" aria-label="Retirer">✕</button></div>`).join('')}
+function clsDlg(id){
+  const c=A.timetable.find(x=>x.id===id);if(!c)return;const n=A.notes.find(x=>x.classId===id)||{text:'',photos:[]};cur={id,ph:[...(n.photos||[])]};
+  const d=$('dlg');d.innerHTML=`<h3>${esc(modName(c.moduleId))}</h3><small class="mu">${esc(c.day)} ${esc(c.startTime)} – ${esc(c.endTime)} · 📍 ${esc(c.room)}</small><label>Notes du cours<textarea id="nt" rows="4" placeholder="Points importants, chapitres traités...">${esc(n.text)}</textarea></label><div id="ph" class="ph"></div><input id="pf" type="file" accept="image/*" multiple hidden><div class="row"><button class="b" data-a="pf">📷 Photo (max 3)</button><button class="b" style="color:var(--er)" data-a="delCls" data-i="${id}">🗑 Supprimer</button><button class="b" onclick="$('dlg').close()">Fermer</button><button class="b p" data-a="saveNote">Sauvegarder</button></div>`;
+  $('pf').onchange=async e=>{const fs=[...e.target.files];if(cur.ph.length+fs.length>3)return toast('Maximum 3 photos','er');for(const f of fs)try{cur.ph.push(await shrink(f))}catch(x){toast('Image illisible','er')}drawPh()};
+  drawPh();d.oncancel=null;d.showModal();
+}
+
+/* ---------- settings ---------- */
+function settings(){
+  const d=$('dlg'),s=A.settings;
+  d.innerHTML=`<h3>⚙️ Réglages</h3><label>Niveau actuel<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
+  <label>Semaine actuelle (l'alternance A/B est automatique)<select onchange="chgWk(this.value)"><option value="A"${curWeek()==='A'?' selected':''}>Semaine A</option><option value="B"${curWeek()==='B'?' selected':''}>Semaine B</option></select></label>
+  <label>Vacances & jours chômés (du / au)<span class="row" style="margin:4px 0 0"><input type="date" id="h1" aria-label="Du"><input type="date" id="h2" aria-label="Au"><button class="b p" data-a="addHol">+</button></span></label>
+  <div>${ranges().map(r=>`<span class="chip">${r[0]===r[1]?r[0]:r[0]+' → '+r[1]}<button class="x-btn" data-a="delHol" data-i="${r[0]}|${r[1]}" aria-label="Supprimer">✕</button></span>`).join('')}</div>
+  <div class="row"><button class="b" data-a="exp">⬇ Exporter</button><button class="b" data-a="imp">⬆ Importer</button><button class="b p" onclick="$('dlg').close()">Fermer</button></div><input type="file" id="jf" accept=".json,application/json" hidden>`;
+  $('jf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||!Array.isArray(o.modules))throw 0;if(!confirm('Remplacer toutes vos données par cette sauvegarde ?'))return;load(o);upd();$('dlg').close();toast('Sauvegarde restaurée','ok')}catch(x){toast('Format JSON invalide','er')}};r.readAsText(f)};
+  d.oncancel=null;d.showModal();
+}
+function chgLvl(l){A.settings.level=l;A.activeSemester=LV[l][0];upd()}
+function chgWk(w){A.settings.currentWeek=w;A.settings.weekRef=iso(monday(new Date()));upd()}
+
+/* ---------- local files (IndexedDB) ---------- */
+let db;const idb=()=>db?Promise.resolve(db):new Promise((ok,ko)=>{const r=indexedDB.open('EduVaultLocalFiles',1);r.onupgradeneeded=()=>r.result.createObjectStore('files',{keyPath:'id'});r.onsuccess=()=>ok(db=r.result);r.onerror=()=>ko(r.error)});
+const fst=async(m,...a)=>{const d=await idb();return new Promise((ok,ko)=>{const t=d.transaction('files',m==='get'?'readonly':'readwrite'),r=t.objectStore('files')[m](...a);t.oncomplete=()=>ok(r.result);t.onerror=()=>ko(t.error)})};
+
+/* ---------- AI import ---------- */
+async function toImages(f){
+  if(f.type==='application/pdf'||/\.pdf$/i.test(f.name)){
+    await lib(PDFJS+'min.js');pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'worker.min.js';
+    const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,out=[];
+    for(let i=1;i<=Math.min(pdf.numPages,3);i++){const pg=await pdf.getPage(i),vp=pg.getViewport({scale:1.5}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;out.push(c.toDataURL('image/jpeg',.85))}
+    return out}
+  return[await shrink(f,1600,.85)];
+}
+const normDay=s=>{const x=String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return DAYS.find(d=>d.toLowerCase()===x)};
+async function aiImport(v,fd){
+  const f=fd.get('file');if(!f||!f.size)return toast('Sélectionnez un document','er');
+  localStorage.setItem('eduVault_aiKey',v.key.trim());toast('Analyse en cours...');
+  try{
+    const imgs=await toImages(f),parts=[{text:'Extrais l\'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"jour":"LUNDI","debut":"08:30","fin":"10:30","matiere":"Nom du module","salle":"Amphi A"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI).'}];
+    imgs.forEach(i=>parts.push({inline_data:{mime_type:'image/jpeg',data:i.split(',')[1]}}));
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(v.key.trim())}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:.1}})});
+    let j;try{j=await res.json()}catch(e){throw Error('Réponse invalide de l\'API (clé ou quota ?)')}
+    if(!res.ok)throw Error(j.error?.message||'Erreur HTTP '+res.status);
+    const raw=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').replace(/```(?:json)?/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
+    if(a<0||b<a)throw Error("L'IA n'a pas renvoyé de JSON valide.");
+    const ss=JSON.parse(raw.slice(a,b+1)).filter(s=>s.matiere&&s.debut&&s.fin&&normDay(s.jour));
+    if(!ss.length)throw Error('Aucun cours trouvé dans ce document.');
+    ss.forEach(s=>{let m=A.modules.find(x=>x.semester===A.activeSemester&&x.name.toLowerCase()===String(s.matiere).toLowerCase());
+      if(!m){m={id:uid('m'),semester:A.activeSemester,name:String(s.matiere),prof:s.prof||'',coeff:1,grade:null,resources:[]};A.modules.push(m)}
+      A.timetable.push({id:uid('c'),moduleId:m.id,day:normDay(s.jour),week:'all',startTime:s.debut,endTime:s.fin,room:s.salle||'Salle'})});
+    upd();toast(ss.length+' séances importées !','ok');
+  }catch(e){toast('Erreur IA : '+e.message,'er')}
+}
+
+/* ---------- reminders / drive UI / boot ---------- */
+const fired=new Set();
+function chk(){const n=new Date();A.tasks.filter(t=>!t.completed).forEach(t=>{const d=new Date(t.dueDate)-n;
+  if(d>0&&d<=36e5&&!fired.has(t.id+'h')){fired.add(t.id+'h');notify('Rappel : '+t.title,"Échéance dans moins d'une heure !")}
+  if(d>36e5&&d<=864e5&&n.getHours()>=18&&!fired.has(t.id+'d')){fired.add(t.id+'d');notify('Demain : '+t.title,'Révisez ce soir !')}})}
+function paintDrive(){$('dd').style.color=tok?'#10b981':'#ef4444'}
+function onboard(){const d=$('dlg');d.innerHTML=`<h3>🎓 Bienvenue sur EduVault</h3><p class="mu">Sélectionnez votre niveau actuel :</p><div class="g" style="grid-template-columns:1fr 1fr;margin-top:12px">${Object.keys(LV).map(l=>`<button class="b" data-a="lvl" data-i="${l}">${l}<small class="mu">${LV[l].join(' & ')}</small></button>`).join('')}</div>`;d.oncancel=e=>e.preventDefault();d.showModal()}
+
+load();
+if(localStorage.getItem('eduTheme')==='light')document.documentElement.classList.remove('dark');
+paintDrive();go('tt');
+if(!A.settings.level)onboard();
+setInterval(chk,6e4);chk();
+</script>
 </body>
 </html>
