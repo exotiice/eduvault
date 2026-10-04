@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduVault - Academic Management & Study Dashboard</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { brand: { 50: '#f0f7ff', 100: '#e0effe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a' } } } }
+    }
+  </script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google GIS (Google Drive Auth) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-500/30">
+          <i class="fa-solid fa-vault"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent">EduVault</h1>
+          <p class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Espace Académique & Révision</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        
+        <!-- Google Drive Auth Button -->
+        <button id="driveAuthBtn" onclick="toggleDriveAuth()" class="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium rounded-xl border transition bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-200">
+          <i class="fa-brands fa-google-drive text-emerald-500 text-sm"></i>
+          <span id="driveStatusText" class="hidden md:inline">Drive Cloud</span>
+          <span id="driveDot" class="w-2 h-2 rounded-full bg-red-500"></span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">
+          <i id="themeIcon" class="fa-solid fa-moon"></i>
+        </button>
+
+        <!-- Backup Data Modal -->
+        <button onclick="openModal('backupModal')" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">
+          <i class="fa-solid fa-database"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Left Sidebar Navigation -->
+      <nav class="lg:col-span-3 space-y-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm space-y-1">
+          <button onclick="switchTab('modulesView')" id="tab-modulesView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-colors text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30">
+            <i class="fa-solid fa-graduation-cap text-lg w-5 text-center"></i>
+            <span>Semestres & Modules</span>
+          </button>
+          <button onclick="switchTab('plannerView')" id="tab-plannerView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+            <i class="fa-solid fa-calendar-check text-lg w-5 text-center"></i>
+            <span>Planning & Échéances</span>
+            <span id="pendingBadge" class="ml-auto bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+          </button>
+          <button onclick="switchTab('flashcardsView')" id="tab-flashcardsView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+            <i class="fa-solid fa-layer-group text-lg w-5 text-center"></i>
+            <span>Fiches 3D (Active Recall)</span>
+          </button>
+          <button onclick="switchTab('pomodoroView')" id="tab-pomodoroView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+            <i class="fa-solid fa-stopwatch text-lg w-5 text-center"></i>
+            <span>Pomodoro Focus</span>
+          </button>
+        </div>
+
+        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-4 shadow-md space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold tracking-wider text-indigo-300 uppercase">Moyenne S.</span>
+            <i class="fa-solid fa-calculator text-indigo-400"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-black" id="semAverageDisplay">-- / 20</div>
+            <div class="text-[11px] text-indigo-200 mt-0.5" id="semAverageStatus">Ajoutez vos notes</div>
+          </div>
+          <div class="pt-2 border-t border-indigo-800 text-[11px] text-gray-300 flex items-center justify-between">
+            <span>Docs:</span>
+            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-cloud"></i> Local & Drive</span>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content Container -->
+      <main class="lg:col-span-9 space-y-6">
+        <!-- VIEW 1: MODULES & RESOURCES -->
+        <section id="modulesView" class="view-content space-y-6">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-1.5 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 custom-scrollbar" id="semesterPills"></div>
+            <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
+              <div class="relative w-full md:w-52">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-gray-400"></i>
+                <input type="text" id="moduleSearch" oninput="renderModules()" placeholder="Rechercher cours..." class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-gray-100 dark:bg-gray-700 border-none focus:ring-2 focus:ring-brand-500 text-gray-800 dark:text-gray-100">
+              </div>
+              <button onclick="openAddModuleModal()" class="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition shadow whitespace-nowrap">
+                <i class="fa-solid fa-plus"></i><span>Nouveau Module</span>
+              </button>
+            </div>
+          </div>
+          <div id="modulesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- VIEW 2: PLANNING -->
+        <section id="plannerView" class="view-content hidden space-y-6">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h2 class="text-base font-bold text-gray-900 dark:text-white">Planning & Examens</h2>
+              <p class="text-xs text-gray-500">Suivez vos échéances.</p>
+            </div>
+            <button onclick="openAddTaskModal()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold flex items-center space-x-2 transition shadow">
+              <i class="fa-solid fa-plus"></i><span>Ajouter</span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-2">
+              <button onclick="setTaskFilter('all')" id="btnFilter-all" class="px-3 py-1.5 rounded-lg bg-brand-600 text-white font-medium">Tous</button>
+              <button onclick="setTaskFilter('pending')" id="btnFilter-pending" class="px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">À venir</button>
+              <button onclick="setTaskFilter('completed')" id="btnFilter-completed" class="px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">Terminés</button>
+            </div>
+          </div>
+          <div id="tasksList" class="space-y-3"></div>
+        </section>
+
+        <!-- VIEW 3: FLASHCARDS -->
+        <section id="flashcardsView" class="view-content hidden space-y-6">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h2 class="text-base font-bold text-gray-900 dark:text-white">Active Recall & Fiches 3D</h2>
+            </div>
+            <button onclick="openAddFlashcardModal()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold flex items-center space-x-2 transition shadow">
+              <i class="fa-solid fa-plus"></i><span>Nouvelle Fiche</span>
+            </button>
+          </div>
+          <div class="flex items-center space-x-3 bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+            <span class="text-xs font-medium text-gray-500">Filtrer:</span>
+            <select id="flashcardModuleFilter" onchange="renderFlashcards()" class="bg-gray-100 dark:bg-gray-700 text-xs rounded-lg px-3 py-1.5 border-none focus:ring-2 focus:ring-brand-500 text-gray-800 dark:text-gray-100"></select>
+          </div>
+          <div id="flashcardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- VIEW 4: POMODORO -->
+        <section id="pomodoroView" class="view-content hidden space-y-6">
+          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700 shadow-xl max-w-xl mx-auto text-center space-y-6">
+            <div class="flex justify-center space-x-2">
+              <button onclick="setPomodoroMode('work')" id="pomoBtn-work" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-brand-600 text-white shadow-md">Travail</button>
+              <button onclick="setPomodoroMode('short')" id="pomoBtn-short" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Pause Courte</button>
+              <button onclick="setPomodoroMode('long')" id="pomoBtn-long" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Pause Longue</button>
+            </div>
+            <div class="max-w-xs mx-auto text-xs">
+              <select id="pomoModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl px-3 py-1.5 text-xs text-gray-800 border-none text-center"></select>
+            </div>
+            <div class="relative w-64 h-64 mx-auto flex items-center justify-center">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" class="text-gray-200 dark:text-gray-700 stroke-current" stroke-width="5" fill="transparent"></circle>
+                <circle id="timerProgress" cx="50" cy="50" r="45" class="text-brand-600 stroke-current transition-all duration-1000 ease-linear" stroke-width="5" stroke-dasharray="283" stroke-dashoffset="0" stroke-linecap="round" fill="transparent"></circle>
+              </svg>
+              <div class="absolute flex flex-col items-center">
+                <span id="timerDisplay" class="text-5xl font-black tracking-tight text-gray-900 dark:text-white">25:00</span>
+                <span id="timerLabel" class="text-xs uppercase tracking-widest text-gray-400 font-semibold mt-2">Concentration</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-center space-x-4">
+              <button onclick="togglePomodoro()" id="timerToggleBtn" class="w-14 h-14 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center text-xl shadow-lg shadow-brand-500/30 transition transform active:scale-95">
+                <i class="fa-solid fa-play" id="timerPlayIcon"></i>
+              </button>
+              <button onclick="resetPomodoro()" class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-600 dark:text-gray-300 flex items-center justify-center text-lg transition">
+                <i class="fa-solid fa-rotate-right"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL: MODULE -->
+  <div id="moduleModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'moduleModal')">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between border-b pb-3 dark:border-gray-700">
+        <h3 class="font-bold text-gray-900 dark:text-white" id="moduleModalTitle">Module</h3>
+        <button onclick="closeModal('moduleModal')" class="text-gray-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="moduleForm" onsubmit="saveModule(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="moduleId">
+        <select id="moduleSemester" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+          <option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+          <option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
+        </select>
+        <input type="text" id="moduleName" required placeholder="Nom du Module" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+        <input type="text" id="moduleProf" placeholder="Professeur" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+        <div class="grid grid-cols-2 gap-3">
+          <input type="number" step="0.25" min="0" max="20" id="moduleGrade" placeholder="Note /20" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+          <input type="number" step="1" min="1" id="moduleCoeff" placeholder="Coef" value="1" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-brand-600 text-white">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: RESOURCE -->
+  <div id="resourceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'resourceModal')">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between border-b pb-3 dark:border-gray-700">
+        <h3 class="font-bold text-gray-900 dark:text-white">Document</h3>
+        <button onclick="closeModal('resourceModal')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="flex border-b border-gray-200 dark:border-gray-700 text-xs">
+        <button type="button" onclick="switchResourceTab('local')" id="resTab-local" class="flex-1 py-2 font-bold border-b-2 border-brand-600 text-brand-600">Local (PDF)</button>
+        <button type="button" onclick="switchResourceTab('drive')" id="resTab-drive" class="flex-1 py-2 font-bold border-b-2 border-transparent text-gray-400">Drive Direct</button>
+        <button type="button" onclick="switchResourceTab('manual')" id="resTab-manual" class="flex-1 py-2 font-bold border-b-2 border-transparent text-gray-400">Lien Web</button>
+      </div>
+
+      <form id="resourceForm" onsubmit="saveResource(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="resModuleId">
+        <select id="resCategory" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+          <option value="cours">📚 Cours</option><option value="td">📝 TD</option>
+          <option value="examen">🎯 Examen</option><option value="resume">⚡ Résumé</option>
+        </select>
+        <input type="text" id="resTitle" required placeholder="Titre du document" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+
+        <!-- Panels -->
+        <div id="resPanel-local" class="space-y-2 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl">
+          <label>Fichier depuis votre appareil (stocké localement)</label>
+          <input type="file" id="resLocalFileInput" class="w-full text-xs">
+        </div>
+        
+        <div id="resPanel-drive" class="hidden space-y-2 bg-emerald-50 dark:bg-emerald-900/30 p-4 rounded-xl">
+          <label class="text-emerald-700 dark:text-emerald-400 font-medium">Uploader vers Google Drive</label>
+          <input type="file" id="resDriveFileInput" class="w-full text-xs">
+        </div>
+
+        <div id="resPanel-manual" class="hidden space-y-2">
+          <label>Lien Web URL</label>
+          <input type="url" id="resUrlInput" placeholder="https://..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('resourceModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="submit" id="saveResBtn" class="px-4 py-2 rounded-xl bg-brand-600 text-white">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TASK & FLASHCARD -->
+  <div id="taskModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'taskModal')">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <h3 class="font-bold text-gray-900 dark:text-white">Échéance</h3>
+      <form id="taskForm" onsubmit="saveTask(event)" class="space-y-3.5 text-xs">
+        <input type="text" id="taskTitle" required placeholder="Titre" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        <select id="taskModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
+        <input type="datetime-local" id="taskDueDate" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        <select id="taskPriority" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+          <option value="high">🔴 Haute</option><option value="medium" selected>🟡 Moyenne</option><option value="low">🟢 Basse</option>
+        </select>
+        <button type="submit" class="w-full py-2 bg-brand-600 text-white rounded-xl">Créer</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="flashcardModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'flashcardModal')">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <h3 class="font-bold text-gray-900 dark:text-white">Nouvelle Fiche Active Recall</h3>
+      <form id="flashcardForm" onsubmit="saveFlashcard(event)" class="space-y-3.5 text-xs">
+        <select id="flashcardModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
+        <textarea id="cardQuestion" required rows="2" placeholder="Question" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
+        <textarea id="cardAnswer" required rows="3" placeholder="Réponse" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
+        <button type="submit" class="w-full py-2 bg-brand-600 text-white rounded-xl">Ajouter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <script>
+    /* ==========================================================================
+       !!! CONFIGURATION GOOGLE DRIVE !!!
+       ========================================================================== */
+    const CLIENT_ID = '786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com';
+    let tokenClient = null;
+    let driveAccessToken = null;
+
+    /* ==========================================================================
+       1. INDEXEDDB LOCAL FILE STORAGE
+       ========================================================================== */
+    const DB_NAME = 'EduVaultLocalFiles';
+    let dbInstance = null;
+
+    function initIndexedDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          if (!e.target.result.objectStoreNames.contains('files')) {
+            e.target.result.createObjectStore('files', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = () => resolve(dbInstance = req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function storeLocalFile(id, file) {
+      if (!dbInstance) await initIndexedDB();
+      return new Promise((resolve, reject) => {
+        const tx = dbInstance.transaction('files', 'readwrite');
+        const reader = new FileReader();
+        reader.onload = e => {
+          tx.objectStore('files').put({ id, name: file.name, type: file.type, dataUrl: e.target.result });
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function openLocalFile(id) {
+      if (!dbInstance) await initIndexedDB();
+      const req = dbInstance.transaction('files', 'readonly').objectStore('files').get(id);
+      req.onsuccess = () => {
+        if (!req.result) return showToast('Fichier non trouvé', 'error');
+        const win = window.open();
+        win ? win.document.write(`<iframe src="${req.result.dataUrl}" style="border:0;width:100%;height:100%;"></iframe>`) : showToast('Bloqué par le navigateur', 'warning');
+      };
+    }
+
+    /* ==========================================================================
+       2. GOOGLE DRIVE GIS AUTH & UPLOAD
+       ========================================================================== */
+    function initDriveClient() {
+      if (window.google?.accounts?.oauth2) {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: 'https://www.googleapis.com/auth/drive.file',
+          callback: (res) => {
+            if (res.error) return showToast('Erreur Drive: ' + res.error, 'error');
+            driveAccessToken = res.access_token;
+            updateDriveUI(true);
+            showToast('Connecté à Google Drive !', 'success');
+          }
+        });
+      } else {
+        setTimeout(initDriveClient, 800);
+      }
+    }
+
+    function toggleDriveAuth() {
+      if (!tokenClient) return showToast("API Google en cours de chargement...", 'warning');
+      if (driveAccessToken) {
+        driveAccessToken = null;
+        updateDriveUI(false);
+        showToast('Déconnecté de Drive', 'info');
+      } else {
+        tokenClient.requestAccessToken();
+      }
+    }
+
+    function updateDriveUI(connected) {
+      document.getElementById('driveStatusText').innerText = connected ? 'Drive Connecté' : 'Drive Cloud';
+      document.getElementById('driveDot').className = connected ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' : 'w-2 h-2 rounded-full bg-red-500';
+    }
+
+    /* ==========================================================================
+       3. APP STATE & RENDERING
+       ========================================================================== */
+    let appState = { activeSemester: 'S1', activeTab: 'modulesView', taskFilter: 'all', modules: [], tasks: [], flashcards: [] };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initIndexedDB().catch(console.warn);
+      loadData();
+      initTheme();
+      initDriveClient();
+      renderSemesterPills();
+      renderModules();
+      renderTasks();
+      renderFlashcards();
+      initPomodoro();
+    });
+
+    function loadData() {
+      const saved = localStorage.getItem('eduVaultData_v4');
+      if (saved) appState = Object.assign(appState, JSON.parse(saved));
+      calculateSemesterAverage();
+    }
+    function saveData() {
+      localStorage.setItem('eduVaultData_v4', JSON.stringify(appState));
+      calculateSemesterAverage();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('text-brand-600', 'bg-brand-50', 'dark:bg-brand-900/30'));
+      document.getElementById(tabId).classList.remove('hidden');
+      document.getElementById('tab-' + tabId).classList.add('text-brand-600', 'bg-brand-50', 'dark:bg-brand-900/30');
+      appState.activeTab = tabId;
+    }
+
+    function renderSemesterPills() {
+      document.getElementById('semesterPills').innerHTML = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'].map(s => `
+        <button onclick="setSemester('${s}')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+          appState.activeSemester === s ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-gray-700'
+        }">${s}</button>
+      `).join('');
+    }
+    function setSemester(sem) { appState.activeSemester = sem; renderSemesterPills(); renderModules(); }
+
+    function calculateSemesterAverage() {
+      const currentMods = appState.modules.filter(m => m.semester === appState.activeSemester && m.grade);
+      const avgDisp = document.getElementById('semAverageDisplay');
+      if (!currentMods.length) return avgDisp.innerText = '-- / 20';
+      let totalPts = 0, totalCoef = 0;
+      currentMods.forEach(m => { totalPts += (m.grade * m.coeff); totalCoef += m.coeff; });
+      avgDisp.innerText = (totalPts / totalCoef).toFixed(2) + ' / 20';
+    }
+
+    function renderModules() {
+      const container = document.getElementById('modulesGrid');
+      const query = (document.getElementById('moduleSearch')?.value || '').toLowerCase();
+      const filtered = appState.modules.filter(m => m.semester === appState.activeSemester && m.name.toLowerCase().includes(query));
+
+      container.innerHTML = filtered.map(m => `
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm space-y-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">${m.semester} | Note: ${m.grade || '-'}</span>
+              <h3 class="font-bold text-base mt-1">${m.name}</h3>
+            </div>
+            <div class="flex space-x-1">
+              <button onclick="openAddResourceModal('${m.id}')" class="text-brand-600 hover:bg-gray-100 p-1.5 rounded"><i class="fa-solid fa-file-circle-plus"></i></button>
+              <button onclick="deleteModule('${m.id}')" class="text-red-400 hover:bg-gray-100 p-1.5 rounded"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="space-y-2 text-xs">
+            ${renderResList('📚 Cours', m.resources?.filter(r=>r.type==='cours'), m.id)}
+            ${renderResList('📝 TD', m.resources?.filter(r=>r.type==='td'), m.id)}
+            ${renderResList('🎯 Exam', m.resources?.filter(r=>r.type==='examen'), m.id)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderResList(title, list=[], modId) {
+      return `
+        <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-2.5">
+          <span class="text-[11px] font-semibold text-gray-500">${title}</span>
+          ${list.map(r => `
+            <div class="flex justify-between py-1 px-2 mt-1 bg-white dark:bg-gray-800 border rounded-lg">
+              ${r.isLocal ? `<button onclick="openLocalFile('${r.localFileId}')" class="text-brand-600 truncate"><i class="fa-solid fa-file-pdf mr-1"></i>${r.title}</button>` 
+                         : `<a href="${r.url}" target="_blank" class="text-blue-500 truncate"><i class="fa-solid fa-link mr-1"></i>${r.title}</a>`}
+              <button onclick="deleteRes('${modId}', '${r.id}')" class="text-red-400 ml-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    let currentResTab = 'local';
+    function switchResourceTab(t) {
+      currentResTab = t;
+      ['local', 'drive', 'manual'].forEach(tab => {
+        document.getElementById('resTab-'+tab).className = `flex-1 py-2 font-bold border-b-2 ${tab===t ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400'}`;
+        document.getElementById('resPanel-'+tab).classList.toggle('hidden', tab!==t);
+      });
+    }
+
+    async function saveResource(e) {
+      e.preventDefault();
+      const modId = document.getElementById('resModuleId').value;
+      const title = document.getElementById('resTitle').value;
+      const cat = document.getElementById('resCategory').value;
+      const mod = appState.modules.find(m => m.id === modId);
+      if(!mod.resources) mod.resources = [];
+      const btn = document.getElementById('saveResBtn'); btn.disabled = true;
+
+      try {
+        if(currentResTab === 'local') {
+          const file = document.getElementById('resLocalFileInput').files[0];
+          const localId = 'file_' + Date.now();
+          await storeLocalFile(localId, file);
+          mod.resources.push({ id: 'r_'+Date.now(), title, type: cat, isLocal: true, localFileId: localId });
+        } 
+        else if (currentResTab === 'drive') {
+          const file = document.getElementById('resDriveFileInput').files[0];
+          if(!driveAccessToken) throw new Error("Connectez-vous à Drive d'abord");
+          
+          const meta = { name: `${title} - ${file.name}`, mimeType: file.type };
+          const form = new FormData();
+          form.append('metadata', new Blob([JSON.stringify(meta)], {type: 'application/json'}));
+          form.append('file', file);
+          
+          const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST', headers: { 'Authorization': 'Bearer ' + driveAccessToken }, body: form
+          });
+          const data = await res.json();
+          if(!data.id) throw new Error("Erreur Upload");
+          mod.resources.push({ id: 'r_'+Date.now(), title, type: cat, isLocal: false, url: `https://drive.google.com/file/d/${data.id}/view` });
+        }
+        else {
+          mod.resources.push({ id: 'r_'+Date.now(), title, type: cat, isLocal: false, url: document.getElementById('resUrlInput').value });
+        }
+        saveData(); renderModules(); closeModal('resourceModal'); showToast('Ajouté!');
+      } catch(err) { showToast(err.message, 'error'); } 
+      finally { btn.disabled = false; }
+    }
+
+    function deleteRes(mId, rId) {
+      const mod = appState.modules.find(m => m.id === mId);
+      mod.resources = mod.resources.filter(r => r.id !== rId);
+      saveData(); renderModules();
+    }
+
+    // Modal, Toast & Basics
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    function backdropClose(e, id) { if(e.target.id===id) closeModal(id); }
+    function showToast(msg, type='info') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `px-4 py-2 rounded-xl text-xs text-white shadow-xl ${type==='error'?'bg-red-600':type==='success'?'bg-emerald-600':'bg-gray-800'}`;
+      t.innerText = msg;
+      c.appendChild(t);
+      setTimeout(()=>t.remove(), 3000);
+    }
+    
+    // Theme
+    function initTheme() { if(localStorage.getItem('eduTheme')==='light') document.documentElement.classList.remove('dark'); }
+    function toggleTheme() { 
+      document.documentElement.classList.toggle('dark'); 
+      localStorage.setItem('eduTheme', document.documentElement.classList.contains('dark') ? 'dark':'light'); 
+    }
+
+    // MODULE CRUD 
+    function openAddModuleModal() { document.getElementById('moduleForm').reset(); openModal('moduleModal'); }
+    function saveModule(e) {
+      e.preventDefault();
+      appState.modules.push({
+        id: 'm_'+Date.now(), semester: document.getElementById('moduleSemester').value,
+        name: document.getElementById('moduleName').value, coeff: Number(document.getElementById('moduleCoeff').value),
+        grade: Number(document.getElementById('moduleGrade').value), resources: []
+      });
+      saveData(); renderModules(); closeModal('moduleModal');
+    }
+    function deleteModule(id) { appState.modules = appState.modules.filter(m=>m.id!==id); saveData(); renderModules(); }
+    function openAddResourceModal(id) { document.getElementById('resModuleId').value = id; openModal('resourceModal'); switchResourceTab('local'); }
+
+    // TASKS & FLASHCARDS (Simplified for integration)
+    function openAddTaskModal() { openModal('taskModal'); }
+    function saveTask(e) { e.preventDefault(); appState.tasks.push({id:'t_'+Date.now(), title:document.getElementById('taskTitle').value, dueDate:document.getElementById('taskDueDate').value}); saveData(); renderTasks(); closeModal('taskModal'); }
+    function renderTasks() { document.getElementById('tasksList').innerHTML = appState.tasks.map(t=>`<div class="p-3 bg-white dark:bg-gray-800 rounded-lg border flex justify-between"><span>${t.title}</span><button onclick="appState.tasks=appState.tasks.filter(x=>x.id!=='${t.id}');saveData();renderTasks()">❌</button></div>`).join(''); }
+    
+    function openAddFlashcardModal() { openModal('flashcardModal'); }
+    function saveFlashcard(e) { e.preventDefault(); appState.flashcards.push({id:'f_'+Date.now(), q:document.getElementById('cardQuestion').value, a:document.getElementById('cardAnswer').value}); saveData(); renderFlashcards(); closeModal('flashcardModal'); }
+    function renderFlashcards() { document.getElementById('flashcardsGrid').innerHTML = appState.flashcards.map(f=>`<div class="p-4 bg-white dark:bg-gray-800 rounded-lg border"><b>Q: ${f.q}</b><hr class="my-2"><p>${f.a}</p><button onclick="appState.flashcards=appState.flashcards.filter(x=>x.id!=='${f.id}');saveData();renderFlashcards()" class="text-red-500 text-xs mt-2">Supprimer</button></div>`).join(''); }
+
+    // POMODORO
+    let pTime=25*60, pInt;
+    function setPomodoroMode(m) { clearInterval(pInt); pTime = m==='work'?25*60:m==='short'?5*60:15*60; updPomo(); }
+    function togglePomodoro() { 
+      if(pInt){ clearInterval(pInt); pInt=null; }
+      else { pInt = setInterval(()=>{ pTime--; updPomo(); if(pTime<=0){clearInterval(pInt); showToast('Terminé!','success');} }, 1000); }
+    }
+    function resetPomodoro() { clearInterval(pInt); pInt=null; pTime=25*60; updPomo(); }
+    function updPomo() { document.getElementById('timerDisplay').innerText = `${String(Math.floor(pTime/60)).padStart(2,'0')}:${String(pTime%60).padStart(2,'0')}`; }
+  </script>
+</body>
+</html>
