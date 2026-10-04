@@ -300,8 +300,9 @@
       </div>
       <div class="space-y-3.5 text-xs">
         <div>
-          <label class="block font-medium mb-1">Clé API (Google Gemini ou Groq)</label>
-          <input type="password" id="aiApiKey" placeholder="AIza... ou gsk_..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+          <label class="block font-medium mb-1">Clé API (Google Gemini recommandée ou Groq)</label>
+          <input type="password" id="aiApiKey" placeholder="AIzaSy... (Gemini) ou gsk_... (Groq)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+          <p class="text-[10px] text-gray-400 mt-1">Clé gratuite sur <a href="https://aistudio.google.com/apikey" target="_blank" class="text-brand-500 underline">Google AI Studio</a>.</p>
         </div>
         <div>
           <label class="block font-medium mb-1">Document (PDF ou Image)</label>
@@ -409,7 +410,7 @@
           <input type="datetime-local" id="taskDueDate" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
         </div>
         <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button>
           <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Créer</button>
         </div>
       </form>
@@ -425,7 +426,7 @@
         <textarea id="cardQuestion" required rows="2" placeholder="Question (Recto)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
         <textarea id="cardAnswer" required rows="3" placeholder="Réponse (Verso)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
         <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeModal('flashcardModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="button" onclick="closeModal('flashcardModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button>
           <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button>
         </div>
       </form>
@@ -465,7 +466,7 @@
         </div>
         
         <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeModal('resourceModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="button" onclick="closeModal('resourceModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700">Annuler</button>
           <button type="submit" id="saveResBtn" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button>
         </div>
       </form>
@@ -542,7 +543,7 @@
     }
 
     function loadData() {
-      const saved = localStorage.getItem('eduVaultData_vFinal');
+      const saved = localStorage.getItem('eduVaultData_vFinal2');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -571,7 +572,7 @@
     }
 
     function saveData() {
-      localStorage.setItem('eduVaultData_vFinal', JSON.stringify(appState));
+      localStorage.setItem('eduVaultData_vFinal2', JSON.stringify(appState));
       calculateSemesterAverage();
       checkComingUp();
       if (appState.settings.level) {
@@ -592,7 +593,7 @@
       });
       const deskBtn = document.getElementById('tab-' + tabId);
       if (deskBtn) {
-        deskBtn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:bg-brand-900/30 transition-colors';
+        deskBtn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:brand-900/30 transition-colors';
       }
 
       document.querySelectorAll('.mob-btn').forEach(btn => {
@@ -1236,7 +1237,7 @@
     }
 
     /* ==========================================================================
-       IMPORTATION IA (AVEC PDF.JS & CONVERSION IMAGE)
+       IMPORTATION IA (AVEC PDF.JS & ROBUSTE SANS ERREURS)
        ========================================================================== */
     function openAiImportModal() {
       document.getElementById('aiApiKey').value = localStorage.getItem('eduVault_aiKey') || '';
@@ -1249,7 +1250,7 @@
 
       if (isPdfFile) {
         if (!window.pdfjsLib) {
-          throw new Error("Bibliothèque PDF.js ma charjatch. T'ekked mn l-connexion.");
+          throw new Error("Bibliothèque PDF.js non chargée");
         }
         pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
         
@@ -1283,8 +1284,8 @@
       const key = document.getElementById('aiApiKey').value.trim();
       const file = document.getElementById('aiFile').files[0];
 
-      if (!key) return showToast("Dkhel la clé API dyalek", "warning");
-      if (!file) return showToast("Khtar fichier (PDF wla Image)", "warning");
+      if (!key) return showToast("Entrez votre clé API", "warning");
+      if (!file) return showToast("Sélectionnez un fichier (PDF ou Image)", "warning");
 
       localStorage.setItem('eduVault_aiKey', key);
       const btn = document.getElementById('btnAiImport');
@@ -1293,7 +1294,7 @@
 
       try {
         const images = await fileToImages(file);
-        if (!images.length) throw new Error("Ma 9dernach n-9raw l-fichier.");
+        if (!images.length) throw new Error("Impossible de lire le document");
 
         let rawText = "";
         if (key.startsWith("gsk_")) {
@@ -1306,11 +1307,11 @@
         const start = rawText.indexOf('[');
         const end = rawText.lastIndexOf(']');
         if (start < 0 || end < start) {
-          throw new Error("L-IA ma rddatch tableau JSON valide: " + rawText.slice(0, 100));
+          throw new Error("L'IA n'a pas renvoyé de tableau JSON valide");
         }
 
         const sessions = JSON.parse(rawText.slice(start, end + 1)).filter(s => s.matiere && s.debut && s.fin);
-        if (!sessions.length) throw new Error("Ma l9ina 7ta séance f had l-emploi.");
+        if (!sessions.length) throw new Error("Aucun cours trouvé dans ce document");
 
         let count = 0;
         sessions.forEach(s => {
@@ -1345,7 +1346,7 @@
         renderModules();
         renderTimetable();
         closeModal('aiImportModal');
-        showToast(`${count} séances t-ajoutaw b nja7!`, 'success');
+        showToast(`${count} séances importées avec succès !`, 'success');
 
       } catch (err) {
         showToast("Erreur IA : " + err.message, "error");
@@ -1359,7 +1360,7 @@
       const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){encodeURIComponent(key)}`;
       
       const parts = [
-        { text: "Extrais l'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON sans texte explicatif: [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI)." }
+        { text: "Extrais l'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON sans aucun texte explicatif : [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI)." }
       ];
 
       images.forEach(imgData => {
@@ -1386,7 +1387,7 @@
       try {
         jsonRes = JSON.parse(textResponse);
       } catch (e) {
-        throw new Error("Google API rj3at page HTML f blast JSON (Vérifier la clé API aw l-quota).");
+        throw new Error("L'API a renvoyé du HTML au lieu de JSON (Vérifiez la clé API).");
       }
 
       if (!res.ok) {
@@ -1407,32 +1408,39 @@
         content.push({ type: "image_url", image_url: { url } });
       });
 
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${key}`
-        },
-        body: JSON.stringify({
-          model: "llama-3.2-11b-vision-preview",
-          temperature: 0.1,
-          messages: [{ role: "user", content: content }]
-        })
-      });
+      // Essaie d'abord le modèle vision officiel de Groq
+      const models = ["llama-3.2-11b-vision-preview", "llama-3.2-90b-vision-preview"];
+      let lastErr = "";
 
-      const textResponse = await res.text();
-      let jsonRes;
-      try {
-        jsonRes = JSON.parse(textResponse);
-      } catch (e) {
-        throw new Error("Groq API rj3at page HTML (Vérifier la clé API Groq).");
+      for (const model of models) {
+        try {
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${key}`
+            },
+            body: JSON.stringify({
+              model: model,
+              temperature: 0.1,
+              messages: [{ role: "user", content: content }]
+            })
+          });
+
+          const textResponse = await res.text();
+          const jsonRes = JSON.parse(textResponse);
+
+          if (res.ok) {
+            return jsonRes.choices[0].message.content;
+          } else {
+            lastErr = jsonRes.error?.message || `Erreur HTTP ${res.status}`;
+          }
+        } catch(e) {
+          lastErr = e.message;
+        }
       }
 
-      if (!res.ok) {
-        throw new Error(jsonRes.error?.message || `Erreur HTTP ${res.status}`);
-      }
-
-      return jsonRes.choices[0].message.content;
+      throw new Error(lastErr || "Échec avec Groq Vision. Utilisez une clé Gemini.");
     }
 
     /* ==========================================================================
@@ -1489,7 +1497,7 @@
           client_id: '786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com',
           scope: '[https://www.googleapis.com/auth/drive.file](https://www.googleapis.com/auth/drive.file)',
           callback: (res) => {
-            if (res.error) return showToast("Échec authentification Drive", "error");
+            if (res.error) return showToast("Échec authentification Drive: " + res.error, "error");
             driveAccessToken = res.access_token;
             updateDriveUI(true);
             showToast("Connecté à Google Drive", "success");
