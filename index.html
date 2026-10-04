@@ -32,7 +32,7 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
 
-  <!-- ONBOARDING MODAL (Choix du niveau) -->
+  <!-- ONBOARDING MODAL -->
   <div id="onboardingModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/90 backdrop-blur-md hidden">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl space-y-6 mx-4">
       <div class="w-16 h-16 bg-gradient-to-tr from-brand-500 to-indigo-500 text-white rounded-2xl mx-auto flex items-center justify-center text-3xl mb-2 shadow-lg shadow-brand-500/30">🎓</div>
@@ -122,7 +122,7 @@
               <p class="text-xs text-brand-600 font-bold" id="weekTypeIndicator">Semaine A</p>
             </div>
             <div class="flex space-x-2">
-              <button onclick="openModal('aiImportModal')" class="w-9 h-9 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+              <button onclick="openAiImportModal()" class="w-9 h-9 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
               <button onclick="openAddClassModal()" class="w-9 h-9 bg-brand-600 text-white rounded-xl flex items-center justify-center shadow"><i class="fa-solid fa-plus"></i></button>
             </div>
           </div>
@@ -246,8 +246,8 @@
         <button onclick="closeModal('aiImportModal')" class="text-gray-400"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="space-y-4 text-xs">
-        <div><label class="block font-medium mb-1">Clé API (Gemini ou Groq)</label><input type="password" id="aiApiKey" placeholder="AIza..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100"></div>
-        <div><label class="block font-medium mb-1">Fichier de l'emploi</label><input type="file" id="aiFile" accept="application/pdf,image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-brand-50 file:text-brand-700 dark:file:bg-gray-700 dark:file:text-brand-400"></div>
+        <div><label class="block font-medium mb-1">Clé API (Gemini ou Groq)</label><input type="password" id="aiApiKey" placeholder="AIza... ou gsk_..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100"></div>
+        <div><label class="block font-medium mb-1">Fichier de l'emploi (PDF ou Image)</label><input type="file" id="aiFile" accept="application/pdf,image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-brand-50 file:text-brand-700 dark:file:bg-gray-700 dark:file:text-brand-400"></div>
         <button id="btnAiImport" onclick="startAiImport()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex justify-center items-center shadow-lg transition"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer</button>
       </div>
     </div>
@@ -298,7 +298,7 @@
         <input type="text" id="moduleName" required placeholder="Nom du Module" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
         <input type="text" id="moduleProf" placeholder="Professeur" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
         <div class="grid grid-cols-2 gap-3"><input type="number" step="0.25" min="0" max="20" id="moduleGrade" placeholder="Note /20" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><input type="number" step="1" min="1" id="moduleCoeff" placeholder="Coef" value="1" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 rounded-xl bg-brand-600 text-white">Enregistrer</button></div>
+        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button></div>
       </form>
     </div>
   </div>
@@ -557,38 +557,116 @@
     function updateDriveUI(on) { document.getElementById('driveStatusText').innerText = on ? 'Drive Connecté' : 'Drive Cloud'; document.getElementById('driveDot').className = on ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' : 'w-2 h-2 rounded-full bg-red-500'; }
 
     /* ==========================================================================
-       AI IMPORT
+       AI IMPORT (NEW ROBUST ENGINE)
        ========================================================================== */
-    const wait = ms => new Promise(z => setTimeout(z, ms));
-    const b64 = f => new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = ko; r.readAsDataURL(f) });
-    const loadScript = src => new Promise((ok, ko) => { const x = document.createElement("script"); x.src = src; x.onload = ok; x.onerror = () => ko(new Error("Erreur chargement PDF")); document.head.append(x) });
+    const loadScript = src => new Promise((ok, ko) => { if(document.querySelector(`script[src="${src}"]`)) return ok(); const x = document.createElement("script"); x.src = src; x.onload = ok; x.onerror = () => ko(new Error("Erreur PDF.js")); document.head.append(x); });
     const isPdf = f => f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+    const b64 = f => new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = ko; r.readAsDataURL(f); });
 
-    async function aiPost(url, headers, body) { let r, j; for (let t = 1; t <= 6; t++) { r = await fetch(url, { method: "POST", headers, body }); j = await r.json().catch(() => ({})); if (r.ok || ![429, 500, 503, 504].includes(r.status) || t === 6) break; for (let i = t * 4; i > 0; i--) await wait(1000); } return { ok: r.ok, status: r.status, data: j, msg: (j.error && j.error.message) || ("HTTP " + r.status) }; }
-    async function toImages(file) { const out = []; const draw = (src, w, h) => { const k = Math.min(1, 2000 / Math.max(w, h)), cv = document.createElement("canvas"); cv.width = Math.round(w * k); cv.height = Math.round(h * k); const cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(src, 0, 0, cv.width, cv.height); return cv.toDataURL("image/jpeg", .85) }; if (isPdf(file)) { if (!window.pdfjsLib) { const B = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/"; await loadScript(B + "pdf.min.js"); await loadScript(B + "pdf.worker.min.js"); pdfjsLib.GlobalWorkerOptions.workerSrc = B + "pdf.worker.min.js" } const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise; for (let i = 1; i <= Math.min(pdf.numPages, 3); i++) { const pg = await pdf.getPage(i), vp = pg.getViewport({ scale: 2 }), cv = document.createElement("canvas"); cv.width = vp.width; cv.height = vp.height; await pg.render({ canvasContext: cv.getContext("2d"), viewport: vp }).promise; out.push(draw(cv, cv.width, cv.height)) } } else { const bm = await createImageBitmap(file); out.push(draw(bm, bm.width, bm.height)) } return out; }
-    
+    async function toImages(file) {
+      const out = [];
+      const draw = (src, w, h) => { const k = Math.min(1, 2000 / Math.max(w, h)), cv = document.createElement("canvas"); cv.width = Math.round(w * k); cv.height = Math.round(h * k); const cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(src, 0, 0, cv.width, cv.height); return cv.toDataURL("image/jpeg", 0.85); };
+      if (isPdf(file)) {
+        const B = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/"; await loadScript(B + "pdf.min.js"); await loadScript(B + "pdf.worker.min.js"); pdfjsLib.GlobalWorkerOptions.workerSrc = B + "pdf.worker.min.js";
+        const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+        for (let i = 1; i <= Math.min(pdf.numPages, 3); i++) { const pg = await pdf.getPage(i), vp = pg.getViewport({ scale: 2 }), cv = document.createElement("canvas"); cv.width = vp.width; cv.height = vp.height; await pg.render({ canvasContext: cv.getContext("2d"), viewport: vp }).promise; out.push(draw(cv, cv.width, cv.height)); }
+      } else { const bm = await createImageBitmap(file); out.push(draw(bm, bm.width, bm.height)); }
+      return out;
+    }
+
     async function startAiImport() {
-      const key = document.getElementById('aiApiKey').value.trim(), file = document.getElementById('aiFile').files[0];
-      if (!key) return showToast('Entrez votre clé API', 'warning'); if (!file) return showToast('Sélectionnez un fichier', 'warning');
-      const btn = document.getElementById('btnAiImport'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Analyse...'; btn.disabled = true;
+      const key = document.getElementById('aiApiKey').value.trim(); // .trim() est vital pour éviter l'erreur 405
+      const file = document.getElementById('aiFile').files[0];
+      
+      if (!key) return showToast('Entrez votre clé API', 'warning');
+      if (!file) return showToast('Sélectionnez un fichier', 'warning');
+      
+      localStorage.setItem('eduVault_aiKey', key); // Sauvegarde locale de la clé
+      const btn = document.getElementById('btnAiImport');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Analyse en cours...';
+      btn.disabled = true;
+
       try {
-        const txt = key.startsWith("gsk_") ? await askGroq(key, file) : await askGemini(key, file);
-        const got = JSON.parse(txt.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/```(?:json)?/g, "").slice(txt.indexOf("["), txt.lastIndexOf("]") + 1)).filter(s => s.matiere && s.debut && s.fin);
-        if (!got.length) throw new Error("Aucun cours trouvé.");
+        let txtData = "";
+        if (key.startsWith("gsk_")) {
+          txtData = await askGroq(key, file);
+        } else {
+          txtData = await askGemini(key, file);
+        }
+
+        // Nettoyage de la réponse IA pour forcer un JSON array propre
+        txtData = txtData.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/```(?:json)?/g, "").trim();
+        const a = txtData.indexOf("["), b = txtData.lastIndexOf("]");
+        if (a < 0 || b < a) throw new Error("L'IA n'a pas renvoyé de données lisibles.");
+        
+        const got = JSON.parse(txtData.slice(a, b + 1)).filter(s => s.matiere && s.debut && s.fin);
+        if (!got.length) throw new Error("Aucun cours trouvé dans ce document.");
+
         let count = 0;
         got.forEach(s => {
-          let mName = (s.type ? `[${s.type}] ` : "") + s.matiere;
-          let mod = appState.modules.find(m => m.semester === appState.activeSemester && m.name.toLowerCase() === mName.toLowerCase());
-          if (!mod) { mod = { id: 'm_' + Date.now() + Math.random(), semester: appState.activeSemester, name: mName, prof: s.prof || "", coeff: 1, grade: null, resources: [] }; appState.modules.push(mod); }
-          appState.timetable.push({ id: 'class_' + Date.now() + Math.random(), moduleId: mod.id, day: s.jour.charAt(0).toUpperCase() + s.jour.slice(1).toLowerCase(), week: 'all', startTime: s.debut, endTime: s.fin, room: s.salle || "" });
+          let mod = appState.modules.find(m => m.semester === appState.activeSemester && m.name.toLowerCase() === s.matiere.toLowerCase());
+          if (!mod) { 
+            mod = { id: 'm_' + Date.now() + Math.random(), semester: appState.activeSemester, name: s.matiere, prof: "", coeff: 1, grade: null, resources: [] }; 
+            appState.modules.push(mod); 
+          }
+          let dayFormatted = s.jour.charAt(0).toUpperCase() + s.jour.slice(1).toLowerCase();
+          appState.timetable.push({ id: 'class_' + Date.now() + Math.random(), moduleId: mod.id, day: dayFormatted, week: 'all', startTime: s.debut, endTime: s.fin, room: s.salle || "" });
           count++;
         });
-        saveData(); renderModules(); renderTimetable(); closeModal('aiImportModal'); showToast(`${count} séances importées !`, 'success');
-      } catch (e) { showToast("Erreur IA: " + e.message, 'error'); } finally { btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer'; btn.disabled = false; }
+
+        saveData(); renderModules(); renderTimetable(); closeModal('aiImportModal');
+        showToast(`${count} séances importées avec succès !`, 'success');
+
+      } catch (e) {
+        showToast("Erreur IA: " + e.message, 'error');
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer';
+        btn.disabled = false;
+      }
     }
-    
-    async function askGemini(key, file) { const mime = file.type || (isPdf(file) ? "application/pdf" : "image/jpeg"); const body = JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: mime, data: await b64(file) } }, { text: `Extrayez tous les cours. Repondez SEULEMENT par un JSON array: [{"jour":"LUNDI|MARDI|MERCREDI|JEUDI|VENDREDI|SAMEDI","debut":"HH:MM","fin":"HH:MM","matiere":"nom","type":"COURS|TD|TP|","prof":"prof","salle":"salle"}]` }] }], generationConfig: { responseMimeType: "application/json", temperature: 0 } }); const r = await aiPost(`[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){encodeURIComponent(key)}`, { "Content-Type": "application/json" }, body); if (!r.ok) throw new Error(r.msg); return r.data.candidates[0].content.parts.map(p => p.text || "").join(""); }
-    async function askGroq(key, file) { const imgs = await toImages(file); let last; for (const model of ["qwen/qwen3.8-27b", "qwen/qwen3.6-27b", "llama3-8b-8192"]) { const body = JSON.stringify({ model, temperature: 0, max_tokens: 4000, messages: [{ role: "user", content: [{ type: "text", text: "Extrayez tous les cours. Retournez UNIQUEMENT un JSON array." }, ...imgs.map(u => ({ type: "image_url", image_url: { url: u } }))] }] }); const r = await aiPost("[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)", { "Content-Type": "application/json", Authorization: "Bearer " + key }, body); if (r.ok) return r.data.choices[0].message.content || ""; last = r; if (!(r.status === 404 || /model/i.test(r.msg))) break; } throw new Error(last.msg); }
+
+    async function askGemini(key, file) {
+      const mime = file.type || (isPdf(file) ? "application/pdf" : "image/jpeg");
+      const base64Data = await b64(file);
+      const url = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){key}`;
+      
+      const payload = {
+        contents: [{
+          parts: [
+            { text: "Extrayez l'emploi du temps. Renvoyez UNIQUEMENT un tableau JSON strict sans aucun autre texte. Format: [{\"jour\":\"LUNDI\",\"debut\":\"08:00\",\"fin\":\"10:00\",\"matiere\":\"Maths\",\"salle\":\"Amphi A\"}]" },
+            { inline_data: { mime_type: mime, data: base64Data } }
+          ]
+        }],
+        generationConfig: { temperature: 0 }
+      };
+
+      const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || `Erreur serveur HTTP ${response.status}`);
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    async function askGroq(key, file) {
+      const imgs = await toImages(file);
+      const url = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
+      
+      const payload = {
+        model: "llama-3.2-11b-vision-preview", // Modèle visuel Groq requis pour les images
+        temperature: 0,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: "Extrayez l'emploi du temps. Renvoyez UNIQUEMENT un tableau JSON strict sans aucun autre texte. Format: [{\"jour\":\"LUNDI\",\"debut\":\"08:00\",\"fin\":\"10:00\",\"matiere\":\"Maths\",\"salle\":\"Amphi A\"}]" },
+            ...imgs.map(u => ({ type: "image_url", image_url: { url: u } }))
+          ]
+        }]
+      };
+
+      const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` }, body: JSON.stringify(payload) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || `Erreur serveur HTTP ${response.status}`);
+      return data.choices[0].message.content;
+    }
   </script>
 </body>
 </html>
