@@ -22,16 +22,29 @@
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
-    .perspective-1000 { perspective: 1000px; }
-    .transform-style-3d { transform-style: preserve-3d; }
-    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-    .rotate-y-180 { transform: rotateY(180deg); }
-    /* Mobile padding for bottom nav */
     main { padding-bottom: 80px; }
     @media (min-width: 1024px) { main { padding-bottom: 0; } }
   </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
+
+  <!-- ONBOARDING MODAL (Choix du niveau initial) -->
+  <div id="onboardingModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/90 backdrop-blur-md hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl space-y-6 mx-4">
+      <div class="w-16 h-16 bg-gradient-to-tr from-brand-500 to-indigo-500 text-white rounded-2xl mx-auto flex items-center justify-center text-3xl mb-2 shadow-lg shadow-brand-500/30">🎓</div>
+      <div>
+        <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-1">Bienvenue sur EduVault</h2>
+        <p class="text-xs text-gray-500">Choisissez votre niveau pour configurer vos semestres automatiquement.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="setLevel('CP1')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-900/30 rounded-xl font-bold transition">CP1 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S1 & S2</span></button>
+        <button onclick="setLevel('CP2')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-900/30 rounded-xl font-bold transition">CP2 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S3 & S4</span></button>
+        <button onclick="setLevel('CI1')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-900/30 rounded-xl font-bold transition">CI1 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S5 & S6</span></button>
+        <button onclick="setLevel('CI2')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-900/30 rounded-xl font-bold transition">CI2 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S7 & S8</span></button>
+        <button onclick="setLevel('CI3')" class="py-3 col-span-2 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-900/30 rounded-xl font-bold transition">CI3 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S9 & S10</span></button>
+      </div>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="sticky top-0 z-30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
@@ -75,6 +88,7 @@
         <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-4 shadow-md">
           <div class="flex justify-between items-center"><span class="text-xs font-bold text-indigo-300">MOYENNE S.</span><i class="fa-solid fa-graduation-cap text-indigo-400"></i></div>
           <div class="text-2xl font-black mt-1" id="semAverageDisplay">-- / 20</div>
+          <div class="text-[10px] text-indigo-200 mt-1 uppercase tracking-wider font-bold" id="currentLevelDisplay">Niveau: -</div>
         </div>
       </nav>
 
@@ -103,7 +117,7 @@
             <div class="bg-white/20 p-2 rounded-xl"><i class="fa-solid fa-clock text-xl"></i></div>
             <div>
               <h3 class="font-black text-sm uppercase tracking-wider text-amber-50">Coming Up</h3>
-              <p class="font-bold" id="comingUpText">Examen d'Algèbre dans 2 heures !</p>
+              <p class="font-bold" id="comingUpText">Examen dans 2 heures !</p>
             </div>
           </div>
           <i class="fa-solid fa-chevron-right opacity-70"></i>
@@ -163,7 +177,7 @@
 
   <!-- ================= MODALS ================= -->
 
-  <!-- MODAL: SETTINGS (Semaine A/B, Vacances, Backup) -->
+  <!-- MODAL: SETTINGS -->
   <div id="settingsModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm hidden pb-0 sm:pb-4 modal-backdrop" onclick="backdropClose(event, 'settingsModal')">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
@@ -172,10 +186,25 @@
       </div>
       
       <div class="space-y-4 text-sm">
+        
+        <!-- NIVEAU ACADEMIQUE -->
+        <div class="flex items-center justify-between bg-brand-50 dark:bg-brand-900/30 p-3 rounded-xl border border-brand-100 dark:border-brand-800">
+          <div><p class="font-bold text-brand-700 dark:text-brand-300">Niveau (Cycle)</p><p class="text-[10px] text-brand-600/70 dark:text-brand-400/70">Change automatiquement les semestres</p></div>
+          <select id="setLevelSelect" onchange="changeLevelFromSettings()" class="bg-white dark:bg-gray-800 text-brand-700 dark:text-brand-300 rounded-lg text-xs border border-brand-200 dark:border-brand-700 font-bold py-1.5 focus:ring-0">
+            <option value="CP1">CP1 (S1-S2)</option>
+            <option value="CP2">CP2 (S3-S4)</option>
+            <option value="CI1">CI1 (S5-S6)</option>
+            <option value="CI2">CI2 (S7-S8)</option>
+            <option value="CI3">CI3 (S9-S10)</option>
+          </select>
+        </div>
+
+        <hr class="dark:border-gray-700">
+
         <!-- Google Drive -->
-        <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-xl border dark:border-gray-700 flex justify-between items-center">
+        <div class="flex justify-between items-center">
           <div><p class="font-bold">Google Drive Sync</p><p class="text-[10px] text-gray-500">Sauvegardez vos PDFs</p></div>
-          <button onclick="toggleDriveAuth()" class="px-3 py-1.5 bg-white dark:bg-gray-800 border rounded-lg text-xs font-bold text-gray-700 dark:text-gray-200"><i class="fa-brands fa-google-drive text-emerald-500 mr-1"></i><span id="setDriveTxt">Connecter</span></button>
+          <button onclick="toggleDriveAuth()" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 rounded-lg text-xs font-bold text-gray-700 dark:text-gray-200"><i class="fa-brands fa-google-drive text-emerald-500 mr-1"></i><span id="setDriveTxt">Connecter</span></button>
         </div>
 
         <!-- Alternance Semaines -->
@@ -202,8 +231,8 @@
         <div>
           <p class="font-bold mb-2">Données & Sauvegarde</p>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="exportDataJSON()" class="py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200"><i class="fa-solid fa-download mr-1"></i>Exporter</button>
-            <button onclick="document.getElementById('importFileInput').click()" class="py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200"><i class="fa-solid fa-upload mr-1"></i>Importer</button>
+            <button onclick="exportDataJSON()" class="py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200"><i class="fa-solid fa-download mr-1"></i>Exporter JSON</button>
+            <button onclick="document.getElementById('importFileInput').click()" class="py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200"><i class="fa-solid fa-upload mr-1"></i>Importer JSON</button>
             <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importDataJSON(event)">
           </div>
         </div>
@@ -265,7 +294,31 @@
           <input type="time" id="classEndTime" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
         </div>
         <input type="text" id="classRoom" placeholder="Salle / Amphi" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <button type="submit" class="w-full py-2.5 bg-brand-600 text-white rounded-xl font-bold mt-2">Ajouter la séance</button>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('classModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD MODULE (With Dynamic Semesters) -->
+  <div id="moduleModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'moduleModal')">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <h3 class="font-bold text-gray-900 dark:text-white" id="moduleModalTitle">Nouveau Module</h3>
+      <form id="moduleForm" onsubmit="saveModule(event)" class="space-y-3 text-xs font-medium">
+        <input type="hidden" id="moduleId">
+        <select id="moduleSemester" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100"></select>
+        <input type="text" id="moduleName" required placeholder="Nom du Module" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+        <input type="text" id="moduleProf" placeholder="Professeur" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+        <div class="grid grid-cols-2 gap-3">
+          <input type="number" step="0.25" min="0" max="20" id="moduleGrade" placeholder="Note /20" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+          <input type="number" step="1" min="1" id="moduleCoeff" placeholder="Coef" value="1" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-brand-600 text-white">Enregistrer</button>
+        </div>
       </form>
     </div>
   </div>
@@ -283,40 +336,95 @@
           </select>
           <input type="datetime-local" id="taskDueDate" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
         </div>
-        <button type="submit" class="w-full py-2.5 bg-brand-600 text-white rounded-xl font-bold mt-2">Créer l'échéance</button>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Créer</button>
+        </div>
       </form>
     </div>
   </div>
 
-  <!-- MODALS BASIC (MODULE, AI IMPORT, FLASHCARD, RESOURCE) Omitted for brevity but assumed identical to previous functional versions -->
   <!-- TOAST -->
   <div id="toastContainer" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] space-y-2 pointer-events-none w-11/12 sm:w-auto text-center"></div>
 
   <script>
     /* ==========================================================================
-       APP STATE & INIT
+       APP CONFIGURATION & LEVELS
        ========================================================================== */
+    const LEVEL_SEMESTERS = {
+      'CP1': ['S1', 'S2'],
+      'CP2': ['S3', 'S4'],
+      'CI1': ['S5', 'S6'],
+      'CI2': ['S7', 'S8'],
+      'CI3': ['S9', 'S10']
+    };
+
     let appState = { 
       activeSemester: 'S1', activeTab: 'timetableView', taskFilter: 'all', 
-      settings: { currentWeek: 'A', holidays: [] },
+      settings: { level: null, currentWeek: 'A', holidays: [] },
       modules: [], tasks: [], flashcards: [], timetable: [], notes: [] 
     };
 
     window.addEventListener('DOMContentLoaded', () => { 
-      loadData(); initTheme(); renderSemesterPills(); 
-      if(window.innerWidth < 1024) switchTab('timetableView'); else switchTab('timetableView');
-      setInterval(checkReminders, 60000); // Check every minute
+      loadData(); 
+      initTheme(); 
+      
+      // Verification Niveau
+      if(!appState.settings.level) {
+        document.getElementById('onboardingModal').classList.remove('hidden');
+      } else {
+        renderSemesterPills(); 
+        if(window.innerWidth < 1024) switchTab('timetableView'); else switchTab('timetableView');
+        setInterval(checkReminders, 60000);
+      }
     });
 
+    function setLevel(lvl) {
+      appState.settings.level = lvl;
+      appState.activeSemester = LEVEL_SEMESTERS[lvl][0]; // set to first semester of that level
+      saveData();
+      
+      document.getElementById('onboardingModal').classList.add('hidden');
+      document.getElementById('setLevelSelect').value = lvl;
+      
+      renderSemesterPills();
+      switchTab('timetableView');
+      showToast(`Bienvenue en ${lvl} ! Semestres configurés.`, 'success');
+      setInterval(checkReminders, 60000);
+    }
+
+    function changeLevelFromSettings() {
+      const newLvl = document.getElementById('setLevelSelect').value;
+      appState.settings.level = newLvl;
+      appState.activeSemester = LEVEL_SEMESTERS[newLvl][0];
+      saveData();
+      renderSemesterPills();
+      renderTimetable();
+      renderModules();
+      showToast(`Niveau changé vers ${newLvl}`, 'info');
+    }
+
     function loadData() { 
-      const saved = localStorage.getItem('eduVaultData_v6'); 
+      const saved = localStorage.getItem('eduVaultData_v7'); // Bumped to v7
       if (saved) appState = Object.assign(appState, JSON.parse(saved)); 
-      if(!appState.settings) appState.settings = { currentWeek: 'A', holidays: [] };
+      
+      if(!appState.settings) appState.settings = { level: null, currentWeek: 'A', holidays: [] };
       if(!appState.notes) appState.notes = [];
+      
+      if(appState.settings.level) {
+        document.getElementById('setLevelSelect').value = appState.settings.level;
+        document.getElementById('currentLevelDisplay').innerText = `Niveau: ${appState.settings.level}`;
+      }
+      
       document.getElementById('setWeekType').value = appState.settings.currentWeek;
       calculateSemesterAverage(); renderHolidays(); checkComingUp();
     }
-    function saveData() { localStorage.setItem('eduVaultData_v6', JSON.stringify(appState)); calculateSemesterAverage(); checkComingUp(); }
+    
+    function saveData() { 
+      localStorage.setItem('eduVaultData_v7', JSON.stringify(appState)); 
+      calculateSemesterAverage(); checkComingUp(); 
+      if(appState.settings.level) document.getElementById('currentLevelDisplay').innerText = `Niveau: ${appState.settings.level}`;
+    }
 
     function switchTab(tabId) { 
       document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden')); 
@@ -339,23 +447,32 @@
     }
 
     /* ==========================================================================
+       DYNAMIC SEMESTERS
+       ========================================================================== */
+    function renderSemesterPills() { 
+      const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1','S2'];
+      document.getElementById('semesterPills').innerHTML = sems.map(s => `<button onclick="setSemester('${s}')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all ${appState.activeSemester === s ? 'bg-brand-600 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}">${s}</button>`).join(''); 
+    }
+    
+    function setSemester(sem) { 
+      appState.activeSemester = sem; 
+      renderSemesterPills(); renderModules(); renderTimetable(); 
+    }
+
+    /* ==========================================================================
        COMING UP & REMINDERS (Exams & Homeworks)
        ========================================================================== */
     let notifiedTasks = new Set();
     function checkComingUp() {
       const now = new Date();
-      // Find closest pending task (exam or homework)
-      const upcoming = appState.tasks
-        .filter(t => !t.completed && new Date(t.dueDate) > now)
-        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
-      
+      const upcoming = appState.tasks.filter(t => !t.completed && new Date(t.dueDate) > now).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
       const widget = document.getElementById('comingUpWidget');
+      
       if(upcoming) {
         const diffMs = new Date(upcoming.dueDate) - now;
         const diffHrs = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffHrs / 24);
         let timeTxt = diffDays > 0 ? `dans ${diffDays} jour(s)` : (diffHrs > 0 ? `dans ${diffHrs} heure(s)` : `Très bientôt!`);
-        
         document.getElementById('comingUpText').innerText = `${upcoming.type === 'exam' ? 'Examen' : 'Devoir'}: ${upcoming.title} ${timeTxt}`;
         widget.classList.remove('hidden');
         document.getElementById('mobBadge').classList.remove('hidden');
@@ -370,18 +487,8 @@
       appState.tasks.filter(t => !t.completed).forEach(t => {
         const due = new Date(t.dueDate);
         const diff = due - now;
-        const isExam = t.type === 'exam';
-        
-        // Reminder 1 hour before
-        if (diff > 0 && diff <= 3600000 && !notifiedTasks.has(t.id+'_1h')) {
-          showNativeNotification(`Rappel: ${t.title}`, `Prévu dans moins d'une heure !`);
-          notifiedTasks.add(t.id+'_1h');
-        }
-        // Reminder day before at 18:00
-        if (diff > 0 && diff <= 86400000 && now.getHours() === 18 && !notifiedTasks.has(t.id+'_1d')) {
-          showNativeNotification(`Demain: ${t.title}`, `N'oubliez pas de réviser !`);
-          notifiedTasks.add(t.id+'_1d');
-        }
+        if (diff > 0 && diff <= 3600000 && !notifiedTasks.has(t.id+'_1h')) { showNativeNotification(`Rappel: ${t.title}`, `Prévu dans moins d'une heure !`); notifiedTasks.add(t.id+'_1h'); }
+        if (diff > 0 && diff <= 86400000 && now.getHours() === 18 && !notifiedTasks.has(t.id+'_1d')) { showNativeNotification(`Demain: ${t.title}`, `N'oubliez pas de réviser !`); notifiedTasks.add(t.id+'_1d'); }
       });
       checkComingUp();
     }
@@ -389,7 +496,7 @@
     function showNativeNotification(title, body) {
       if(Notification.permission === 'granted') new Notification(title, {body});
       showToast(`${title} - ${body}`, 'warning');
-      try { navigator.vibrate([200, 100, 200]); } catch(e){} // Vibrate phone
+      try { navigator.vibrate([200, 100, 200]); } catch(e){} 
     }
     if("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") { Notification.requestPermission(); }
 
@@ -402,8 +509,7 @@
     function renderTimetable() {
       const container = document.getElementById('timetableGrid');
       const isHoliday = appState.settings.holidays.includes(new Date().toISOString().split('T')[0]);
-      
-      document.getElementById('weekTypeIndicator').innerText = `Semaine ${appState.settings.currentWeek} ${isHoliday ? '(Vacances!)' : ''}`;
+      document.getElementById('weekTypeIndicator').innerText = `Semaine ${appState.settings.currentWeek} ${isHoliday ? '(Vacances)' : ''}`;
 
       if (isHoliday) {
         container.innerHTML = `<div class="col-span-full text-center p-8 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl text-emerald-600 font-bold"><i class="fa-solid fa-mug-hot text-3xl mb-2 block"></i>Profitez de vos vacances ! Aucun cours aujourd'hui.</div>`;
@@ -418,7 +524,7 @@
           const mod = appState.modules.find(m => m.id === c.moduleId);
           const hasNote = appState.notes.some(n => n.classId === c.id);
           return `
-            <div onclick="openClassDetails('${c.id}')" class="bg-brand-50 dark:bg-brand-900/30 border ${hasNote?'border-amber-400':'border-brand-100 dark:border-brand-800'} rounded-lg p-3 relative cursor-pointer active:scale-95 transition">
+            <div onclick="openClassDetails('${c.id}')" class="bg-brand-50 dark:bg-brand-900/30 border ${hasNote?'border-amber-400':'border-brand-100 dark:border-brand-800'} rounded-lg p-3 relative cursor-pointer active:scale-95 transition shadow-sm">
               <div class="text-[10px] font-bold text-brand-600 mb-1">${c.startTime} - ${c.endTime}</div>
               <div class="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">${mod ? mod.name : ''}</div>
               <div class="flex justify-between items-center mt-1 text-xs text-gray-500">
@@ -427,7 +533,7 @@
               </div>
             </div>`;
         }).join('');
-        if(!coursHtml) coursHtml = `<div class="text-xs text-gray-400 italic p-2 text-center border border-dashed rounded-lg">Aucun cours</div>`;
+        if(!coursHtml) coursHtml = `<div class="text-xs text-gray-400 italic p-2 text-center border border-dashed rounded-lg">Libre</div>`;
         
         return `<div class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl p-4 shadow-sm h-full"><h3 class="font-black text-xs mb-3 border-b dark:border-gray-700 pb-1">${jour}</h3><div class="space-y-2">${coursHtml}</div></div>`;
       }).join('');
@@ -451,7 +557,7 @@
 
       const note = appState.notes.find(n => n.classId === classId) || { text: '', photos: [] };
       document.getElementById('cdNotes').value = note.text;
-      tempPhotos = [...note.photos];
+      tempPhotos = [...(note.photos||[])];
       renderCdPhotos();
       openModal('classDetailsModal');
     }
@@ -459,14 +565,12 @@
     function handleClassPhotos(e) {
       const files = Array.from(e.target.files);
       if(tempPhotos.length + files.length > 3) return showToast("Max 3 photos !", "warning");
-      
       files.forEach(f => {
         const r = new FileReader();
         r.onload = ev => { tempPhotos.push(ev.target.result); renderCdPhotos(); };
-        r.readAsDataURL(f); // Saves as Base64 (OK for small images, recommend compressing in real app)
+        r.readAsDataURL(f);
       });
     }
-
     function renderCdPhotos() {
       document.getElementById('cdPhotosGrid').innerHTML = tempPhotos.map((src, i) => `
         <div class="relative w-16 h-16 shrink-0">
@@ -474,7 +578,6 @@
           <button onclick="tempPhotos.splice(${i},1); renderCdPhotos()" class="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-[8px] flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
         </div>`).join('');
     }
-
     function saveClassNotes() {
       const text = document.getElementById('cdNotes').value.trim();
       let n = appState.notes.find(x => x.classId === currentClassIdForNote);
@@ -484,7 +587,7 @@
     }
 
     /* ==========================================================================
-       UTILITIES
+       UTILITIES & CRUD
        ========================================================================== */
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
@@ -497,16 +600,26 @@
     }
     function initTheme() { if (localStorage.getItem('eduTheme') === 'light') document.documentElement.classList.remove('dark'); }
     function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('eduTheme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
-    function renderSemesterPills() { document.getElementById('semesterPills').innerHTML = ['S1','S2','S3','S4','S5','S6'].map(s => `<button onclick="setSemester('${s}')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all ${appState.activeSemester === s ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-gray-700'}">${s}</button>`).join(''); }
-    function setSemester(sem) { appState.activeSemester = sem; renderSemesterPills(); renderModules(); renderTimetable(); }
 
-    /* Other basic functions (CRUD Modules, Tasks) omitted for exact brevity limit, but implement logic simply below */
+    // MODULES
+    function openAddModuleModal() { 
+      const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1','S2'];
+      document.getElementById('moduleSemester').innerHTML = sems.map(s => `<option value="${s}">${s}</option>`).join('');
+      document.getElementById('moduleForm').reset(); 
+      document.getElementById('moduleSemester').value = appState.activeSemester;
+      openModal('moduleModal'); 
+    }
+    function saveModule(e) { e.preventDefault(); appState.modules.push({ id: 'm_' + Date.now(), semester: document.getElementById('moduleSemester').value, name: document.getElementById('moduleName').value, coeff: Number(document.getElementById('moduleCoeff').value), grade: Number(document.getElementById('moduleGrade').value), resources: [] }); saveData(); renderModules(); renderTimetable(); closeModal('moduleModal'); }
+    function renderModules() { const query = (document.getElementById('moduleSearch')?.value || '').toLowerCase(); document.getElementById('modulesGrid').innerHTML = appState.modules.filter(m => m.semester === appState.activeSemester && m.name.toLowerCase().includes(query)).map(m => `<div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm space-y-4"><div class="flex items-start justify-between"><div><span class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">${m.semester} | Note: ${m.grade || '-'}</span><h3 class="font-bold text-base mt-1">${m.name}</h3></div><button onclick="appState.modules=appState.modules.filter(x=>x.id!=='${m.id}');saveData();renderModules();" class="text-red-400 hover:bg-gray-100 p-1.5 rounded"><i class="fa-solid fa-trash"></i></button></div></div>`).join(''); }
+
+    // TIMETABLE
     function openAddClassModal() { document.getElementById('classModuleSelect').innerHTML = appState.modules.filter(m=>m.semester===appState.activeSemester).map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); openModal('classModal'); }
     function saveClass(e) { e.preventDefault(); appState.timetable.push({ id:'c_'+Date.now(), moduleId:document.getElementById('classModuleSelect').value, day:document.getElementById('classDay').value, week:document.getElementById('classWeek').value, startTime:document.getElementById('classStartTime').value, endTime:document.getElementById('classEndTime').value, room:document.getElementById('classRoom').value }); saveData(); renderTimetable(); closeModal('classModal'); showToast("Séance ajoutée", "success"); }
     
+    // TASKS
     function openAddTaskModal() { document.getElementById('taskModuleSelect').innerHTML = appState.modules.filter(m=>m.semester===appState.activeSemester).map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); openModal('taskModal'); }
     function saveTask(e) { e.preventDefault(); appState.tasks.push({ id:'t_'+Date.now(), title:document.getElementById('taskTitle').value, moduleId:document.getElementById('taskModuleSelect').value, type:document.getElementById('taskType').value, dueDate:document.getElementById('taskDueDate').value, completed:false }); saveData(); renderTasks(); closeModal('taskModal'); }
-    function renderTasks() { document.getElementById('tasksList').innerHTML = appState.tasks.filter(t=>appState.taskFilter==='all'||t.type===appState.taskFilter).map(t=>`<div class="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border ${t.type==='exam'?'border-red-400':''} flex justify-between items-center"><div class="flex items-center"><input type="checkbox" ${t.completed?'checked':''} onchange="t=appState.tasks.find(x=>x.id==='${t.id}');t.completed=!t.completed;saveData();renderTasks()" class="mr-3 w-5 h-5"><div class="${t.completed?'line-through opacity-50':''}"><p class="font-bold text-sm">${t.type==='exam'?'🚨':''} ${t.title}</p><p class="text-[10px] text-gray-500">${new Date(t.dueDate).toLocaleString('fr-FR')}</p></div></div><button onclick="appState.tasks=appState.tasks.filter(x=>x.id!=='${t.id}');saveData();renderTasks()" class="text-red-400"><i class="fa-solid fa-trash"></i></button></div>`).join(''); }
+    function renderTasks() { document.getElementById('tasksList').innerHTML = appState.tasks.filter(t=>appState.taskFilter==='all'||t.type===appState.taskFilter).map(t=>`<div class="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border ${t.type==='exam'?'border-red-400':''} flex justify-between items-center"><div class="flex items-center"><input type="checkbox" ${t.completed?'checked':''} onchange="t=appState.tasks.find(x=>x.id==='${t.id}');t.completed=!t.completed;saveData();renderTasks()" class="mr-3 w-5 h-5 rounded"><div class="${t.completed?'line-through opacity-50':''}"><p class="font-bold text-sm">${t.type==='exam'?'🚨':''} ${t.title}</p><p class="text-[10px] text-gray-500">${new Date(t.dueDate).toLocaleString('fr-FR')}</p></div></div><button onclick="appState.tasks=appState.tasks.filter(x=>x.id!=='${t.id}');saveData();renderTasks()" class="text-red-400"><i class="fa-solid fa-trash"></i></button></div>`).join(''); }
     function setTaskFilter(f) { appState.taskFilter=f; renderTasks(); }
     
     function calculateSemesterAverage() { const currentMods = appState.modules.filter(m => m.semester === appState.activeSemester && m.grade); const avgDisp = document.getElementById('semAverageDisplay'); if (!currentMods.length) return avgDisp.innerText = '-- / 20'; let totalPts = 0, totalCoef = 0; currentMods.forEach(m => { totalPts += (m.grade * m.coeff); totalCoef += m.coeff; }); avgDisp.innerText = (totalPts / totalCoef).toFixed(2) + ' / 20'; }
