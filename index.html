@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#1e3a8a">
   <title>EduVault - Academic App</title>
   
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -14,8 +15,16 @@
     }
   </script>
 
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google GIS (Drive) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <!-- PDF.js pour la conversion des PDF côté client -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <!-- Inter Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
@@ -26,26 +35,26 @@
     .transform-style-3d { transform-style: preserve-3d; }
     .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
     .rotate-y-180 { transform: rotateY(180deg); }
-    main { padding-bottom: 80px; }
-    @media (min-width: 1024px) { main { padding-bottom: 0; } }
+    main { padding-bottom: 85px; }
+    @media (min-width: 1024px) { main { padding-bottom: 10px; } }
   </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
 
-  <!-- ONBOARDING MODAL -->
-  <div id="onboardingModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/90 backdrop-blur-md hidden">
-    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl space-y-6 mx-4">
-      <div class="w-16 h-16 bg-gradient-to-tr from-brand-500 to-indigo-500 text-white rounded-2xl mx-auto flex items-center justify-center text-3xl mb-2 shadow-lg shadow-brand-500/30">🎓</div>
+  <!-- ONBOARDING MODAL (CHOIX NIVEAU) -->
+  <div id="onboardingModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/90 backdrop-blur-md hidden p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl space-y-5">
+      <div class="w-14 h-14 bg-gradient-to-tr from-brand-500 to-indigo-500 text-white rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-lg shadow-brand-500/30">🎓</div>
       <div>
-        <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-1">Bienvenue sur EduVault</h2>
-        <p class="text-xs text-gray-500">Choisissez votre niveau pour configurer vos semestres automatiquement.</p>
+        <h2 class="text-xl font-black text-gray-900 dark:text-white">Bienvenue sur EduVault</h2>
+        <p class="text-xs text-gray-500 mt-1">Sélectionnez votre niveau actuel :</p>
       </div>
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="setLevel('CP1')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl font-bold transition">CP1 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S1 & S2</span></button>
-        <button onclick="setLevel('CP2')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl font-bold transition">CP2 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S3 & S4</span></button>
-        <button onclick="setLevel('CI1')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl font-bold transition">CI1 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S5 & S6</span></button>
-        <button onclick="setLevel('CI2')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl font-bold transition">CI2 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S7 & S8</span></button>
-        <button onclick="setLevel('CI3')" class="py-3 col-span-2 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl font-bold transition">CI3 <span class="block text-[9px] font-normal text-gray-400 mt-0.5">S9 & S10</span></button>
+      <div class="grid grid-cols-2 gap-2.5 text-xs font-bold">
+        <button onclick="setLevel('CP1')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CP1 <span class="block text-[10px] font-normal text-gray-400">S1 & S2</span></button>
+        <button onclick="setLevel('CP2')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CP2 <span class="block text-[10px] font-normal text-gray-400">S3 & S4</span></button>
+        <button onclick="setLevel('CI1')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CI1 <span class="block text-[10px] font-normal text-gray-400">S5 & S6</span></button>
+        <button onclick="setLevel('CI2')" class="py-3 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CI2 <span class="block text-[10px] font-normal text-gray-400">S7 & S8</span></button>
+        <button onclick="setLevel('CI3')" class="py-3 col-span-2 bg-gray-100 dark:bg-gray-700 hover:bg-brand-50 hover:text-brand-600 rounded-xl transition">CI3 <span class="block text-[10px] font-normal text-gray-400">S9 & S10</span></button>
       </div>
     </div>
   </div>
@@ -53,18 +62,23 @@
   <!-- Header -->
   <header class="sticky top-0 z-30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg sm:text-xl shadow-lg shadow-brand-500/30">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-md shadow-brand-500/30">
           <i class="fa-solid fa-vault"></i>
         </div>
-        <h1 class="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent">EduVault</h1>
+        <h1 class="font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent">EduVault</h1>
       </div>
       <div class="flex items-center space-x-2">
-        <button id="driveAuthBtn" onclick="toggleDriveAuth()" class="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium rounded-xl border transition bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-200">
-          <i class="fa-brands fa-google-drive text-emerald-500 text-sm"></i><span id="driveStatusText" class="hidden md:inline">Drive Cloud</span><span id="driveDot" class="w-2 h-2 rounded-full bg-red-500"></span>
+        <button id="driveAuthBtn" onclick="toggleDriveAuth()" class="flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-xl border transition bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-200">
+          <i class="fa-brands fa-google-drive text-emerald-500"></i>
+          <span id="driveStatusText" class="hidden sm:inline">Drive Cloud</span>
+          <span id="driveDot" class="w-2 h-2 rounded-full bg-red-500"></span>
         </button>
-        <button onclick="toggleTheme()" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">
+        <button onclick="toggleTheme()" class="p-2 sm:p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">
           <i id="themeIcon" class="fa-solid fa-moon"></i>
+        </button>
+        <button onclick="openModal('settingsModal')" class="p-2 sm:p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition hidden sm:inline-flex">
+          <i class="fa-solid fa-gear"></i>
         </button>
       </div>
     </div>
@@ -76,27 +90,53 @@
       <!-- Desktop Sidebar -->
       <nav class="hidden lg:block lg:col-span-3 space-y-4">
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm space-y-1">
-          <button onclick="switchTab('timetableView')" id="tab-timetableView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:bg-brand-900/30 transition-colors"><i class="fa-solid fa-table-cells-large w-5 text-center"></i><span>Emploi du Temps</span></button>
-          <button onclick="switchTab('plannerView')" id="tab-plannerView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"><i class="fa-solid fa-bell w-5 text-center"></i><span>Examens & Devoirs</span></button>
-          <button onclick="switchTab('modulesView')" id="tab-modulesView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"><i class="fa-solid fa-graduation-cap w-5 text-center"></i><span>Modules & Cours</span></button>
-          <button onclick="switchTab('flashcardsView')" id="tab-flashcardsView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"><i class="fa-solid fa-layer-group w-5 text-center"></i><span>Active Recall</span></button>
-          <button onclick="switchTab('pomodoroView')" id="tab-pomodoroView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"><i class="fa-solid fa-stopwatch w-5 text-center"></i><span>Pomodoro Focus</span></button>
-          <button onclick="openModal('settingsModal')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"><i class="fa-solid fa-gear w-5 text-center"></i><span>Réglages & Data</span></button>
+          <button onclick="switchTab('timetableView')" id="tab-timetableView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:bg-brand-900/30 transition-colors">
+            <i class="fa-solid fa-table-cells-large w-5 text-center"></i><span>Emploi du Temps</span>
+          </button>
+          <button onclick="switchTab('plannerView')" id="tab-plannerView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+            <i class="fa-solid fa-bell w-5 text-center"></i><span>Examens & Devoirs</span>
+          </button>
+          <button onclick="switchTab('modulesView')" id="tab-modulesView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+            <i class="fa-solid fa-graduation-cap w-5 text-center"></i><span>Modules & Cours</span>
+          </button>
+          <button onclick="switchTab('flashcardsView')" id="tab-flashcardsView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+            <i class="fa-solid fa-layer-group w-5 text-center"></i><span>Active Recall</span>
+          </button>
+          <button onclick="switchTab('pomodoroView')" id="tab-pomodoroView" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+            <i class="fa-solid fa-stopwatch w-5 text-center"></i><span>Pomodoro Focus</span>
+          </button>
+          <button onclick="openModal('settingsModal')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+            <i class="fa-solid fa-gear w-5 text-center"></i><span>Paramètres & Data</span>
+          </button>
         </div>
-        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-4 shadow-md">
-          <div class="flex justify-between items-center"><span class="text-xs font-bold text-indigo-300">MOYENNE S.</span><i class="fa-solid fa-graduation-cap text-indigo-400"></i></div>
+
+        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-4 shadow-md space-y-1">
+          <div class="flex justify-between items-center text-xs font-bold text-indigo-300 uppercase tracking-wider">
+            <span>Moyenne S.</span>
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
           <div class="text-2xl font-black mt-1" id="semAverageDisplay">-- / 20</div>
-          <div class="text-[10px] text-indigo-200 mt-1 uppercase tracking-wider font-bold" id="currentLevelDisplay">Niveau: -</div>
+          <div class="text-[10px] text-indigo-200 uppercase font-bold" id="currentLevelDisplay">Niveau: -</div>
         </div>
       </nav>
 
       <!-- Mobile Bottom Navigation -->
-      <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-40 flex justify-around pb-safe pt-1">
-        <button onclick="switchTab('timetableView')" id="mob-timetableView" class="mob-btn flex flex-col items-center p-2 text-brand-600 w-1/5"><i class="fa-solid fa-table-cells-large text-[20px] mb-1"></i><span class="text-[9px] font-bold">Horaires</span></button>
-        <button onclick="switchTab('plannerView')" id="mob-plannerView" class="mob-btn flex flex-col items-center p-2 text-gray-400 dark:text-gray-500 w-1/5"><i class="fa-solid fa-bell text-[20px] mb-1 relative"><span id="mobBadge" class="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] px-1 rounded-full hidden">!</span></i><span class="text-[9px] font-bold">Agenda</span></button>
-        <button onclick="switchTab('modulesView')" id="mob-modulesView" class="mob-btn flex flex-col items-center p-2 text-gray-400 dark:text-gray-500 w-1/5"><i class="fa-solid fa-graduation-cap text-[20px] mb-1"></i><span class="text-[9px] font-bold">Cours</span></button>
-        <button onclick="switchTab('pomodoroView')" id="mob-pomodoroView" class="mob-btn flex flex-col items-center p-2 text-gray-400 dark:text-gray-500 w-1/5"><i class="fa-solid fa-stopwatch text-[20px] mb-1"></i><span class="text-[9px] font-bold">Focus</span></button>
-        <button onclick="openModal('settingsModal')" class="flex flex-col items-center p-2 text-gray-400 dark:text-gray-500 w-1/5"><i class="fa-solid fa-gear text-[20px] mb-1"></i><span class="text-[9px] font-bold">Plus</span></button>
+      <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-40 flex justify-around pb-1 pt-1.5 shadow-lg">
+        <button onclick="switchTab('timetableView')" id="mob-timetableView" class="mob-btn flex flex-col items-center p-2 text-brand-600 w-1/5">
+          <i class="fa-solid fa-table-cells-large text-lg mb-1"></i><span class="text-[9px] font-bold">Horaires</span>
+        </button>
+        <button onclick="switchTab('plannerView')" id="mob-plannerView" class="mob-btn flex flex-col items-center p-2 text-gray-400 w-1/5">
+          <i class="fa-solid fa-bell text-lg mb-1 relative"><span id="mobBadge" class="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] px-1 rounded-full hidden">!</span></i><span class="text-[9px] font-bold">Agenda</span>
+        </button>
+        <button onclick="switchTab('modulesView')" id="mob-modulesView" class="mob-btn flex flex-col items-center p-2 text-gray-400 w-1/5">
+          <i class="fa-solid fa-graduation-cap text-lg mb-1"></i><span class="text-[9px] font-bold">Cours</span>
+        </button>
+        <button onclick="switchTab('pomodoroView')" id="mob-pomodoroView" class="mob-btn flex flex-col items-center p-2 text-gray-400 w-1/5">
+          <i class="fa-solid fa-stopwatch text-lg mb-1"></i><span class="text-[9px] font-bold">Focus</span>
+        </button>
+        <button onclick="openModal('settingsModal')" class="flex flex-col items-center p-2 text-gray-400 w-1/5">
+          <i class="fa-solid fa-gear text-lg mb-1"></i><span class="text-[9px] font-bold">Plus</span>
+        </button>
       </nav>
 
       <!-- Main Area -->
@@ -105,10 +145,10 @@
         <!-- WIDGET: COMING UP -->
         <div id="comingUpWidget" class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 shadow-md text-white flex items-center justify-between hidden cursor-pointer" onclick="switchTab('plannerView')">
           <div class="flex items-center space-x-3">
-            <div class="bg-white/20 p-2 rounded-xl"><i class="fa-solid fa-clock text-xl"></i></div>
+            <div class="bg-white/20 p-2.5 rounded-xl"><i class="fa-solid fa-clock text-xl"></i></div>
             <div>
-              <h3 class="font-black text-sm uppercase tracking-wider text-amber-50">Coming Up</h3>
-              <p class="font-bold" id="comingUpText">Examen dans 2 heures !</p>
+              <h3 class="font-black text-xs uppercase tracking-wider text-amber-100">À Venir Prochainement</h3>
+              <p class="font-bold text-sm" id="comingUpText">-</p>
             </div>
           </div>
           <i class="fa-solid fa-chevron-right opacity-70"></i>
@@ -122,8 +162,12 @@
               <p class="text-xs text-brand-600 font-bold" id="weekTypeIndicator">Semaine A</p>
             </div>
             <div class="flex space-x-2">
-              <button onclick="openAiImportModal()" class="w-9 h-9 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
-              <button onclick="openAddClassModal()" class="w-9 h-9 bg-brand-600 text-white rounded-xl flex items-center justify-center shadow"><i class="fa-solid fa-plus"></i></button>
+              <button onclick="openAiImportModal()" class="px-3 py-2 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl text-xs font-bold flex items-center space-x-1 shadow-sm">
+                <i class="fa-solid fa-wand-magic-sparkles"></i><span class="hidden sm:inline">Importer IA</span>
+              </button>
+              <button onclick="openAddClassModal()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow flex items-center space-x-1">
+                <i class="fa-solid fa-plus"></i><span class="hidden sm:inline">Ajouter</span>
+              </button>
             </div>
           </div>
           <div id="timetableGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
@@ -133,34 +177,40 @@
         <section id="plannerView" class="view-content hidden space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-black text-gray-900 dark:text-white">Examens & Devoirs</h2>
-            <button onclick="openAddTaskModal()" class="px-3 py-1.5 bg-brand-600 text-white rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-plus mr-1"></i>Ajouter</button>
+            <button onclick="openAddTaskModal()" class="px-3.5 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow flex items-center space-x-1">
+              <i class="fa-solid fa-plus"></i><span>Ajouter</span>
+            </button>
           </div>
           <div class="flex space-x-2 text-xs overflow-x-auto pb-1 custom-scrollbar">
             <button onclick="setTaskFilter('all')" id="btnFilter-all" class="px-3 py-1.5 rounded-lg bg-brand-600 text-white font-bold whitespace-nowrap">Tous</button>
             <button onclick="setTaskFilter('exam')" id="btnFilter-exam" class="px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap">Examens</button>
             <button onclick="setTaskFilter('homework')" id="btnFilter-homework" class="px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap">Devoirs</button>
           </div>
-          <div id="tasksList" class="space-y-3"></div>
+          <div id="tasksList" class="space-y-2.5"></div>
         </section>
 
         <!-- VIEW: MODULES -->
         <section id="modulesView" class="view-content hidden space-y-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-1.5 overflow-x-auto w-full pb-1 custom-scrollbar" id="semesterPills"></div>
-            <button onclick="openAddModuleModal()" class="ml-2 w-9 h-9 shrink-0 bg-brand-600 text-white rounded-xl flex items-center justify-center shadow"><i class="fa-solid fa-plus"></i></button>
+            <button onclick="openAddModuleModal()" class="ml-2 px-3 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow shrink-0 flex items-center space-x-1">
+              <i class="fa-solid fa-plus"></i><span class="hidden sm:inline">Module</span>
+            </button>
           </div>
-          <input type="text" id="moduleSearch" oninput="renderModules()" placeholder="Chercher un module..." class="w-full px-4 py-2 text-xs rounded-xl bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-brand-500 text-gray-800 dark:text-gray-100 shadow-sm">
+          <input type="text" id="moduleSearch" oninput="renderModules()" placeholder="Rechercher un module..." class="w-full px-4 py-2 text-xs rounded-xl bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-brand-500 text-gray-800 dark:text-gray-100 shadow-sm">
           <div id="modulesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
         <!-- VIEW: FLASHCARDS -->
         <section id="flashcardsView" class="view-content hidden space-y-4">
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-black text-gray-900 dark:text-white">Active Recall</h2>
-            <button onclick="openAddFlashcardModal()" class="px-3 py-1.5 bg-brand-600 text-white rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-plus mr-1"></i>Créer</button>
+            <h2 class="text-lg font-black text-gray-900 dark:text-white">Active Recall (Fiches 3D)</h2>
+            <button onclick="openAddFlashcardModal()" class="px-3.5 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow flex items-center space-x-1">
+              <i class="fa-solid fa-plus"></i><span>Créer</span>
+            </button>
           </div>
           <div class="flex items-center space-x-3 bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
-            <span class="text-xs font-medium text-gray-500">Filtrer:</span>
+            <span class="text-xs font-medium text-gray-500">Filtrer par module:</span>
             <select id="flashcardModuleFilter" onchange="renderFlashcards()" class="bg-gray-100 dark:bg-gray-700 text-xs rounded-lg px-3 py-1.5 border-none focus:ring-2 focus:ring-brand-500 text-gray-800 dark:text-gray-100"></select>
           </div>
           <div id="flashcardsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
@@ -168,28 +218,28 @@
 
         <!-- VIEW: POMODORO -->
         <section id="pomodoroView" class="view-content hidden space-y-6">
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700 shadow-xl max-w-xl mx-auto text-center space-y-6">
+          <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700 shadow-xl max-w-xl mx-auto text-center space-y-6">
             <div class="flex justify-center space-x-2">
-              <button onclick="setPomodoroMode('work')" id="pomoBtn-work" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-brand-600 text-white shadow-md">Travail</button>
-              <button onclick="setPomodoroMode('short')" id="pomoBtn-short" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Pause Courte</button>
-              <button onclick="setPomodoroMode('long')" id="pomoBtn-long" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Pause Longue</button>
+              <button onclick="setPomodoroMode('work')" id="pomoBtn-work" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-brand-600 text-white shadow-md">Travail (25m)</button>
+              <button onclick="setPomodoroMode('short')" id="pomoBtn-short" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Pause (5m)</button>
+              <button onclick="setPomodoroMode('long')" id="pomoBtn-long" class="px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Longue (15m)</button>
             </div>
             <div class="max-w-xs mx-auto text-xs">
-              <select id="pomoModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl px-3 py-1.5 text-xs text-gray-800 dark:text-gray-100 border-none text-center"></select>
+              <select id="pomoModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl px-3 py-1.5 text-xs text-gray-800 dark:text-gray-100 border-none text-center font-medium"></select>
             </div>
-            <div class="relative w-64 h-64 mx-auto flex items-center justify-center">
+            <div class="relative w-56 h-56 mx-auto flex items-center justify-center">
               <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="45" class="text-gray-200 dark:text-gray-700 stroke-current" stroke-width="5" fill="transparent"></circle>
                 <circle id="timerProgress" cx="50" cy="50" r="45" class="text-brand-600 stroke-current transition-all duration-1000 ease-linear" stroke-width="5" stroke-dasharray="283" stroke-dashoffset="0" stroke-linecap="round" fill="transparent"></circle>
               </svg>
               <div class="absolute flex flex-col items-center">
-                <span id="timerDisplay" class="text-5xl font-black tracking-tight text-gray-900 dark:text-white">25:00</span>
-                <span id="timerLabel" class="text-xs uppercase tracking-widest text-gray-400 font-semibold mt-2">Concentration</span>
+                <span id="timerDisplay" class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white">25:00</span>
+                <span id="timerLabel" class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mt-2">Concentration</span>
               </div>
             </div>
             <div class="flex items-center justify-center space-x-4">
-              <button onclick="togglePomodoro()" id="timerToggleBtn" class="w-14 h-14 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center text-xl shadow-lg shadow-brand-500/30 transition transform active:scale-95"><i class="fa-solid fa-play" id="timerPlayIcon"></i></button>
-              <button onclick="resetPomodoro()" class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-600 dark:text-gray-300 flex items-center justify-center text-lg transition"><i class="fa-solid fa-rotate-right"></i></button>
+              <button onclick="togglePomodoro()" id="timerToggleBtn" class="w-12 h-12 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center text-lg shadow-lg shadow-brand-500/30 transition transform active:scale-95"><i class="fa-solid fa-play" id="timerPlayIcon"></i></button>
+              <button onclick="resetPomodoro()" class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-600 dark:text-gray-300 flex items-center justify-center text-sm transition"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
           </div>
         </section>
@@ -204,33 +254,36 @@
   <div id="settingsModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm hidden pb-0 sm:pb-4 modal-backdrop" onclick="backdropClose(event, 'settingsModal')">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
-        <h3 class="font-bold text-lg text-gray-900 dark:text-white"><i class="fa-solid fa-gear mr-2 text-brand-500"></i>Réglages</h3>
-        <button onclick="closeModal('settingsModal')" class="text-gray-400 bg-gray-100 dark:bg-gray-700 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="font-bold text-base text-gray-900 dark:text-white"><i class="fa-solid fa-gear mr-2 text-brand-500"></i>Réglages</h3>
+        <button onclick="closeModal('settingsModal')" class="text-gray-400 bg-gray-100 dark:bg-gray-700 w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="space-y-4 text-sm">
+      <div class="space-y-4 text-xs font-medium">
         <div class="flex items-center justify-between bg-brand-50 dark:bg-brand-900/30 p-3 rounded-xl border border-brand-100 dark:border-brand-800">
-          <div><p class="font-bold text-brand-700 dark:text-brand-300">Niveau (Cycle)</p></div>
-          <select id="setLevelSelect" onchange="changeLevelFromSettings()" class="bg-white dark:bg-gray-800 text-brand-700 dark:text-brand-300 rounded-lg text-xs border border-brand-200 dark:border-brand-700 font-bold py-1.5 focus:ring-0">
+          <div><p class="font-bold text-brand-700 dark:text-brand-300">Niveau Actuel</p><p class="text-[10px] text-gray-500">Bascule automatique des semestres</p></div>
+          <select id="setLevelSelect" onchange="changeLevelFromSettings()" class="bg-white dark:bg-gray-800 text-brand-700 dark:text-brand-300 rounded-lg text-xs border border-brand-200 dark:border-brand-700 font-bold py-1 px-2">
             <option value="CP1">CP1</option><option value="CP2">CP2</option><option value="CI1">CI1</option><option value="CI2">CI2</option><option value="CI3">CI3</option>
           </select>
         </div>
         <div class="flex items-center justify-between">
-          <div><p class="font-bold">Semaine Actuelle</p></div>
-          <select id="setWeekType" onchange="changeWeekType()" class="bg-gray-100 dark:bg-gray-700 rounded-lg text-xs border-none font-bold py-1.5">
+          <div><p class="font-bold">Semaine A / B</p><p class="text-[10px] text-gray-500">Alterne l'affichage de l'emploi du temps</p></div>
+          <select id="setWeekType" onchange="changeWeekType()" class="bg-gray-100 dark:bg-gray-700 rounded-lg text-xs border-none font-bold py-1.5 px-3">
             <option value="A">Semaine A</option><option value="B">Semaine B</option>
           </select>
         </div>
         <div>
-          <p class="font-bold mb-1">Vacances</p>
-          <div class="flex space-x-2"><input type="date" id="holidayDate" class="flex-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-2 text-xs border-none"><button onclick="addHoliday()" class="px-3 bg-emerald-500 text-white rounded-xl text-xs font-bold">Ajouter</button></div>
-          <div id="holidaysList" class="flex flex-wrap gap-2 mt-2"></div>
+          <p class="font-bold mb-1">Vacances & Jours Chômés</p>
+          <div class="flex space-x-2">
+            <input type="date" id="holidayDate" class="flex-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-2 text-xs border-none">
+            <button onclick="addHoliday()" class="px-3 bg-emerald-500 text-white rounded-xl text-xs font-bold">Ajouter</button>
+          </div>
+          <div id="holidaysList" class="flex flex-wrap gap-1.5 mt-2"></div>
         </div>
         <hr class="dark:border-gray-700">
         <div>
-          <p class="font-bold mb-2">Sauvegarde (JSON)</p>
+          <p class="font-bold mb-2">Sauvegarde & Restauration (JSON)</p>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="exportDataJSON()" class="py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-xs font-bold"><i class="fa-solid fa-download mr-1"></i>Exporter</button>
-            <button onclick="document.getElementById('importFileInput').click()" class="py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-xs font-bold"><i class="fa-solid fa-upload mr-1"></i>Importer</button>
+            <button onclick="exportDataJSON()" class="py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded-xl font-bold flex items-center justify-center space-x-1.5"><i class="fa-solid fa-download"></i><span>Exporter</span></button>
+            <button onclick="document.getElementById('importFileInput').click()" class="py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded-xl font-bold flex items-center justify-center space-x-1.5"><i class="fa-solid fa-upload"></i><span>Importer</span></button>
             <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importDataJSON(event)">
           </div>
         </div>
@@ -242,28 +295,50 @@
   <div id="aiImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'aiImportModal')">
     <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
       <div class="flex justify-between border-b pb-3 dark:border-gray-700">
-        <h3 class="font-bold text-gray-900 dark:text-white">Importation IA</h3>
-        <button onclick="closeModal('aiImportModal')" class="text-gray-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <h3 class="font-bold text-gray-900 dark:text-white">Importation Emploi du Temps (IA)</h3>
+        <button onclick="closeModal('aiImportModal')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="space-y-4 text-xs">
-        <div><label class="block font-medium mb-1">Clé API (Gemini ou Groq)</label><input type="password" id="aiApiKey" placeholder="AIza... ou gsk_..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100"></div>
-        <div><label class="block font-medium mb-1">Fichier de l'emploi (PDF ou Image)</label><input type="file" id="aiFile" accept="application/pdf,image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-brand-50 file:text-brand-700 dark:file:bg-gray-700 dark:file:text-brand-400"></div>
-        <button id="btnAiImport" onclick="startAiImport()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex justify-center items-center shadow-lg transition"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer</button>
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-medium mb-1">Clé API (Google Gemini ou Groq)</label>
+          <input type="password" id="aiApiKey" placeholder="AIza... ou gsk_..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
+        </div>
+        <div>
+          <label class="block font-medium mb-1">Document (PDF ou Image)</label>
+          <input type="file" id="aiFile" accept="application/pdf,image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-brand-50 file:text-brand-700 dark:file:bg-gray-700 dark:file:text-brand-300">
+        </div>
+        <button id="btnAiImport" onclick="startAiImport()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex justify-center items-center shadow-lg transition">
+          <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- CLASS DETAILS MODAL -->
+  <!-- CLASS DETAILS MODAL (NOTES & PHOTOS) -->
   <div id="classDetailsModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm hidden pb-0 sm:pb-4 modal-backdrop" onclick="backdropClose(event, 'classDetailsModal')">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
       <div class="flex justify-between items-start border-b pb-3 dark:border-gray-700">
-        <div><span id="cdTime" class="text-[10px] font-black text-brand-600 bg-brand-50 px-2 py-0.5 rounded"></span><h3 id="cdTitle" class="font-black text-lg text-gray-900 dark:text-white mt-1"></h3><p id="cdRoom" class="text-xs text-gray-500"></p></div>
-        <div class="flex space-x-2"><button id="cdDeleteBtn" class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button><button onclick="closeModal('classDetailsModal')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-xs"></i></button></div>
+        <div>
+          <span id="cdTime" class="text-[10px] font-black text-brand-600 bg-brand-50 px-2 py-0.5 rounded"></span>
+          <h3 id="cdTitle" class="font-black text-lg text-gray-900 dark:text-white mt-1"></h3>
+          <p id="cdRoom" class="text-xs text-gray-500"></p>
+        </div>
+        <div class="flex space-x-2">
+          <button id="cdDeleteBtn" class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
+          <button onclick="closeModal('classDetailsModal')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-xs"></i></button>
+        </div>
       </div>
       <div class="flex-1 overflow-y-auto custom-scrollbar space-y-4">
-        <div><label class="block text-xs font-bold text-gray-500 mb-1">Notes du cours</label><textarea id="cdNotes" rows="4" placeholder="Notes..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-3 border-none text-xs text-gray-900 dark:text-gray-100"></textarea></div>
         <div>
-          <div class="flex justify-between items-center mb-1"><label class="block text-xs font-bold text-gray-500">Photos (Max 3)</label><button onclick="document.getElementById('cdPhotoInput').click()" class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg"><i class="fa-solid fa-camera mr-1"></i>Ajouter</button><input type="file" id="cdPhotoInput" accept="image/*" multiple class="hidden" onchange="handleClassPhotos(event)"></div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Notes du cours</label>
+          <textarea id="cdNotes" rows="4" placeholder="Points importants, chapitres traités..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-3 border-none text-xs text-gray-900 dark:text-gray-100"></textarea>
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-xs font-bold text-gray-500">Tableau / Photos (Max 3)</label>
+            <button onclick="document.getElementById('cdPhotoInput').click()" class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg"><i class="fa-solid fa-camera mr-1"></i>Ajouter</button>
+            <input type="file" id="cdPhotoInput" accept="image/*" multiple class="hidden" onchange="handleClassPhotos(event)">
+          </div>
           <div id="cdPhotosGrid" class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar"></div>
         </div>
       </div>
@@ -278,12 +353,22 @@
       <form id="classForm" onsubmit="saveClass(event)" class="space-y-3 text-xs font-medium">
         <select id="classModuleSelect" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
         <div class="grid grid-cols-2 gap-3">
-          <select id="classDay" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><option value="Lundi">Lundi</option><option value="Mardi">Mardi</option><option value="Mercredi">Mercredi</option><option value="Jeudi">Jeudi</option><option value="Vendredi">Vendredi</option><option value="Samedi">Samedi</option></select>
-          <select id="classWeek" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><option value="all">Toutes semaines</option><option value="A">Semaine A</option><option value="B">Semaine B</option></select>
+          <select id="classDay" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+            <option value="Lundi">Lundi</option><option value="Mardi">Mardi</option><option value="Mercredi">Mercredi</option><option value="Jeudi">Jeudi</option><option value="Vendredi">Vendredi</option><option value="Samedi">Samedi</option>
+          </select>
+          <select id="classWeek" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+            <option value="all">Toutes semaines</option><option value="A">Semaine A</option><option value="B">Semaine B</option>
+          </select>
         </div>
-        <div class="grid grid-cols-2 gap-3"><input type="time" id="classStartTime" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><input type="time" id="classEndTime" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
-        <input type="text" id="classRoom" placeholder="Salle / Amphi" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('classModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button></div>
+        <div class="grid grid-cols-2 gap-3">
+          <input type="time" id="classStartTime" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+          <input type="time" id="classEndTime" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        </div>
+        <input type="text" id="classRoom" placeholder="Salle ou Amphi" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('classModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button>
+        </div>
       </form>
     </div>
   </div>
@@ -295,10 +380,16 @@
       <form id="moduleForm" onsubmit="saveModule(event)" class="space-y-3 text-xs font-medium">
         <input type="hidden" id="moduleId">
         <select id="moduleSemester" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100"></select>
-        <input type="text" id="moduleName" required placeholder="Nom du Module" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
-        <input type="text" id="moduleProf" placeholder="Professeur" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
-        <div class="grid grid-cols-2 gap-3"><input type="number" step="0.25" min="0" max="20" id="moduleGrade" placeholder="Note /20" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><input type="number" step="1" min="1" id="moduleCoeff" placeholder="Coef" value="1" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button></div>
+        <input type="text" id="moduleName" required placeholder="Nom du Module (ex: Analyse 1)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        <input type="text" id="moduleProf" placeholder="Professeur (Optionnel)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        <div class="grid grid-cols-2 gap-3">
+          <input type="number" step="0.25" min="0" max="20" id="moduleGrade" placeholder="Note /20" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+          <input type="number" step="1" min="1" id="moduleCoeff" placeholder="Coefficient" value="1" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button>
+        </div>
       </form>
     </div>
   </div>
@@ -306,12 +397,21 @@
   <!-- ADD TASK MODAL -->
   <div id="taskModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'taskModal')">
     <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <h3 class="font-bold text-gray-900 dark:text-white">Échéance</h3>
+      <h3 class="font-bold text-gray-900 dark:text-white">Ajouter une Échéance</h3>
       <form id="taskForm" onsubmit="saveTask(event)" class="space-y-3 text-xs font-medium">
-        <input type="text" id="taskTitle" required placeholder="Titre (ex: Examen Final)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        <input type="text" id="taskTitle" required placeholder="Titre (ex: Examen Final, Rendu TP)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
         <select id="taskModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
-        <div class="grid grid-cols-2 gap-3"><select id="taskType" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><option value="exam">🚨 Examen</option><option value="homework">📝 Devoir</option></select><input type="datetime-local" id="taskDueDate" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Créer</button></div>
+        <div class="grid grid-cols-2 gap-3">
+          <select id="taskType" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+            <option value="exam">🚨 Examen</option>
+            <option value="homework">📝 Devoir</option>
+          </select>
+          <input type="datetime-local" id="taskDueDate" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Créer</button>
+        </div>
       </form>
     </div>
   </div>
@@ -319,12 +419,15 @@
   <!-- ADD FLASHCARD MODAL -->
   <div id="flashcardModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'flashcardModal')">
     <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <h3 class="font-bold text-gray-900 dark:text-white">Nouvelle Fiche 3D</h3>
+      <h3 class="font-bold text-gray-900 dark:text-white">Nouvelle Fiche Active Recall</h3>
       <form id="flashcardForm" onsubmit="saveFlashcard(event)" class="space-y-3 text-xs font-medium">
         <select id="flashcardModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
         <textarea id="cardQuestion" required rows="2" placeholder="Question (Recto)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
-        <textarea id="cardAnswer" required rows="3" placeholder="Réponse détaillée (Verso)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('flashcardModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button></div>
+        <textarea id="cardAnswer" required rows="3" placeholder="Réponse (Verso)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('flashcardModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button>
+        </div>
       </form>
     </div>
   </div>
@@ -332,340 +435,1147 @@
   <!-- ADD RESOURCE MODAL -->
   <div id="resourceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'resourceModal')">
     <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-      <div class="flex justify-between border-b pb-3 dark:border-gray-700"><h3 class="font-bold text-gray-900 dark:text-white">Document</h3><button onclick="closeModal('resourceModal')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="flex justify-between border-b pb-3 dark:border-gray-700">
+        <h3 class="font-bold text-gray-900 dark:text-white">Ajouter un Document</h3>
+        <button onclick="closeModal('resourceModal')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+      </div>
       <div class="flex border-b border-gray-200 dark:border-gray-700 text-xs">
         <button type="button" onclick="switchResourceTab('local')" id="resTab-local" class="flex-1 py-2 font-bold border-b-2 border-brand-600 text-brand-600">Local (PDF)</button>
         <button type="button" onclick="switchResourceTab('drive')" id="resTab-drive" class="flex-1 py-2 font-bold border-b-2 border-transparent text-gray-400">Drive Direct</button>
         <button type="button" onclick="switchResourceTab('manual')" id="resTab-manual" class="flex-1 py-2 font-bold border-b-2 border-transparent text-gray-400">Lien Web</button>
       </div>
-      <form id="resourceForm" onsubmit="saveResource(event)" class="space-y-3.5 text-xs">
+      <form id="resourceForm" onsubmit="saveResource(event)" class="space-y-3 text-xs">
         <input type="hidden" id="resModuleId">
-        <select id="resCategory" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><option value="cours">📚 Cours</option><option value="td">📝 TD</option><option value="examen">🎯 Examen</option><option value="resume">⚡ Résumé</option></select>
+        <select id="resCategory" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+          <option value="cours">📚 Cours</option>
+          <option value="td">📝 TD / TP</option>
+          <option value="examen">🎯 Examen</option>
+          <option value="resume">⚡ Résumé</option>
+        </select>
         <input type="text" id="resTitle" required placeholder="Titre du document" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <div id="resPanel-local" class="space-y-2 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl"><input type="file" id="resLocalFileInput" class="w-full text-xs"></div>
-        <div id="resPanel-drive" class="hidden space-y-2 bg-emerald-50 dark:bg-emerald-900/30 p-4 rounded-xl"><input type="file" id="resDriveFileInput" class="w-full text-xs"></div>
-        <div id="resPanel-manual" class="hidden space-y-2"><input type="url" id="resUrlInput" placeholder="https://..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
-        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('resourceModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700">Annuler</button><button type="submit" id="saveResBtn" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button></div>
+        
+        <div id="resPanel-local" class="space-y-2 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-xl border dark:border-gray-700">
+          <input type="file" id="resLocalFileInput" class="w-full text-xs">
+        </div>
+        <div id="resPanel-drive" class="hidden space-y-2 bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800">
+          <input type="file" id="resDriveFileInput" class="w-full text-xs">
+        </div>
+        <div id="resPanel-manual" class="hidden space-y-2">
+          <input type="url" id="resUrlInput" placeholder="https://drive.google.com/..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
+        </div>
+        
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('resourceModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700">Annuler</button>
+          <button type="submit" id="saveResBtn" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button>
+        </div>
       </form>
     </div>
   </div>
 
-  <!-- TOAST -->
+  <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] space-y-2 pointer-events-none w-11/12 sm:w-auto text-center"></div>
 
   <script>
     /* ==========================================================================
-       APP CONFIGURATION & LEVELS
+       INITIALISATION & NIVEAUX D'ÉTUDES
        ========================================================================== */
-    const LEVEL_SEMESTERS = {'CP1':['S1','S2'], 'CP2':['S3','S4'], 'CI1':['S5','S6'], 'CI2':['S7','S8'], 'CI3':['S9','S10']};
-    let appState = { activeSemester: 'S1', activeTab: 'timetableView', taskFilter: 'all', settings: { level: null, currentWeek: 'A', holidays: [] }, modules: [], tasks: [], flashcards: [], timetable: [], notes: [] };
+    const LEVEL_SEMESTERS = {
+      'CP1': ['S1', 'S2'],
+      'CP2': ['S3', 'S4'],
+      'CI1': ['S5', 'S6'],
+      'CI2': ['S7', 'S8'],
+      'CI3': ['S9', 'S10']
+    };
 
-    window.addEventListener('DOMContentLoaded', () => { 
-      loadData(); initTheme(); initDriveClient();
-      if(!appState.settings.level) { document.getElementById('onboardingModal').classList.remove('hidden'); } 
-      else { renderSemesterPills(); switchTab('timetableView'); setInterval(checkReminders, 60000); }
+    let appState = {
+      activeSemester: 'S1',
+      activeTab: 'timetableView',
+      taskFilter: 'all',
+      settings: { level: null, currentWeek: 'A', holidays: [] },
+      modules: [],
+      tasks: [],
+      flashcards: [],
+      timetable: [],
+      notes: []
+    };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Configuration explicite du worker PDF.js
+      if (window.pdfjsLib) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      }
+
+      await initIndexedDB().catch(console.warn);
+      loadData();
+      initTheme();
+      initDriveClient();
+
+      if (!appState.settings.level) {
+        document.getElementById('onboardingModal').classList.remove('hidden');
+      } else {
+        renderSemesterPills();
+        switchTab('timetableView');
+        setInterval(checkReminders, 60000);
+      }
     });
 
     function setLevel(lvl) {
-      appState.settings.level = lvl; appState.activeSemester = LEVEL_SEMESTERS[lvl][0]; saveData();
+      appState.settings.level = lvl;
+      appState.activeSemester = LEVEL_SEMESTERS[lvl][0];
+      saveData();
       document.getElementById('onboardingModal').classList.add('hidden');
       document.getElementById('setLevelSelect').value = lvl;
-      renderSemesterPills(); switchTab('timetableView'); showToast(`Niveau ${lvl} configuré !`, 'success');
+      renderSemesterPills();
+      switchTab('timetableView');
+      showToast(`Niveau ${lvl} configuré !`, 'success');
       setInterval(checkReminders, 60000);
     }
 
     function changeLevelFromSettings() {
       const newLvl = document.getElementById('setLevelSelect').value;
-      appState.settings.level = newLvl; appState.activeSemester = LEVEL_SEMESTERS[newLvl][0]; saveData();
-      renderSemesterPills(); renderTimetable(); renderModules(); showToast(`Niveau changé: ${newLvl}`, 'info');
+      appState.settings.level = newLvl;
+      appState.activeSemester = LEVEL_SEMESTERS[newLvl][0];
+      saveData();
+      renderSemesterPills();
+      renderTimetable();
+      renderModules();
+      showToast(`Niveau configuré sur ${newLvl}`, 'info');
     }
 
-    function loadData() { 
-      const saved = localStorage.getItem('eduVaultData_v7'); 
-      if(saved) appState = Object.assign(appState, JSON.parse(saved)); 
-      if(!appState.settings) appState.settings = { level: null, currentWeek: 'A', holidays: [] };
-      if(!appState.notes) appState.notes = [];
-      if(appState.settings.level) { document.getElementById('setLevelSelect').value = appState.settings.level; document.getElementById('currentLevelDisplay').innerText = `Niveau: ${appState.settings.level}`; }
-      document.getElementById('setWeekType').value = appState.settings.currentWeek;
-      calculateSemesterAverage(); renderHolidays(); checkComingUp();
-    }
-    
-    function saveData() { 
-      localStorage.setItem('eduVaultData_v7', JSON.stringify(appState)); 
-      calculateSemesterAverage(); checkComingUp(); 
-      if(appState.settings.level) document.getElementById('currentLevelDisplay').innerText = `Niveau: ${appState.settings.level}`;
+    function loadData() {
+      const saved = localStorage.getItem('eduVaultData_vFinal');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          appState = Object.assign(appState, parsed);
+        } catch(e) {
+          console.warn("Réinitialisation du cache des données");
+        }
+      }
+      
+      // Sécurité des listes
+      if (!appState.modules) appState.modules = [];
+      if (!appState.tasks) appState.tasks = [];
+      if (!appState.flashcards) appState.flashcards = [];
+      if (!appState.timetable) appState.timetable = [];
+      if (!appState.notes) appState.notes = [];
+      if (!appState.settings) appState.settings = { level: null, currentWeek: 'A', holidays: [] };
+
+      if (appState.settings.level) {
+        document.getElementById('setLevelSelect').value = appState.settings.level;
+        document.getElementById('currentLevelDisplay').innerText = `Niveau: ${appState.settings.level}`;
+      }
+
+      document.getElementById('setWeekType').value = appState.settings.currentWeek || 'A';
+      calculateSemesterAverage();
+      renderHolidays();
+      checkComingUp();
     }
 
-    function switchTab(tabId) { 
-      document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden')); 
-      document.getElementById(tabId).classList.remove('hidden'); 
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors');
-      const deskBtn = document.getElementById('tab-' + tabId); if(deskBtn) deskBtn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:bg-brand-900/30 transition-colors';
-      document.querySelectorAll('.mob-btn').forEach(btn => btn.className = 'mob-btn flex flex-col items-center p-2 text-gray-400 dark:text-gray-500 w-1/5');
-      const mobBtn = document.getElementById('mob-' + tabId); if(mobBtn) mobBtn.className = 'mob-btn flex flex-col items-center p-2 text-brand-600 w-1/5';
-      appState.activeTab = tabId; 
-      if (tabId === 'timetableView') renderTimetable(); 
+    function saveData() {
+      localStorage.setItem('eduVaultData_vFinal', JSON.stringify(appState));
+      calculateSemesterAverage();
+      checkComingUp();
+      if (appState.settings.level) {
+        document.getElementById('currentLevelDisplay').innerText = `Niveau: ${appState.settings.level}`;
+      }
+    }
+
+    /* ==========================================================================
+       NAVIGATION & ONGLETS
+       ========================================================================== */
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(tabId);
+      if (target) target.classList.remove('hidden');
+
+      // Mise à jour de la barre latérale sur grand écran
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors';
+      });
+      const deskBtn = document.getElementById('tab-' + tabId);
+      if (deskBtn) {
+        deskBtn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:bg-brand-900/30 transition-colors';
+      }
+
+      // Mise à jour de la barre mobile inférieure
+      document.querySelectorAll('.mob-btn').forEach(btn => {
+        btn.className = 'mob-btn flex flex-col items-center p-2 text-gray-400 w-1/5';
+      });
+      const mobBtn = document.getElementById('mob-' + tabId);
+      if (mobBtn) {
+        mobBtn.className = 'mob-btn flex flex-col items-center p-2 text-brand-600 w-1/5';
+      }
+
+      appState.activeTab = tabId;
+      if (tabId === 'timetableView') renderTimetable();
       if (tabId === 'plannerView') renderTasks();
       if (tabId === 'modulesView') renderModules();
       if (tabId === 'flashcardsView') renderFlashcards();
       if (tabId === 'pomodoroView') updatePomoModuleDropdown();
     }
 
-    function renderSemesterPills() { 
-      const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1','S2'];
-      document.getElementById('semesterPills').innerHTML = sems.map(s => `<button onclick="setSemester('${s}')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all ${appState.activeSemester === s ? 'bg-brand-600 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}">${s}</button>`).join(''); 
+    function renderSemesterPills() {
+      const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1', 'S2'];
+      document.getElementById('semesterPills').innerHTML = sems.map(s => `
+        <button onclick="setSemester('${s}')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all ${appState.activeSemester === s ? 'bg-brand-600 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}">
+          ${s}
+        </button>
+      `).join('');
     }
-    function setSemester(sem) { appState.activeSemester = sem; renderSemesterPills(); renderModules(); renderTimetable(); renderTasks(); renderFlashcards(); }
+
+    function setSemester(sem) {
+      appState.activeSemester = sem;
+      renderSemesterPills();
+      renderModules();
+      renderTimetable();
+      renderTasks();
+      renderFlashcards();
+      calculateSemesterAverage();
+    }
 
     /* ==========================================================================
-       COMING UP & REMINDERS
+       COMING UP & NOTIFICATIONS
        ========================================================================== */
     let notifiedTasks = new Set();
+
     function checkComingUp() {
       const now = new Date();
-      const upcoming = appState.tasks.filter(t => !t.completed && new Date(t.dueDate) > now).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+      const upcoming = appState.tasks
+        .filter(t => !t.completed && new Date(t.dueDate) > now)
+        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+
       const widget = document.getElementById('comingUpWidget');
-      if(upcoming) {
-        const diffMs = new Date(upcoming.dueDate) - now; const diffHrs = Math.floor(diffMs / 3600000); const diffDays = Math.floor(diffHrs / 24);
-        let timeTxt = diffDays > 0 ? `dans ${diffDays} jour(s)` : (diffHrs > 0 ? `dans ${diffHrs} heure(s)` : `Très bientôt!`);
-        document.getElementById('comingUpText').innerText = `${upcoming.type === 'exam' ? 'Examen' : 'Devoir'}: ${upcoming.title} ${timeTxt}`;
-        widget.classList.remove('hidden'); document.getElementById('mobBadge').classList.remove('hidden');
-      } else { widget.classList.add('hidden'); document.getElementById('mobBadge').classList.add('hidden'); }
+      const mobBadge = document.getElementById('mobBadge');
+
+      if (upcoming) {
+        const diffMs = new Date(upcoming.dueDate) - now;
+        const diffHrs = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffHrs / 24);
+        let timeTxt = diffDays > 0 ? `dans ${diffDays} jour(s)` : (diffHrs > 0 ? `dans ${diffHrs}h` : `très bientôt !`);
+        
+        document.getElementById('comingUpText').innerText = `${upcoming.type === 'exam' ? 'Examen' : 'Devoir'}: ${upcoming.title} (${timeTxt})`;
+        widget.classList.remove('hidden');
+        mobBadge.classList.remove('hidden');
+      } else {
+        widget.classList.add('hidden');
+        mobBadge.classList.add('hidden');
+      }
     }
+
     function checkReminders() {
       const now = new Date();
       appState.tasks.filter(t => !t.completed).forEach(t => {
         const diff = new Date(t.dueDate) - now;
-        if (diff > 0 && diff <= 3600000 && !notifiedTasks.has(t.id+'_1h')) { showNativeNotification(`Rappel: ${t.title}`, `Dans moins d'une heure!`); notifiedTasks.add(t.id+'_1h'); }
-        if (diff > 0 && diff <= 86400000 && now.getHours() === 18 && !notifiedTasks.has(t.id+'_1d')) { showNativeNotification(`Demain: ${t.title}`, `N'oubliez pas!`); notifiedTasks.add(t.id+'_1d'); }
-      }); checkComingUp();
+        if (diff > 0 && diff <= 3600000 && !notifiedTasks.has(t.id + '_1h')) {
+          showNativeNotification(`Rappel : ${t.title}`, `Échéance dans moins d'une heure !`);
+          notifiedTasks.add(t.id + '_1h');
+        }
+        if (diff > 0 && diff <= 86400000 && now.getHours() === 18 && !notifiedTasks.has(t.id + '_1d')) {
+          showNativeNotification(`Demain : ${t.title}`, `Révisez ce soir !`);
+          notifiedTasks.add(t.id + '_1d');
+        }
+      });
+      checkComingUp();
     }
-    function showNativeNotification(title, body) { if(Notification.permission==='granted') new Notification(title, {body}); showToast(`${title} - ${body}`, 'warning'); try{navigator.vibrate([200,100,200]);}catch(e){} }
-    if("Notification" in window && Notification.permission !== "granted") { Notification.requestPermission(); }
+
+    function showNativeNotification(title, body) {
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body });
+      }
+      showToast(`${title} : ${body}`, 'warning');
+      try { navigator.vibrate([200, 100, 200]); } catch(e) {}
+    }
+
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission();
+    }
 
     /* ==========================================================================
-       TIMETABLE, WEEK A/B, HOLIDAYS, NOTES & PHOTOS
+       GESTION DE L'EMPLOI DU TEMPS & NOTES
        ========================================================================== */
     const joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     let currentClassIdForNote = null;
+    let tempPhotos = [];
 
     function renderTimetable() {
       const container = document.getElementById('timetableGrid');
-      const isHoliday = appState.settings.holidays.includes(new Date().toISOString().split('T')[0]);
-      document.getElementById('weekTypeIndicator').innerText = `Semaine ${appState.settings.currentWeek} ${isHoliday ? '(Vacances)' : ''}`;
-      if (isHoliday) { container.innerHTML = `<div class="col-span-full text-center p-8 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl text-emerald-600 font-bold"><i class="fa-solid fa-mug-hot text-3xl mb-2 block"></i>Profitez de vos vacances !</div>`; return; }
+      const isHoliday = (appState.settings.holidays || []).includes(new Date().toISOString().split('T')[0]);
+      document.getElementById('weekTypeIndicator').innerText = `Semaine ${appState.settings.currentWeek} ${isHoliday ? '(En Vacances)' : ''}`;
 
-      const mods = appState.modules.filter(m => m.semester === appState.activeSemester).map(m => m.id);
-      const tt = appState.timetable.filter(c => mods.includes(c.moduleId) && (c.week === 'all' || c.week === appState.settings.currentWeek));
+      if (isHoliday) {
+        container.innerHTML = `<div class="col-span-full text-center p-8 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl text-emerald-600 font-bold"><i class="fa-solid fa-mug-hot text-3xl mb-2 block"></i>Vacances enregistrées pour aujourd'hui !</div>`;
+        return;
+      }
+
+      const modIds = appState.modules.filter(m => m.semester === appState.activeSemester).map(m => m.id);
+      const tt = appState.timetable.filter(c => modIds.includes(c.moduleId) && (c.week === 'all' || c.week === appState.settings.currentWeek));
 
       container.innerHTML = joursSemaine.map(jour => {
-        let coursHtml = tt.filter(c => c.day === jour).sort((a,b) => a.startTime.localeCompare(b.startTime)).map(c => {
-          const mod = appState.modules.find(m => m.id === c.moduleId); const hasNote = appState.notes.some(n => n.classId === c.id);
-          return `<div onclick="openClassDetails('${c.id}')" class="bg-brand-50 dark:bg-brand-900/30 border ${hasNote?'border-amber-400':'border-brand-100 dark:border-brand-800'} rounded-lg p-3 relative cursor-pointer active:scale-95 transition shadow-sm"><div class="text-[10px] font-bold text-brand-600 mb-1">${c.startTime} - ${c.endTime}</div><div class="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">${mod ? mod.name : ''}</div><div class="flex justify-between items-center mt-1 text-xs text-gray-500"><span><i class="fa-solid fa-location-dot mr-1"></i>${c.room}</span>${hasNote ? '<i class="fa-solid fa-note-sticky text-amber-500"></i>' : ''}</div></div>`;
+        const coursHtml = tt.filter(c => c.day === jour).sort((a,b) => a.startTime.localeCompare(b.startTime)).map(c => {
+          const mod = appState.modules.find(m => m.id === c.moduleId);
+          const hasNote = (appState.notes || []).some(n => n.classId === c.id);
+          return `
+            <div onclick="openClassDetails('${c.id}')" class="bg-brand-50 dark:bg-brand-900/30 border ${hasNote ? 'border-amber-400' : 'border-brand-100 dark:border-brand-800'} rounded-xl p-3 cursor-pointer active:scale-95 transition shadow-sm">
+              <div class="text-[10px] font-black text-brand-600 mb-0.5">${c.startTime} - ${c.endTime}</div>
+              <div class="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">${mod ? mod.name : 'Module Inconnu'}</div>
+              <div class="flex justify-between items-center mt-1.5 text-xs text-gray-500">
+                <span><i class="fa-solid fa-location-dot mr-1"></i>${c.room}</span>
+                ${hasNote ? '<i class="fa-solid fa-note-sticky text-amber-500"></i>' : ''}
+              </div>
+            </div>`;
         }).join('');
-        if(!coursHtml) coursHtml = `<div class="text-xs text-gray-400 italic p-2 text-center border border-dashed rounded-lg">Libre</div>`;
-        return `<div class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl p-4 shadow-sm h-full"><h3 class="font-black text-xs mb-3 border-b dark:border-gray-700 pb-1">${jour}</h3><div class="space-y-2">${coursHtml}</div></div>`;
+
+        return `
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm h-full">
+            <h3 class="font-black text-xs uppercase tracking-wider mb-3 border-b dark:border-gray-700 pb-1">${jour}</h3>
+            <div class="space-y-2">${coursHtml || '<p class="text-xs text-gray-400 italic p-2 text-center border border-dashed rounded-xl">Aucune séance</p>'}</div>
+          </div>`;
       }).join('');
     }
 
-    function changeWeekType() { appState.settings.currentWeek = document.getElementById('setWeekType').value; saveData(); renderTimetable(); }
-    function addHoliday() { const d = document.getElementById('holidayDate').value; if(d && !appState.settings.holidays.includes(d)) { appState.settings.holidays.push(d); saveData(); renderHolidays(); renderTimetable(); } }
-    function renderHolidays() { document.getElementById('holidaysList').innerHTML = appState.settings.holidays.map(d => `<span class="text-[10px] bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md flex items-center">${d} <button onclick="appState.settings.holidays=appState.settings.holidays.filter(x=>x!=='${d}');saveData();renderHolidays();renderTimetable()" class="ml-1 text-red-500"><i class="fa-solid fa-xmark"></i></button></span>`).join(''); }
-
-    let tempPhotos = [];
-    function openClassDetails(classId) {
-      currentClassIdForNote = classId; const c = appState.timetable.find(x => x.id === classId); const m = appState.modules.find(x => x.id === c.moduleId);
-      document.getElementById('cdTime').innerText = `${c.day} ${c.startTime} - ${c.endTime}`; document.getElementById('cdTitle').innerText = m.name; document.getElementById('cdRoom').innerHTML = `<i class="fa-solid fa-location-dot mr-1"></i>${c.room}`;
-      document.getElementById('cdDeleteBtn').onclick = () => { if(confirm("Supprimer ?")){ appState.timetable=appState.timetable.filter(x=>x.id!==classId); saveData(); renderTimetable(); closeModal('classDetailsModal'); } };
-      const note = appState.notes.find(n => n.classId === classId) || { text: '', photos: [] }; document.getElementById('cdNotes').value = note.text; tempPhotos = [...(note.photos||[])]; renderCdPhotos(); openModal('classDetailsModal');
+    function changeWeekType() {
+      appState.settings.currentWeek = document.getElementById('setWeekType').value;
+      saveData();
+      renderTimetable();
     }
-    function handleClassPhotos(e) { const files = Array.from(e.target.files); if(tempPhotos.length + files.length > 3) return showToast("Max 3 photos !", "warning"); files.forEach(f => { const r = new FileReader(); r.onload = ev => { tempPhotos.push(ev.target.result); renderCdPhotos(); }; r.readAsDataURL(f); }); }
-    function renderCdPhotos() { document.getElementById('cdPhotosGrid').innerHTML = tempPhotos.map((src, i) => `<div class="relative w-16 h-16 shrink-0"><img src="${src}" class="w-full h-full object-cover rounded-lg border"><button onclick="tempPhotos.splice(${i},1); renderCdPhotos()" class="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-[8px] flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button></div>`).join(''); }
-    function saveClassNotes() { const text = document.getElementById('cdNotes').value.trim(); let n = appState.notes.find(x => x.classId === currentClassIdForNote); if(!n) { n = { classId: currentClassIdForNote, date: new Date().toISOString() }; appState.notes.push(n); } n.text = text; n.photos = [...tempPhotos]; saveData(); renderTimetable(); closeModal('classDetailsModal'); showToast("Notes sauvegardées", "success"); }
 
-    /* ==========================================================================
-       MODULES, TASKS, FLASHCARDS, RESOURCES
-       ========================================================================== */
-    function openAddModuleModal() { 
-      const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1','S2'];
-      document.getElementById('moduleSemester').innerHTML = sems.map(s => `<option value="${s}">${s}</option>`).join('');
-      document.getElementById('moduleForm').reset(); document.getElementById('moduleSemester').value = appState.activeSemester; openModal('moduleModal'); 
+    function addHoliday() {
+      const d = document.getElementById('holidayDate').value;
+      if (d && !appState.settings.holidays.includes(d)) {
+        appState.settings.holidays.push(d);
+        saveData();
+        renderHolidays();
+        renderTimetable();
+      }
     }
-    function saveModule(e) { e.preventDefault(); appState.modules.push({ id: 'm_' + Date.now(), semester: document.getElementById('moduleSemester').value, name: document.getElementById('moduleName').value, coeff: Number(document.getElementById('moduleCoeff').value), grade: Number(document.getElementById('moduleGrade').value), resources: [] }); saveData(); renderModules(); renderTimetable(); closeModal('moduleModal'); showToast("Module ajouté", "success"); }
-    function renderModules() { const query = (document.getElementById('moduleSearch')?.value || '').toLowerCase(); document.getElementById('modulesGrid').innerHTML = appState.modules.filter(m => m.semester === appState.activeSemester && m.name.toLowerCase().includes(query)).map(m => `<div class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 p-5 shadow-sm space-y-4"><div class="flex justify-between"><div><span class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">${m.semester} | Note: ${m.grade || '-'}</span><h3 class="font-bold text-base mt-1">${m.name}</h3></div><div class="flex space-x-1"><button onclick="openAddResourceModal('${m.id}')" class="text-brand-600 hover:bg-gray-100 p-1.5 rounded"><i class="fa-solid fa-file-circle-plus"></i></button><button onclick="if(confirm('Supprimer module et ses cours ?')){appState.modules=appState.modules.filter(x=>x.id!=='${m.id}');appState.timetable=appState.timetable.filter(x=>x.moduleId!=='${m.id}');saveData();renderModules();renderTimetable();}" class="text-red-400 hover:bg-gray-100 p-1.5 rounded"><i class="fa-solid fa-trash"></i></button></div></div><div class="space-y-2 text-xs">${renderResList('📚 Cours', m.resources?.filter(r=>r.type==='cours'), m.id)}${renderResList('📝 TD', m.resources?.filter(r=>r.type==='td'), m.id)}${renderResList('🎯 Exam', m.resources?.filter(r=>r.type==='examen'), m.id)}</div></div>`).join(''); }
-    function renderResList(t, l = [], mid) { return `<div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-2.5"><span class="text-[11px] font-semibold text-gray-500">${t}</span>${l.map(r => `<div class="flex justify-between py-1 px-2 mt-1 bg-white dark:bg-gray-800 border rounded-lg">${r.isLocal ? `<button onclick="openLocalFile('${r.localFileId}')" class="text-brand-600 truncate"><i class="fa-solid fa-file-pdf mr-1"></i>${r.title}</button>` : `<a href="${r.url}" target="_blank" class="text-blue-500 truncate"><i class="fa-solid fa-link mr-1"></i>${r.title}</a>`}<button onclick="appState.modules.find(m=>m.id==='${mid}').resources=appState.modules.find(m=>m.id==='${mid}').resources.filter(x=>x.id!=='${r.id}');saveData();renderModules();" class="text-red-400 ml-2"><i class="fa-solid fa-xmark"></i></button></div>`).join('')}</div>`; }
 
-    function openAddClassModal() { const mods=appState.modules.filter(m=>m.semester===appState.activeSemester); if(!mods.length) return showToast("Ajoutez un module d'abord!", "error"); document.getElementById('classModuleSelect').innerHTML = mods.map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); document.getElementById('classForm').reset(); openModal('classModal'); }
-    function saveClass(e) { e.preventDefault(); appState.timetable.push({ id:'c_'+Date.now(), moduleId:document.getElementById('classModuleSelect').value, day:document.getElementById('classDay').value, week:document.getElementById('classWeek').value, startTime:document.getElementById('classStartTime').value, endTime:document.getElementById('classEndTime').value, room:document.getElementById('classRoom').value }); saveData(); renderTimetable(); closeModal('classModal'); showToast("Séance ajoutée", "success"); }
+    function renderHolidays() {
+      document.getElementById('holidaysList').innerHTML = (appState.settings.holidays || []).map(d => `
+        <span class="text-[10px] bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md flex items-center">
+          ${d} <button onclick="appState.settings.holidays=appState.settings.holidays.filter(x=>x!=='${d}');saveData();renderHolidays();renderTimetable()" class="ml-1.5 text-red-500"><i class="fa-solid fa-xmark"></i></button>
+        </span>`).join('');
+    }
 
-    function openAddTaskModal() { const mods=appState.modules.filter(m=>m.semester===appState.activeSemester); if(!mods.length) return showToast("Ajoutez un module d'abord!", "error"); document.getElementById('taskModuleSelect').innerHTML = mods.map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); document.getElementById('taskForm').reset(); openModal('taskModal'); }
-    function saveTask(e) { e.preventDefault(); appState.tasks.push({ id:'t_'+Date.now(), title:document.getElementById('taskTitle').value, moduleId:document.getElementById('taskModuleSelect').value, type:document.getElementById('taskType').value, dueDate:document.getElementById('taskDueDate').value, completed:false }); saveData(); renderTasks(); closeModal('taskModal'); showToast("Échéance ajoutée", "success"); }
-    function renderTasks() { document.getElementById('tasksList').innerHTML = appState.tasks.filter(t=>appState.modules.find(m=>m.id===t.moduleId)?.semester === appState.activeSemester).filter(t=>appState.taskFilter==='all'||t.type===appState.taskFilter).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)).map(t=>`<div class="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border ${t.type==='exam'?'border-red-400':''} flex justify-between items-center"><div class="flex items-center"><input type="checkbox" ${t.completed?'checked':''} onchange="let tk=appState.tasks.find(x=>x.id==='${t.id}');tk.completed=!tk.completed;saveData();renderTasks()" class="mr-3 w-5 h-5 rounded"><div class="${t.completed?'line-through opacity-50':''}"><p class="font-bold text-sm">${t.type==='exam'?'🚨':''} ${t.title}</p><p class="text-[10px] text-gray-500">${new Date(t.dueDate).toLocaleString('fr-FR')}</p></div></div><button onclick="appState.tasks=appState.tasks.filter(x=>x.id!=='${t.id}');saveData();renderTasks()" class="text-red-400"><i class="fa-solid fa-trash"></i></button></div>`).join(''); }
-    function setTaskFilter(f) { appState.taskFilter=f; document.querySelectorAll('[id^=btnFilter-]').forEach(b=>b.className='px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap'); document.getElementById('btnFilter-'+f).className='px-3 py-1.5 rounded-lg bg-brand-600 text-white font-bold whitespace-nowrap'; renderTasks(); }
-
-    function openAddFlashcardModal() { const mods=appState.modules.filter(m=>m.semester===appState.activeSemester); if(!mods.length) return showToast("Ajoutez un module d'abord!", "error"); document.getElementById('flashcardModuleSelect').innerHTML = mods.map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); document.getElementById('flashcardForm').reset(); openModal('flashcardModal'); }
-    function saveFlashcard(e) { e.preventDefault(); appState.flashcards.push({ id:'f_'+Date.now(), moduleId:document.getElementById('flashcardModuleSelect').value, q:document.getElementById('cardQuestion').value, a:document.getElementById('cardAnswer').value }); saveData(); renderFlashcards(); closeModal('flashcardModal'); showToast("Fiche créée", "success"); }
-    function renderFlashcards() { 
-      const filter = document.getElementById('flashcardModuleFilter').value;
-      const mods = appState.modules.filter(m=>m.semester===appState.activeSemester);
-      document.getElementById('flashcardModuleFilter').innerHTML = `<option value="all">Tous les modules</option>` + mods.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
-      document.getElementById('flashcardModuleFilter').value = filter || 'all';
+    function openAddClassModal() {
+      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
+      if (!mods.length) return showToast("Ajoutez d'abord un module pour ce semestre", "error");
       
-      const cards = appState.flashcards.filter(f=>mods.find(m=>m.id===f.moduleId)).filter(f=>filter==='all'||f.moduleId===filter);
-      document.getElementById('flashcardsGrid').innerHTML = cards.map(f=>`
-        <div class="perspective-1000 h-64"><div id="fc_${f.id}" class="transform-style-3d relative w-full h-full duration-500 transition-transform cursor-pointer" onclick="document.getElementById('fc_${f.id}').classList.toggle('rotate-y-180')">
-          <div class="backface-hidden absolute inset-0 bg-white dark:bg-gray-800 rounded-2xl border p-5 flex flex-col justify-between"><div><div class="flex justify-end"><button onclick="event.stopPropagation();appState.flashcards=appState.flashcards.filter(x=>x.id!=='${f.id}');saveData();renderFlashcards()" class="text-red-400"><i class="fa-solid fa-trash"></i></button></div><span class="text-[10px] text-gray-400 font-bold uppercase">Question</span><p class="font-bold mt-2">${f.q}</p></div><div class="text-[11px] text-brand-600 font-semibold"><i class="fa-solid fa-rotate mr-1"></i>Cliquez pour la réponse</div></div>
-          <div class="backface-hidden rotate-y-180 absolute inset-0 bg-brand-50 dark:bg-brand-900 border-2 border-brand-500 rounded-2xl p-5 flex flex-col justify-between"><div><span class="text-[10px] text-brand-600 font-bold uppercase">Réponse</span><p class="text-sm mt-2 overflow-y-auto max-h-36 custom-scrollbar">${f.a}</p></div><div class="text-[10px] text-gray-500 font-bold">Cliquez pour retourner</div></div>
-        </div></div>`).join(''); 
+      document.getElementById('classModuleSelect').innerHTML = mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      document.getElementById('classForm').reset();
+      openModal('classModal');
     }
 
+    function saveClass(e) {
+      e.preventDefault();
+      appState.timetable.push({
+        id: 'c_' + Date.now(),
+        moduleId: document.getElementById('classModuleSelect').value,
+        day: document.getElementById('classDay').value,
+        week: document.getElementById('classWeek').value,
+        startTime: document.getElementById('classStartTime').value,
+        endTime: document.getElementById('classEndTime').value,
+        room: document.getElementById('classRoom').value
+      });
+      saveData();
+      renderTimetable();
+      closeModal('classModal');
+      showToast("Séance ajoutée", "success");
+    }
+
+    function openClassDetails(classId) {
+      currentClassIdForNote = classId;
+      const c = appState.timetable.find(x => x.id === classId);
+      if (!c) return;
+      const m = appState.modules.find(x => x.id === c.moduleId);
+
+      document.getElementById('cdTime').innerText = `${c.day} ${c.startTime} - ${c.endTime}`;
+      document.getElementById('cdTitle').innerText = m ? m.name : 'Séance';
+      document.getElementById('cdRoom').innerHTML = `<i class="fa-solid fa-location-dot mr-1"></i>${c.room}`;
+
+      document.getElementById('cdDeleteBtn').onclick = () => {
+        if (confirm("Supprimer ce cours de l'emploi du temps ?")) {
+          appState.timetable = appState.timetable.filter(x => x.id !== classId);
+          saveData();
+          renderTimetable();
+          closeModal('classDetailsModal');
+        }
+      };
+
+      const note = (appState.notes || []).find(n => n.classId === classId) || { text: '', photos: [] };
+      document.getElementById('cdNotes').value = note.text || '';
+      tempPhotos = [...(note.photos || [])];
+      renderCdPhotos();
+      openModal('classDetailsModal');
+    }
+
+    function handleClassPhotos(e) {
+      const files = Array.from(e.target.files);
+      if (tempPhotos.length + files.length > 3) return showToast("Maximum 3 photos autorisées", "warning");
+      files.forEach(f => {
+        const r = new FileReader();
+        r.onload = ev => {
+          tempPhotos.push(ev.target.result);
+          renderCdPhotos();
+        };
+        r.readAsDataURL(f);
+      });
+    }
+
+    function renderCdPhotos() {
+      document.getElementById('cdPhotosGrid').innerHTML = tempPhotos.map((src, i) => `
+        <div class="relative w-16 h-16 shrink-0">
+          <img src="${src}" class="w-full h-full object-cover rounded-lg border">
+          <button onclick="tempPhotos.splice(${i},1); renderCdPhotos()" class="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-[8px] flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>`).join('');
+    }
+
+    function saveClassNotes() {
+      const text = document.getElementById('cdNotes').value.trim();
+      let n = appState.notes.find(x => x.classId === currentClassIdForNote);
+      if (!n) {
+        n = { classId: currentClassIdForNote, date: new Date().toISOString() };
+        appState.notes.push(n);
+      }
+      n.text = text;
+      n.photos = [...tempPhotos];
+      saveData();
+      renderTimetable();
+      closeModal('classDetailsModal');
+      showToast("Notes enregistrées", "success");
+    }
+
+    /* ==========================================================================
+       GESTION DES MODULES
+       ========================================================================== */
+    function openAddModuleModal() {
+      const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1', 'S2'];
+      document.getElementById('moduleSemester').innerHTML = sems.map(s => `<option value="${s}">${s}</option>`).join('');
+      document.getElementById('moduleForm').reset();
+      document.getElementById('moduleSemester').value = appState.activeSemester;
+      openModal('moduleModal');
+    }
+
+    function saveModule(e) {
+      e.preventDefault();
+      const sem = document.getElementById('moduleSemester').value;
+      const name = document.getElementById('moduleName').value.trim();
+      const prof = document.getElementById('moduleProf').value.trim();
+      const grade = document.getElementById('moduleGrade').value;
+      const coeff = Number(document.getElementById('moduleCoeff').value) || 1;
+
+      appState.modules.push({
+        id: 'm_' + Date.now(),
+        semester: sem,
+        name: name,
+        prof: prof,
+        grade: grade === '' ? null : Number(grade),
+        coeff: coeff,
+        resources: []
+      });
+
+      saveData();
+      renderModules();
+      renderTimetable();
+      closeModal('moduleModal');
+      showToast("Module ajouté avec succès", "success");
+    }
+
+    function renderModules() {
+      const query = (document.getElementById('moduleSearch')?.value || '').toLowerCase();
+      const filtered = appState.modules.filter(m => m.semester === appState.activeSemester && m.name.toLowerCase().includes(query));
+      
+      const container = document.getElementById('modulesGrid');
+      if (!filtered.length) {
+        container.innerHTML = `<div class="col-span-full text-center py-8 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 text-xs text-gray-400">Aucun module dans ${appState.activeSemester}</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(m => `
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/40 px-2 py-0.5 rounded-md">${m.semester} | Note: ${m.grade !== null ? m.grade + '/20' : '-'}</span>
+              <h3 class="font-bold text-base mt-1 text-gray-900 dark:text-white">${m.name}</h3>
+              <p class="text-xs text-gray-400">${m.prof || 'Enseignant non spécifié'}</p>
+            </div>
+            <div class="flex space-x-1">
+              <button onclick="openAddResourceModal('${m.id}')" class="p-1.5 text-brand-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><i class="fa-solid fa-file-circle-plus"></i></button>
+              <button onclick="deleteModule('${m.id}')" class="p-1.5 text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="space-y-1.5 text-xs">
+            ${renderResSection('📚 Cours', (m.resources||[]).filter(r=>r.type==='cours'), m.id)}
+            ${renderResSection('📝 TD / TP', (m.resources||[]).filter(r=>r.type==='td'), m.id)}
+            ${renderResSection('🎯 Examens', (m.resources||[]).filter(r=>r.type==='examen'), m.id)}
+          </div>
+        </div>`).join('');
+    }
+
+    function renderResSection(title, list, mid) {
+      return `
+        <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-2">
+          <span class="text-[10px] font-bold text-gray-400 uppercase">${title} (${list.length})</span>
+          ${list.map(r => `
+            <div class="flex justify-between items-center py-1 px-2 mt-1 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
+              ${r.isLocal 
+                ? `<button onclick="openLocalFile('${r.localFileId}')" class="text-brand-600 truncate text-left"><i class="fa-solid fa-file-pdf mr-1 text-red-500"></i>${r.title}</button>` 
+                : `<a href="${r.url}" target="_blank" class="text-brand-600 truncate"><i class="fa-solid fa-link mr-1"></i>${r.title}</a>`}
+              <button onclick="deleteResource('${mid}', '${r.id}')" class="text-gray-300 hover:text-red-500 ml-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    function deleteModule(id) {
+      if (confirm("Supprimer ce module et toutes ses séances associées ?")) {
+        appState.modules = appState.modules.filter(x => x.id !== id);
+        appState.timetable = appState.timetable.filter(x => x.moduleId !== id);
+        appState.tasks = appState.tasks.filter(x => x.moduleId !== id);
+        saveData();
+        renderModules();
+        renderTimetable();
+      }
+    }
+
+    /* ==========================================================================
+       GESTION DES TÂCHES & EXAMENS
+       ========================================================================== */
+    function openAddTaskModal() {
+      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
+      if (!mods.length) return showToast("Ajoutez d'abord un module pour ce semestre", "error");
+      
+      document.getElementById('taskModuleSelect').innerHTML = mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      document.getElementById('taskForm').reset();
+      openModal('taskModal');
+    }
+
+    function saveTask(e) {
+      e.preventDefault();
+      appState.tasks.push({
+        id: 't_' + Date.now(),
+        title: document.getElementById('taskTitle').value.trim(),
+        moduleId: document.getElementById('taskModuleSelect').value,
+        type: document.getElementById('taskType').value,
+        dueDate: document.getElementById('taskDueDate').value,
+        completed: false
+      });
+      saveData();
+      renderTasks();
+      closeModal('taskModal');
+      showToast("Échéance ajoutée", "success");
+    }
+
+    function renderTasks() {
+      const modIds = appState.modules.filter(m => m.semester === appState.activeSemester).map(m => m.id);
+      const list = appState.tasks
+        .filter(t => modIds.includes(t.moduleId))
+        .filter(t => appState.taskFilter === 'all' || t.type === appState.taskFilter)
+        .sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+      const container = document.getElementById('tasksList');
+      if (!list.length) {
+        container.innerHTML = `<div class="text-center py-8 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 text-xs text-gray-400">Aucune échéance enregistrée</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(t => {
+        const mod = appState.modules.find(m => m.id === t.moduleId);
+        return `
+          <div class="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border ${t.type === 'exam' ? 'border-red-300 dark:border-red-900' : 'border-gray-200 dark:border-gray-700'} flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+              <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTaskDone('${t.id}')" class="w-4 h-4 rounded">
+              <div class="${t.completed ? 'line-through opacity-50' : ''}">
+                <p class="font-bold text-sm text-gray-900 dark:text-white">${t.type === 'exam' ? '🚨 ' : ''}${t.title}</p>
+                <p class="text-[10px] text-gray-400">${mod ? mod.name : ''} • Date : ${new Date(t.dueDate).toLocaleString('fr-FR')}</p>
+              </div>
+            </div>
+            <button onclick="deleteTask('${t.id}')" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+          </div>`;
+      }).join('');
+    }
+
+    function toggleTaskDone(id) {
+      const t = appState.tasks.find(x => x.id === id);
+      if (t) {
+        t.completed = !t.completed;
+        saveData();
+        renderTasks();
+      }
+    }
+
+    function deleteTask(id) {
+      appState.tasks = appState.tasks.filter(x => x.id !== id);
+      saveData();
+      renderTasks();
+    }
+
+    function setTaskFilter(f) {
+      appState.taskFilter = f;
+      document.querySelectorAll('[id^=btnFilter-]').forEach(b => {
+        b.className = 'px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap';
+      });
+      document.getElementById('btnFilter-' + f).className = 'px-3 py-1.5 rounded-lg bg-brand-600 text-white font-bold whitespace-nowrap';
+      renderTasks();
+    }
+
+    /* ==========================================================================
+       GESTION DES FLASHCARDS
+       ========================================================================== */
+    function openAddFlashcardModal() {
+      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
+      if (!mods.length) return showToast("Ajoutez d'abord un module pour ce semestre", "error");
+      document.getElementById('flashcardModuleSelect').innerHTML = mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      document.getElementById('flashcardForm').reset();
+      openModal('flashcardModal');
+    }
+
+    function saveFlashcard(e) {
+      e.preventDefault();
+      appState.flashcards.push({
+        id: 'f_' + Date.now(),
+        moduleId: document.getElementById('flashcardModuleSelect').value,
+        q: document.getElementById('cardQuestion').value.trim(),
+        a: document.getElementById('cardAnswer').value.trim()
+      });
+      saveData();
+      renderFlashcards();
+      closeModal('flashcardModal');
+      showToast("Fiche créée", "success");
+    }
+
+    function renderFlashcards() {
+      const filter = document.getElementById('flashcardModuleFilter').value || 'all';
+      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
+      
+      document.getElementById('flashcardModuleFilter').innerHTML = `<option value="all">Tous les modules</option>` + mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      document.getElementById('flashcardModuleFilter').value = filter;
+
+      const modIds = mods.map(m => m.id);
+      const cards = appState.flashcards.filter(f => modIds.includes(f.moduleId)).filter(f => filter === 'all' || f.moduleId === filter);
+
+      const container = document.getElementById('flashcardsGrid');
+      if (!cards.length) {
+        container.innerHTML = `<div class="col-span-full text-center py-8 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 text-xs text-gray-400">Aucune fiche de révision</div>`;
+        return;
+      }
+
+      container.innerHTML = cards.map(f => `
+        <div class="perspective-1000 h-60">
+          <div id="fc_${f.id}" class="transform-style-3d relative w-full h-full duration-500 transition-transform cursor-pointer" onclick="document.getElementById('fc_${f.id}').classList.toggle('rotate-y-180')">
+            <div class="backface-hidden absolute inset-0 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-end">
+                  <button onclick="event.stopPropagation();deleteFlashcard('${f.id}')" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <span class="text-[10px] text-gray-400 font-bold uppercase">Question</span>
+                <p class="font-bold text-sm mt-1 text-gray-900 dark:text-white">${f.q}</p>
+              </div>
+              <div class="text-[11px] text-brand-600 font-bold"><i class="fa-solid fa-rotate mr-1"></i>Cliquer pour voir la réponse</div>
+            </div>
+            <div class="backface-hidden rotate-y-180 absolute inset-0 bg-brand-50 dark:bg-brand-950/80 border-2 border-brand-500 rounded-2xl p-5 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] text-brand-600 font-bold uppercase">Réponse</span>
+                <p class="text-xs font-medium mt-1 text-gray-800 dark:text-gray-100 overflow-y-auto max-h-36 custom-scrollbar">${f.a}</p>
+              </div>
+              <div class="text-[10px] text-gray-400 font-bold">Cliquer pour retourner</div>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function deleteFlashcard(id) {
+      appState.flashcards = appState.flashcards.filter(x => x.id !== id);
+      saveData();
+      renderFlashcards();
+    }
+
+    /* ==========================================================================
+       GESTION DES RESSOURCES & FICHIERS
+       ========================================================================== */
     let currentResTab = 'local';
-    function openAddResourceModal(id) { document.getElementById('resModuleId').value = id; switchResourceTab('local'); openModal('resourceModal'); }
-    function switchResourceTab(t) { currentResTab = t; ['local', 'drive', 'manual'].forEach(tab => { document.getElementById('resTab-' + tab).className = `flex-1 py-2 font-bold border-b-2 ${tab === t ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400'}`; document.getElementById('resPanel-' + tab).classList.toggle('hidden', tab !== t); }); }
-    async function saveResource(e) { e.preventDefault(); const modId = document.getElementById('resModuleId').value, title = document.getElementById('resTitle').value, cat = document.getElementById('resCategory').value, mod = appState.modules.find(m => m.id === modId); if (!mod.resources) mod.resources = []; const btn = document.getElementById('saveResBtn'); btn.disabled = true; try { if (currentResTab === 'local') { const f = document.getElementById('resLocalFileInput').files[0]; if(!f) throw new Error("Fichier requis"); const lid = 'f_' + Date.now(); await storeLocalFile(lid, f); mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: true, localFileId: lid }); } else if (currentResTab === 'drive') { const f = document.getElementById('resDriveFileInput').files[0]; if(!f) throw new Error("Fichier requis"); if (!driveAccessToken) throw new Error("Drive requis"); const m = { name: `${title} - ${f.name}`, mimeType: f.type }, frm = new FormData(); frm.append('metadata', new Blob([JSON.stringify(m)], { type: 'application/json' })); frm.append('file', f); const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers: { 'Authorization': 'Bearer ' + driveAccessToken }, body: frm }); const d = await res.json(); if (!d.id) throw new Error("Erreur Upload"); mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: false, url: `https://drive.google.com/file/d/${d.id}/view` }); } else { const u = document.getElementById('resUrlInput').value; if(!u) throw new Error("URL requise"); mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: false, url: u }); } saveData(); renderModules(); closeModal('resourceModal'); showToast('Ajouté!', 'success'); } catch (err) { showToast(err.message, 'error'); } finally { btn.disabled = false; document.getElementById('resourceForm').reset(); } }
 
-    function calculateSemesterAverage() { const currentMods = appState.modules.filter(m => m.semester === appState.activeSemester && m.grade); const avgDisp = document.getElementById('semAverageDisplay'); if (!currentMods.length) return avgDisp.innerText = '-- / 20'; let totalPts = 0, totalCoef = 0; currentMods.forEach(m => { totalPts += (m.grade * m.coeff); totalCoef += m.coeff; }); avgDisp.innerText = (totalPts / totalCoef).toFixed(2) + ' / 20'; }
-    function exportDataJSON() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); a.download = "EduVault_Backup.json"; a.click(); showToast('Exporté!', 'success'); }
-    function importDataJSON(e) { const r = new FileReader(); r.onload = function(evt) { appState = Object.assign(appState, JSON.parse(evt.target.result)); saveData(); location.reload(); }; r.readAsText(e.target.files[0]); }
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-    function backdropClose(e, id) { if (e.target.id === id) closeModal(id); }
-    function showToast(msg, type = 'info') { const c = document.getElementById('toastContainer'), t = document.createElement('div'); t.className = `inline-block px-4 py-3 rounded-full text-xs text-white shadow-2xl font-bold animate-bounce ${type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-emerald-600' : type === 'warning' ? 'bg-amber-600' : 'bg-gray-900'}`; t.innerText = msg; c.appendChild(t); setTimeout(() => t.remove(), 3500); }
-    function initTheme() { if (localStorage.getItem('eduTheme') === 'light') document.documentElement.classList.remove('dark'); }
-    function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('eduTheme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
+    function openAddResourceModal(id) {
+      document.getElementById('resModuleId').value = id;
+      document.getElementById('resourceForm').reset();
+      switchResourceTab('local');
+      openModal('resourceModal');
+    }
+
+    function switchResourceTab(t) {
+      currentResTab = t;
+      ['local', 'drive', 'manual'].forEach(tab => {
+        document.getElementById('resTab-' + tab).className = `flex-1 py-2 font-bold border-b-2 ${tab === t ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400'}`;
+        document.getElementById('resPanel-' + tab).classList.toggle('hidden', tab !== t);
+      });
+    }
+
+    async function saveResource(e) {
+      e.preventDefault();
+      const modId = document.getElementById('resModuleId').value;
+      const title = document.getElementById('resTitle').value.trim();
+      const cat = document.getElementById('resCategory').value;
+      const mod = appState.modules.find(m => m.id === modId);
+      if (!mod) return;
+
+      const btn = document.getElementById('saveResBtn');
+      btn.disabled = true;
+
+      try {
+        if (currentResTab === 'local') {
+          const f = document.getElementById('resLocalFileInput').files[0];
+          if (!f) throw new Error("Sélectionnez un fichier");
+          const lid = 'f_' + Date.now();
+          await storeLocalFile(lid, f);
+          if (!mod.resources) mod.resources = [];
+          mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: true, localFileId: lid });
+        } else if (currentResTab === 'drive') {
+          const f = document.getElementById('resDriveFileInput').files[0];
+          if (!f) throw new Error("Sélectionnez un fichier");
+          if (!driveAccessToken) throw new Error("Connectez-vous d'abord à Google Drive");
+          
+          const metadata = { name: `${title} - ${f.name}`, mimeType: f.type };
+          const form = new FormData();
+          form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+          form.append('file', f);
+
+          const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + driveAccessToken },
+            body: form
+          });
+          const data = await res.json();
+          if (!data.id) throw new Error("Échec du téléversement Google Drive");
+          if (!mod.resources) mod.resources = [];
+          mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: false, url: `https://drive.google.com/file/d/${data.id}/view` });
+        } else {
+          const u = document.getElementById('resUrlInput').value.trim();
+          if (!u) throw new Error("Saisissez une URL");
+          if (!mod.resources) mod.resources = [];
+          mod.resources.push({ id: 'r_' + Date.now(), title, type: cat, isLocal: false, url: u });
+        }
+
+        saveData();
+        renderModules();
+        closeModal('resourceModal');
+        showToast("Document enregistré", "success");
+      } catch(err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function deleteResource(mid, rid) {
+      const m = appState.modules.find(x => x.id === mid);
+      if (m && m.resources) {
+        m.resources = m.resources.filter(x => x.id !== rid);
+        saveData();
+        renderModules();
+      }
+    }
 
     /* ==========================================================================
-       POMODORO
+       POMODORO TIMER
        ========================================================================== */
-    let pTime = 25 * 60, pInt; 
-    function updatePomoModuleDropdown() { document.getElementById('pomoModuleSelect').innerHTML = `<option value="">Focus Général</option>` + appState.modules.filter(m=>m.semester===appState.activeSemester).map(m=>`<option value="${m.id}">${m.name}</option>`).join(''); }
-    function setPomodoroMode(m) { clearInterval(pInt); pInt = null; pTime = m === 'work' ? 25 * 60 : m === 'short' ? 5 * 60 : 15 * 60; document.getElementById('timerPlayIcon').className = 'fa-solid fa-play'; updPomo(); } 
-    function togglePomodoro() { if (pInt) { clearInterval(pInt); pInt = null; document.getElementById('timerPlayIcon').className = 'fa-solid fa-play'; } else { document.getElementById('timerPlayIcon').className = 'fa-solid fa-pause'; pInt = setInterval(() => { pTime--; updPomo(); if (pTime <= 0) { clearInterval(pInt); pInt = null; document.getElementById('timerPlayIcon').className = 'fa-solid fa-play'; try{navigator.vibrate([300, 200, 300]);}catch(e){} showToast('Terminé!', 'success'); } }, 1000); } } 
-    function resetPomodoro() { clearInterval(pInt); pInt = null; document.getElementById('timerPlayIcon').className = 'fa-solid fa-play'; pTime = 25 * 60; updPomo(); } 
-    function updPomo() { document.getElementById('timerDisplay').innerText = `${String(Math.floor(pTime / 60)).padStart(2, '0')}:${String(pTime % 60).padStart(2, '0')}`; }
+    let pTime = 25 * 60, pTotal = 25 * 60, pInt = null;
+
+    function updatePomoModuleDropdown() {
+      const select = document.getElementById('pomoModuleSelect');
+      const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
+      select.innerHTML = `<option value="">Focus Libre (Général)</option>` + mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+    }
+
+    function setPomodoroMode(m) {
+      clearInterval(pInt);
+      pInt = null;
+      document.getElementById('timerPlayIcon').className = 'fa-solid fa-play';
+      pTotal = m === 'work' ? 25 * 60 : (m === 'short' ? 5 * 60 : 15 * 60);
+      pTime = pTotal;
+      
+      ['work', 'short', 'long'].forEach(mode => {
+        document.getElementById('pomoBtn-' + mode).className = (mode === m) 
+          ? 'px-4 py-1.5 rounded-full text-xs font-bold transition bg-brand-600 text-white shadow-md' 
+          : 'px-4 py-1.5 rounded-full text-xs font-bold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
+      });
+      updPomo();
+    }
+
+    function togglePomodoro() {
+      if (pInt) {
+        clearInterval(pInt);
+        pInt = null;
+        document.getElementById('timerPlayIcon').className = 'fa-solid fa-play';
+      } else {
+        document.getElementById('timerPlayIcon').className = 'fa-solid fa-pause';
+        pInt = setInterval(() => {
+          pTime--;
+          updPomo();
+          if (pTime <= 0) {
+            clearInterval(pInt);
+            pInt = null;
+            document.getElementById('timerPlayIcon').className = 'fa-solid fa-play';
+            try { navigator.vibrate([300, 200, 300]); } catch(e) {}
+            showToast("Session Pomodoro terminée !", "success");
+          }
+        }, 1000);
+      }
+    }
+
+    function resetPomodoro() {
+      clearInterval(pInt);
+      pInt = null;
+      document.getElementById('timerPlayIcon').className = 'fa-solid fa-play';
+      pTime = pTotal;
+      updPomo();
+    }
+
+    function updPomo() {
+      const mins = Math.floor(pTime / 60);
+      const secs = pTime % 60;
+      document.getElementById('timerDisplay').innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      const offset = 283 - ((pTotal - pTime) / pTotal) * 283;
+      document.getElementById('timerProgress').style.strokeDashoffset = offset;
+    }
 
     /* ==========================================================================
-       LOCAL FILE STORAGE & GOOGLE DRIVE INIT
+       IMPORTATION IA (CORRECTION INTÉGRALE DES ERREURS HTTP 405)
        ========================================================================== */
-    const DB_NAME = 'EduVaultLocalFiles'; let dbInstance = null;
-    function initIndexedDB() { return new Promise((ok, ko) => { const req = indexedDB.open(DB_NAME, 1); req.onupgradeneeded = e => { if (!e.target.result.objectStoreNames.contains('files')) e.target.result.createObjectStore('files', { keyPath: 'id' }); }; req.onsuccess = () => ok(dbInstance = req.result); req.onerror = () => ko(req.error); }); }
-    async function storeLocalFile(id, file) { if (!dbInstance) await initIndexedDB(); return new Promise((ok) => { const tx = dbInstance.transaction('files', 'readwrite'); const reader = new FileReader(); reader.onload = e => { tx.objectStore('files').put({ id, name: file.name, type: file.type, dataUrl: e.target.result }); ok(); }; reader.readAsDataURL(file); }); }
-    async function openLocalFile(id) { if (!dbInstance) await initIndexedDB(); const req = dbInstance.transaction('files', 'readonly').objectStore('files').get(id); req.onsuccess = () => { if (!req.result) return showToast('Fichier non trouvé', 'error'); const win = window.open(); win ? win.document.write(`<iframe src="${req.result.dataUrl}" style="border:0;width:100%;height:100%;"></iframe>`) : showToast('Bloqué', 'warning'); }; }
+    function openAiImportModal() {
+      document.getElementById('aiApiKey').value = localStorage.getItem('eduVault_aiKey') || '';
+      openModal('aiImportModal');
+    }
 
-    function initDriveClient() { if (window.google?.accounts?.oauth2) { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/drive.file', callback: (res) => { if (res.error) return showToast('Erreur Drive', 'error'); driveAccessToken = res.access_token; updateDriveUI(true); showToast('Connecté à Drive!', 'success'); } }); } else setTimeout(initDriveClient, 800); }
-    function toggleDriveAuth() { if (!tokenClient) return showToast("Chargement API...", 'warning'); if (driveAccessToken) { driveAccessToken = null; updateDriveUI(false); showToast('Déconnecté', 'info'); } else tokenClient.requestAccessToken(); }
-    function updateDriveUI(on) { document.getElementById('driveStatusText').innerText = on ? 'Drive Connecté' : 'Drive Cloud'; document.getElementById('driveDot').className = on ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' : 'w-2 h-2 rounded-full bg-red-500'; }
+    const b64 = f => new Promise((ok, ko) => {
+      const r = new FileReader();
+      r.onload = () => ok(r.result.split(',')[1]);
+      r.onerror = ko;
+      r.readAsDataURL(f);
+    });
 
-    /* ==========================================================================
-       AI IMPORT (NEW ROBUST ENGINE)
-       ========================================================================== */
-    const loadScript = src => new Promise((ok, ko) => { if(document.querySelector(`script[src="${src}"]`)) return ok(); const x = document.createElement("script"); x.src = src; x.onload = ok; x.onerror = () => ko(new Error("Erreur PDF.js")); document.head.append(x); });
-    const isPdf = f => f.type === "application/pdf" || /\.pdf$/i.test(f.name);
-    const b64 = f => new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = ko; r.readAsDataURL(f); });
+    async function pdfToImages(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const images = [];
 
-    async function toImages(file) {
-      const out = [];
-      const draw = (src, w, h) => { const k = Math.min(1, 2000 / Math.max(w, h)), cv = document.createElement("canvas"); cv.width = Math.round(w * k); cv.height = Math.round(h * k); const cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(src, 0, 0, cv.width, cv.height); return cv.toDataURL("image/jpeg", 0.85); };
-      if (isPdf(file)) {
-        const B = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/"; await loadScript(B + "pdf.min.js"); await loadScript(B + "pdf.worker.min.js"); pdfjsLib.GlobalWorkerOptions.workerSrc = B + "pdf.worker.min.js";
-        const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
-        for (let i = 1; i <= Math.min(pdf.numPages, 3); i++) { const pg = await pdf.getPage(i), vp = pg.getViewport({ scale: 2 }), cv = document.createElement("canvas"); cv.width = vp.width; cv.height = vp.height; await pg.render({ canvasContext: cv.getContext("2d"), viewport: vp }).promise; out.push(draw(cv, cv.width, cv.height)); }
-      } else { const bm = await createImageBitmap(file); out.push(draw(bm, bm.width, bm.height)); }
-      return out;
+      for (let i = 1; i <= Math.min(pdf.numPages, 3); i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        images.push(canvas.toDataURL('image/jpeg', 0.85));
+      }
+      return images;
     }
 
     async function startAiImport() {
-      const key = document.getElementById('aiApiKey').value.trim(); // .trim() est vital pour éviter l'erreur 405
+      const key = document.getElementById('aiApiKey').value.trim();
       const file = document.getElementById('aiFile').files[0];
-      
-      if (!key) return showToast('Entrez votre clé API', 'warning');
-      if (!file) return showToast('Sélectionnez un fichier', 'warning');
-      
-      localStorage.setItem('eduVault_aiKey', key); // Sauvegarde locale de la clé
+
+      if (!key) return showToast("Entrez votre clé API", "warning");
+      if (!file) return showToast("Sélectionnez un document", "warning");
+
+      localStorage.setItem('eduVault_aiKey', key);
       const btn = document.getElementById('btnAiImport');
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Analyse en cours...';
       btn.disabled = true;
 
       try {
-        let txtData = "";
+        let rawText = "";
         if (key.startsWith("gsk_")) {
-          txtData = await askGroq(key, file);
+          rawText = await callGroqAPI(key, file);
         } else {
-          txtData = await askGemini(key, file);
+          rawText = await callGeminiAPI(key, file);
         }
 
-        // Nettoyage de la réponse IA pour forcer un JSON array propre
-        txtData = txtData.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/```(?:json)?/g, "").trim();
-        const a = txtData.indexOf("["), b = txtData.lastIndexOf("]");
-        if (a < 0 || b < a) throw new Error("L'IA n'a pas renvoyé de données lisibles.");
-        
-        const got = JSON.parse(txtData.slice(a, b + 1)).filter(s => s.matiere && s.debut && s.fin);
-        if (!got.length) throw new Error("Aucun cours trouvé dans ce document.");
+        // Extraction robuste du tableau JSON
+        rawText = rawText.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/```(?:json)?/g, "").trim();
+        const start = rawText.indexOf('[');
+        const end = rawText.lastIndexOf(']');
+        if (start < 0 || end < start) {
+          throw new Error("L'IA n'a pas détecté de format structuré valide");
+        }
+
+        const sessions = JSON.parse(rawText.slice(start, end + 1)).filter(s => s.matiere && s.debut && s.fin);
+        if (!sessions.length) throw new Error("Aucune séance trouvée dans ce fichier");
 
         let count = 0;
-        got.forEach(s => {
+        sessions.forEach(s => {
           let mod = appState.modules.find(m => m.semester === appState.activeSemester && m.name.toLowerCase() === s.matiere.toLowerCase());
-          if (!mod) { 
-            mod = { id: 'm_' + Date.now() + Math.random(), semester: appState.activeSemester, name: s.matiere, prof: "", coeff: 1, grade: null, resources: [] }; 
-            appState.modules.push(mod); 
+          if (!mod) {
+            mod = {
+              id: 'm_' + Date.now() + Math.random().toString(36).substr(2, 4),
+              semester: appState.activeSemester,
+              name: s.matiere,
+              prof: s.prof || "",
+              coeff: 1,
+              grade: null,
+              resources: []
+            };
+            appState.modules.push(mod);
           }
-          let dayFormatted = s.jour.charAt(0).toUpperCase() + s.jour.slice(1).toLowerCase();
-          appState.timetable.push({ id: 'class_' + Date.now() + Math.random(), moduleId: mod.id, day: dayFormatted, week: 'all', startTime: s.debut, endTime: s.fin, room: s.salle || "" });
+
+          const jour = s.jour ? (s.jour.charAt(0).toUpperCase() + s.jour.slice(1).toLowerCase()) : 'Lundi';
+          appState.timetable.push({
+            id: 'c_' + Date.now() + Math.random().toString(36).substr(2, 4),
+            moduleId: mod.id,
+            day: jour,
+            week: 'all',
+            startTime: s.debut,
+            endTime: s.fin,
+            room: s.salle || 'Salle'
+          });
           count++;
         });
 
-        saveData(); renderModules(); renderTimetable(); closeModal('aiImportModal');
+        saveData();
+        renderModules();
+        renderTimetable();
+        closeModal('aiImportModal');
         showToast(`${count} séances importées avec succès !`, 'success');
 
-      } catch (e) {
-        showToast("Erreur IA: " + e.message, 'error');
+      } catch (err) {
+        showToast("Erreur IA : " + err.message, "error");
       } finally {
         btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer';
         btn.disabled = false;
       }
     }
 
-    async function askGemini(key, file) {
-      const mime = file.type || (isPdf(file) ? "application/pdf" : "image/jpeg");
-      const base64Data = await b64(file);
-      const url = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){key}`;
-      
+    async function callGeminiAPI(key, file) {
+      const isPdfFile = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+      let mimeType = file.type || "image/jpeg";
+      let base64Content = "";
+
+      if (isPdfFile) {
+        // Envoi direct du PDF natif via base64 pour Gemini
+        mimeType = "application/pdf";
+        base64Content = await b64(file);
+      } else {
+        base64Content = await b64(file);
+      }
+
+      // Requête HTTP POST standardisée vers Google AI Studio
+      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){encodeURIComponent(key)}`;
       const payload = {
         contents: [{
           parts: [
-            { text: "Extrayez l'emploi du temps. Renvoyez UNIQUEMENT un tableau JSON strict sans aucun autre texte. Format: [{\"jour\":\"LUNDI\",\"debut\":\"08:00\",\"fin\":\"10:00\",\"matiere\":\"Maths\",\"salle\":\"Amphi A\"}]" },
-            { inline_data: { mime_type: mime, data: base64Data } }
+            { text: "Extrais l'emploi du temps de ce document. Réponds STRICTEMENT avec un tableau JSON sans markdown, sous la forme : [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]. Utilise les jours en français." },
+            { inline_data: { mime_type: mimeType, data: base64Content } }
           ]
         }],
-        generationConfig: { temperature: 0 }
+        generationConfig: { temperature: 0.1 }
       };
 
-      const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || `Erreur serveur HTTP ${response.status}`);
-      return data.candidates[0].content.parts[0].text;
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const jsonRes = await res.json();
+      if (!res.ok) {
+        throw new Error(jsonRes.error?.message || `Erreur HTTP ${res.status}`);
+      }
+      return jsonRes.candidates[0].content.parts[0].text;
     }
 
-    async function askGroq(key, file) {
-      const imgs = await toImages(file);
-      const url = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
-      
+    async function callGroqAPI(key, file) {
+      const isPdfFile = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+      let imageUrls = [];
+
+      if (isPdfFile) {
+        imageUrls = await pdfToImages(file);
+      } else {
+        const dataUrl = await new Promise((ok, ko) => {
+          const r = new FileReader();
+          r.onload = () => ok(r.result);
+          r.onerror = ko;
+          r.readAsDataURL(file);
+        });
+        imageUrls.push(dataUrl);
+      }
+
+      const endpoint = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
       const payload = {
-        model: "llama-3.2-11b-vision-preview", // Modèle visuel Groq requis pour les images
-        temperature: 0,
+        model: "llama-3.2-11b-vision-preview",
+        temperature: 0.1,
         messages: [{
           role: "user",
           content: [
-            { type: "text", text: "Extrayez l'emploi du temps. Renvoyez UNIQUEMENT un tableau JSON strict sans aucun autre texte. Format: [{\"jour\":\"LUNDI\",\"debut\":\"08:00\",\"fin\":\"10:00\",\"matiere\":\"Maths\",\"salle\":\"Amphi A\"}]" },
-            ...imgs.map(u => ({ type: "image_url", image_url: { url: u } }))
+            { type: "text", text: "Extrais l'emploi du temps de cette image. Réponds UNIQUEMENT avec un tableau JSON : [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]" },
+            ...imageUrls.map(url => ({ type: "image_url", image_url: { url } }))
           ]
         }]
       };
 
-      const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` }, body: JSON.stringify(payload) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || `Erreur serveur HTTP ${response.status}`);
-      return data.choices[0].message.content;
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${key}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const jsonRes = await res.json();
+      if (!res.ok) {
+        throw new Error(jsonRes.error?.message || `Erreur HTTP ${res.status}`);
+      }
+      return jsonRes.choices[0].message.content;
+    }
+
+    /* ==========================================================================
+       STOCKAGE LOCAL (INDEXEDDB) & GOOGLE DRIVE
+       ========================================================================== */
+    const DB_NAME = 'EduVaultLocalFiles';
+    let dbInstance = null;
+
+    function initIndexedDB() {
+      return new Promise((ok, ko) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = e => {
+          if (!e.target.result.objectStoreNames.contains('files')) {
+            e.target.result.createObjectStore('files', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = () => ok(dbInstance = req.result);
+        req.onerror = () => ko(req.error);
+      });
+    }
+
+    async function storeLocalFile(id, file) {
+      if (!dbInstance) await initIndexedDB();
+      return new Promise((ok, ko) => {
+        const tx = dbInstance.transaction('files', 'readwrite');
+        const reader = new FileReader();
+        reader.onload = e => {
+          tx.objectStore('files').put({ id, name: file.name, type: file.type, dataUrl: e.target.result });
+          ok();
+        };
+        reader.onerror = ko;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function openLocalFile(id) {
+      if (!dbInstance) await initIndexedDB();
+      const req = dbInstance.transaction('files', 'readonly').objectStore('files').get(id);
+      req.onsuccess = () => {
+        if (!req.result) return showToast("Fichier introuvable en base locale", "error");
+        const w = window.open();
+        if (w) {
+          w.document.write(`<iframe src="${req.result.dataUrl}" style="border:0;width:100%;height:100%;"></iframe>`);
+        } else {
+          showToast("Ouverture bloquée par le navigateur", "warning");
+        }
+      };
+    }
+
+    let tokenClient = null, driveAccessToken = null;
+    function initDriveClient() {
+      if (window.google?.accounts?.oauth2) {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: '786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com',
+          scope: '[https://www.googleapis.com/auth/drive.file](https://www.googleapis.com/auth/drive.file)',
+          callback: (res) => {
+            if (res.error) return showToast("Échec authentification Drive", "error");
+            driveAccessToken = res.access_token;
+            updateDriveUI(true);
+            showToast("Connecté à Google Drive", "success");
+          }
+        });
+      } else {
+        setTimeout(initDriveClient, 800);
+      }
+    }
+
+    function toggleDriveAuth() {
+      if (!tokenClient) return showToast("Initialisation de l'API Google en cours...", "warning");
+      if (driveAccessToken) {
+        driveAccessToken = null;
+        updateDriveUI(false);
+        showToast("Déconnecté de Google Drive", "info");
+      } else {
+        tokenClient.requestAccessToken();
+      }
+    }
+
+    function updateDriveUI(connected) {
+      document.getElementById('driveStatusText').innerText = connected ? 'Drive Connecté' : 'Drive Cloud';
+      document.getElementById('driveDot').className = connected ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' : 'w-2 h-2 rounded-full bg-red-500';
+    }
+
+    /* ==========================================================================
+       OUTILS (MODALS, TOAST, THEME, MOYENNE)
+       ========================================================================== */
+    function calculateSemesterAverage() {
+      const semsMods = appState.modules.filter(m => m.semester === appState.activeSemester && m.grade !== null && m.grade !== undefined);
+      const display = document.getElementById('semAverageDisplay');
+      if (!semsMods.length) {
+        display.innerText = '-- / 20';
+        return;
+      }
+      let total = 0, coefs = 0;
+      semsMods.forEach(m => {
+        total += (m.grade * m.coeff);
+        coefs += m.coeff;
+      });
+      display.innerText = (total / coefs).toFixed(2) + ' / 20';
+    }
+
+    function exportDataJSON() {
+      const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const a = document.createElement('a');
+      a.href = str;
+      a.download = `EduVault_Sauvegarde_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      showToast("Sauvegarde exportée", "success");
+    }
+
+    function importDataJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        try {
+          appState = Object.assign(appState, JSON.parse(ev.target.result));
+          saveData();
+          location.reload();
+        } catch(err) {
+          showToast("Format JSON invalide", "error");
+        }
+      };
+      r.readAsText(file);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    function backdropClose(e, id) { if (e.target.id === id) closeModal(id); }
+
+    function showToast(msg, type = 'info') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      const bg = type === 'error' ? 'bg-red-600' : (type === 'success' ? 'bg-emerald-600' : (type === 'warning' ? 'bg-amber-600' : 'bg-gray-900'));
+      t.className = `inline-block px-4 py-2.5 rounded-full text-xs text-white shadow-2xl font-bold animate-bounce ${bg}`;
+      t.innerText = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+
+    function initTheme() {
+      if (localStorage.getItem('eduTheme') === 'light') {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('eduTheme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
     }
   </script>
 </body>
