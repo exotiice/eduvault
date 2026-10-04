@@ -40,6 +40,7 @@ input,select,textarea{width:100%;margin-top:4px;padding:10px;border:0;border-rad
 .ph{display:flex;gap:8px;overflow-x:auto;margin:8px 0}.ph div{position:relative;flex:none}.ph img{width:64px;height:64px;object-fit:cover;border-radius:10px}.ph button{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;border:0;background:var(--er);color:#fff;font-size:11px}
 #ts{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99;display:grid;gap:6px;pointer-events:none;width:92%;max-width:420px}#ts div{color:#fff;border-radius:99px;padding:9px 14px;font-weight:700;font-size:12px;text-align:center;background:#111827}
 #ts .er{background:var(--er)}#ts .ok{background:var(--ok)}
+.tod{border-color:var(--br);box-shadow:0 0 0 1px var(--br)}
 :focus-visible{outline:3px solid var(--br);outline-offset:2px}
 </style>
 </head>
@@ -68,9 +69,11 @@ input,select,textarea{width:100%;margin-top:4px;padding:10px;border:0;border-rad
 const $=i=>document.getElementById(i);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LV={CP1:['S1','S2'],CP2:['S3','S4'],CI1:['S5','S6'],CI2:['S7','S8'],CI3:['S9','S10']};
+const ALLS=Object.values(LV).flat();
 const DAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const CATS=[['cours','📚 Cours'],['td','📝 TD / TP'],['examen','🎯 Examens'],['resume','⚡ Résumés']];
 const KEY='eduVaultData_vFinal3';
+const TOD=()=>DAYS[(new Date().getDay()+6)%7];
 const GEMINI_MODEL='gemini-2.5-flash'; /* verifie le nom actuel sur ai.google.dev/gemini-api/docs/models */
 const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'qwen/qwen3.8-27b'}}; /* modele vision : modifiable dans la fenetre d'import */
 const aiKey=p=>localStorage.getItem('eduVault_aiKey_'+p)||(p==='gemini'?localStorage.getItem('eduVault_aiKey'):'')||'';
@@ -100,7 +103,9 @@ function load(o){
   A.settings=Object.assign({level:null,currentWeek:'A',weekRef:'',holidays:[]},A.settings);
   if(!Array.isArray(A.settings.holidays))A.settings.holidays=[];
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){toast('Stockage plein : supprimez des photos','er')}}
+let syncT;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){toast('Stockage plein : supprimez des photos','er')}
+  if(tok&&localStorage.getItem('eduVault_auto')==='1'){clearTimeout(syncT);syncT=setTimeout(()=>drvSave(true).catch(e=>toast(e.message,'er')),4000)}}
 function upd(){save();render()}
 
 /* ---------- week A/B + holidays ---------- */
@@ -121,7 +126,7 @@ function ask(title,fields,ok){
 }
 
 /* ---------- views ---------- */
-const pills=()=>`<div class="pills">${sems().map(s=>`<button class="b${s===A.activeSemester?' p':''}" data-a="sem" data-i="${s}">${s}</button>`).join('')}</div>`;
+const pills=()=>`<div class="pills">${ALLS.map(s=>`<button class="b${s===A.activeSemester?' p':''}" data-a="sem" data-i="${s}">${s}</button>`).join('')}</div>`;
 function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&new Date(t.dueDate)>n).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];if(!t)return'';const h=Math.floor((new Date(t.dueDate)-n)/36e5),d=Math.floor(h/24);return`<div class="up" data-a="goAg">⏰ ${t.type==='exam'?'Examen':'Devoir'} : ${esc(t.title)} (${d>0?'dans '+d+' j':h>0?'dans '+h+' h':'très bientôt'})</div>`}
 function avg(){const ms=mods().filter(m=>m.grade!==null&&m.grade!==undefined);let t=0,c=0;ms.forEach(m=>{t+=m.grade*m.coeff;c+=m.coeff});$('avg').textContent=ms.length?`Moy. ${A.activeSemester} : ${(t/c).toFixed(2)}`:''}
 
@@ -129,14 +134,14 @@ function rTT(){
   const wk=curWeek(),ids=mods().map(m=>m.id),tt=A.timetable.filter(c=>ids.includes(c.moduleId)&&(c.week==='all'||c.week===wk));
   const days=DAYS.filter((d,i)=>i<6||tt.some(c=>c.day===d));
   return pills()+`<div class="top"><div><h2>Emploi du temps</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">+ Séance</button></div></div><div class="g">`+
-  days.map(d=>`<div class="c"><h4>${d}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
+  days.map(d=>`<div class="c${d===TOD()?' tod':''}"><h4>${d}${d===TOD()?' · aujourd’hui':''}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
     const n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
     return`<div class="cl${n?' nt':''}" data-a="cls" data-i="${c.id}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||'<p class="mu e">Aucune séance</p>')+'</div>').join('')+'</div>';
 }
 function rAg(){
   const ids=mods().map(m=>m.id),l=A.tasks.filter(t=>ids.includes(t.moduleId)&&(filt==='all'||t.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
   return pills()+`<div class="top"><h2>Examens & Devoirs</h2><div><button class="b p" data-a="addTask">+ Ajouter</button></div></div><div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${f[1]}</button>`).join('')}</div>`+
-  (l.length?l.map(t=>`<div class="c t${t.type==='exam'?' x':''}${t.completed?' d':''}"><input type="checkbox" ${t.completed?'checked':''} data-a="done" data-i="${t.id}" aria-label="Terminé"><div><b>${t.type==='exam'?'🚨 ':'📝 '}${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))} • ${new Date(t.dueDate).toLocaleString('fr-FR')}</small></div><button class="x-btn" data-a="delTask" data-i="${t.id}" aria-label="Supprimer">🗑</button></div>`).join(''):'<p class="mu e">Aucune échéance</p>');
+  (l.length?l.map(t=>`<div class="c t${t.type==='exam'?' x':''}${t.completed?' d':''}"><input type="checkbox" ${t.completed?'checked':''} data-a="done" data-i="${t.id}" aria-label="Terminé"><div><b>${t.type==='exam'?'🚨 ':'📝 '}${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))} • ${new Date(t.dueDate).toLocaleString('fr-FR')}</small></div><button class="x-btn" data-a="editTask" data-i="${t.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${t.id}" aria-label="Supprimer">🗑</button></div>`).join(''):'<p class="mu e">Aucune échéance</p>');
 }
 function mgrid(){
   const l=mods().filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
@@ -147,7 +152,7 @@ function rMo(){return pills()+`<div class="top"><h2>Modules & Cours</h2><div><bu
 function rFc(){
   const ms=mods(),ids=ms.map(m=>m.id),l=A.flashcards.filter(f=>ids.includes(f.moduleId)&&(cardMod==='all'||f.moduleId===cardMod));
   return pills()+`<div class="top"><h2>Active Recall</h2><div><button class="b p" data-a="addFc">+ Créer</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
-  (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu">QUESTION</small><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div><div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><small class="mu">Touchez pour retourner</small></div></div></div>`).join(''):'<p class="mu e" style="grid-column:1/-1">Aucune fiche</p>')+'</div>';
+  (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu">QUESTION</small><span><button class="x-btn" data-a="editFc" data-i="${f.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></span></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div><div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><small class="mu">Touchez pour retourner</small></div></div></div>`).join(''):'<p class="mu e" style="grid-column:1/-1">Aucune fiche</p>')+'</div>';
 }
 
 /* ---------- pomodoro ---------- */
@@ -165,7 +170,7 @@ function go(t){tab=t;document.querySelectorAll('#nav [data-t]').forEach(b=>b.cla
 
 /* ---------- actions ---------- */
 function modForm(m){ask(m?'Modifier le module':'Nouveau module',[
-  {k:'semester',l:'Semestre',t:'select',o:sems().map(s=>[s,s]),v:m?.semester||A.activeSemester},
+  {k:'semester',l:'Semestre',t:'select',o:ALLS.map(s=>[s,s]),v:m?.semester||A.activeSemester},
   {k:'name',l:'Nom du module',r:1,v:m?.name},{k:'prof',l:'Professeur (optionnel)',v:m?.prof},
   {k:'grade',l:'Note /20',t:'number',a:' min="0" max="20" step="0.25"',v:m?.grade??''},
   {k:'coeff',l:'Coefficient',t:'number',a:' min="0.5" step="0.5"',v:m?.coeff??1}],v=>{
@@ -217,13 +222,24 @@ const act={
     ask('Importation IA',[{k:'prov',l:'Fournisseur',t:'select',o:Object.keys(AI).map(k=>[k,AI[k].n]),v:p0},{k:'key',l:'Clé API (Gemini : aistudio.google.com/apikey · Groq : console.groq.com/keys)',t:'password',r:1,v:aiKey(p0)},{k:'model',l:'Modèle avec vision',r:1,v:aiModel(p0)},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport);
     const f=$('dlg').querySelector('form'),sel=f.elements.prov;sel.onchange=()=>{f.elements.key.value=aiKey(sel.value);f.elements.model.value=aiModel(sel.value)}},
   drive:async()=>{if(tok){tok=null;paintDrive();return toast('Drive déconnecté')}
-    try{await lib('https://accounts.google.com/gsi/client');tc=tc||google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.file',callback:r=>{if(r.error)return toast('Échec authentification Drive','er');tok=r.access_token;paintDrive();toast('Connecté à Google Drive','ok')}});tc.requestAccessToken()}catch(e){toast(e.message,'er')}},
+    try{await lib('https://accounts.google.com/gsi/client');tc=tc||google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.file',callback:r=>{if(r.error)return toast('Échec authentification Drive','er');tok=r.access_token;paintDrive();toast('Connecté à Google Drive','ok');if(!A.modules.length)drvLoad().catch(()=>{})}});tc.requestAccessToken()}catch(e){toast(e.message,'er')}},
   set:()=>settings(),
   addHol:()=>{const a=$('h1').value,b=$('h2').value||a;if(!a||b<a)return toast('Dates invalides','er');const d=new Date(a+'T00:00');for(let n=0;iso(d)<=b&&n<400;n++){const s=iso(d);if(!isHol(s))A.settings.holidays.push(s);d.setDate(d.getDate()+1)}upd();settings()},
   delHol:i=>{const[a,b]=i.split('|');A.settings.holidays=A.settings.holidays.filter(d=>d<a||d>b);upd();settings()},
   exp:()=>{dlBlob('EduVault_Sauvegarde_'+iso(new Date())+'.json',new Blob([JSON.stringify(A,null,2)],{type:'application/json'}));toast('Sauvegarde exportée','ok')},
   imp:()=>$('jf').click()
 };
+function clsForm(c){ask(c?'Modifier la séance':'Séance',[{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:c?.moduleId},{k:'day',l:'Jour',t:'select',o:DAYS.map(d=>[d,d]),v:c?.day},{k:'week',l:'Semaine',t:'select',o:[['all','Toutes les semaines'],['A','Semaine A'],['B','Semaine B']],v:c?.week},{k:'startTime',l:'Début',t:'time',r:1,v:c?.startTime},{k:'endTime',l:'Fin',t:'time',r:1,v:c?.endTime},{k:'room',l:'Salle ou amphi',r:1,v:c?.room}],v=>{
+  if(v.endTime<=v.startTime)return toast("L'heure de fin doit être après le début",'er');c?Object.assign(c,v):A.timetable.push({id:uid('c'),...v});upd();toast('Séance enregistrée','ok')})}
+function taskForm(t){ask(t?"Modifier l'échéance":'Ajouter une échéance',[{k:'title',l:'Titre',r:1,v:t?.title},{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:t?.moduleId},{k:'type',l:'Type',t:'select',o:[['exam','🚨 Examen'],['homework','📝 Devoir']],v:t?.type},{k:'dueDate',l:'Date et heure',t:'datetime-local',r:1,v:t?.dueDate}],v=>{
+  v.title=v.title.trim();if(t){Object.assign(t,v);fired.delete(t.id+'h');fired.delete(t.id+'d')}else A.tasks.push({id:uid('t'),...v,completed:false});upd();toast('Échéance enregistrée','ok')})}
+function fcForm(f){ask(f?'Modifier la fiche':'Nouvelle fiche',[{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:f?.moduleId},{k:'q',l:'Question (recto)',t:'textarea',r:1,v:f?.q},{k:'a',l:'Réponse (verso)',t:'textarea',r:1,v:f?.a}],v=>{
+  v.q=v.q.trim();v.a=v.a.trim();f?Object.assign(f,v):A.flashcards.push({id:uid('f'),...v});upd();toast('Fiche enregistrée','ok')})}
+Object.assign(act,{
+  addCls:()=>{if(!needMod())clsForm()},editCls:i=>{$('dlg').close();clsForm(A.timetable.find(x=>x.id===i))},
+  addTask:()=>{if(!needMod())taskForm()},editTask:i=>taskForm(A.tasks.find(x=>x.id===i)),
+  addFc:()=>{if(!needMod())fcForm()},editFc:i=>fcForm(A.flashcards.find(x=>x.id===i)),
+  dsave:()=>drvSave().catch(e=>toast(e.message,'er')),dload:()=>drvLoad().catch(e=>toast(e.message,'er'))});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&act[b.dataset.a])act[b.dataset.a](b.dataset.i,b)});
 $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)go(b.dataset.t)});
 
@@ -231,7 +247,7 @@ $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)
 function drawPh(){$('ph').innerHTML=cur.ph.map((s,i)=>`<div><img src="${s}" alt="Photo ${i+1}"><button data-a="delPh" data-i="${i}" aria-label="Retirer">✕</button></div>`).join('')}
 function clsDlg(id){
   const c=A.timetable.find(x=>x.id===id);if(!c)return;const n=A.notes.find(x=>x.classId===id)||{text:'',photos:[]};cur={id,ph:[...(n.photos||[])]};
-  const d=$('dlg');d.innerHTML=`<h3>${esc(modName(c.moduleId))}</h3><small class="mu">${esc(c.day)} ${esc(c.startTime)} – ${esc(c.endTime)} · 📍 ${esc(c.room)}</small><label>Notes du cours<textarea id="nt" rows="4" placeholder="Points importants, chapitres traités...">${esc(n.text)}</textarea></label><div id="ph" class="ph"></div><input id="pf" type="file" accept="image/*" multiple hidden><div class="row"><button class="b" data-a="pf">📷 Photo (max 3)</button><button class="b" style="color:var(--er)" data-a="delCls" data-i="${id}">🗑 Supprimer</button><button class="b" onclick="$('dlg').close()">Fermer</button><button class="b p" data-a="saveNote">Sauvegarder</button></div>`;
+  const d=$('dlg');d.innerHTML=`<h3>${esc(modName(c.moduleId))}</h3><small class="mu">${esc(c.day)} ${esc(c.startTime)} – ${esc(c.endTime)} · 📍 ${esc(c.room)}</small><label>Notes du cours<textarea id="nt" rows="4" placeholder="Points importants, chapitres traités...">${esc(n.text)}</textarea></label><div id="ph" class="ph"></div><input id="pf" type="file" accept="image/*" multiple hidden><div class="row"><button class="b" data-a="pf">📷 Photo (max 3)</button><button class="b" data-a="editCls" data-i="${id}">✏️ Modifier</button><button class="b" style="color:var(--er)" data-a="delCls" data-i="${id}">🗑 Supprimer</button><button class="b" onclick="$('dlg').close()">Fermer</button><button class="b p" data-a="saveNote">Sauvegarder</button></div>`;
   $('pf').onchange=async e=>{const fs=[...e.target.files];if(cur.ph.length+fs.length>3)return toast('Maximum 3 photos','er');for(const f of fs)try{cur.ph.push(await shrink(f))}catch(x){toast('Image illisible','er')}drawPh()};
   drawPh();d.oncancel=null;d.showModal();
 }
@@ -243,6 +259,9 @@ function settings(){
   <label>Semaine actuelle (l'alternance A/B est automatique)<select onchange="chgWk(this.value)"><option value="A"${curWeek()==='A'?' selected':''}>Semaine A</option><option value="B"${curWeek()==='B'?' selected':''}>Semaine B</option></select></label>
   <label>Vacances & jours chômés (du / au)<span class="row" style="margin:4px 0 0"><input type="date" id="h1" aria-label="Du"><input type="date" id="h2" aria-label="Au"><button class="b p" data-a="addHol">+</button></span></label>
   <div>${ranges().map(r=>`<span class="chip">${r[0]===r[1]?r[0]:r[0]+' → '+r[1]}<button class="x-btn" data-a="delHol" data-i="${r[0]}|${r[1]}" aria-label="Supprimer">✕</button></span>`).join('')}</div>
+  <label>☁️ Google Drive <small class="mu">${tok?'Connecté':'Non connecté'}${localStorage.getItem('eduVault_lastSync')?' · dernière sauvegarde '+new Date(localStorage.getItem('eduVault_lastSync')).toLocaleString('fr-FR'):''}</small></label>
+  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="drive">${tok?'Déconnecter':'Se connecter'}</button><button class="b" data-a="dsave">⬆ Sauvegarder</button><button class="b" data-a="dload">⬇ Restaurer</button></div>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${localStorage.getItem('eduVault_auto')==='1'?'checked':''} onchange="localStorage.setItem('eduVault_auto',this.checked?'1':'0');if(this.checked&&tok)drvSave(true).catch(e=>toast(e.message,'er'))"> Sauvegarde automatique après chaque modification</label>
   <div class="row"><button class="b" data-a="exp">⬇ Exporter</button><button class="b" data-a="imp">⬆ Importer</button><button class="b p" onclick="$('dlg').close()">Fermer</button></div><input type="file" id="jf" accept=".json,application/json" hidden>`;
   $('jf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||!Array.isArray(o.modules))throw 0;if(!confirm('Remplacer toutes vos données par cette sauvegarde ?'))return;load(o);upd();$('dlg').close();toast('Sauvegarde restaurée','ok')}catch(x){toast('Format JSON invalide','er')}};r.readAsText(f)};
   d.oncancel=null;d.showModal();
@@ -302,6 +321,30 @@ async function aiImport(v,fd){
     upd();toast(ss.length+' séances importées !','ok');
   }catch(e){toast('Erreur IA : '+e.message,'er')}
 }
+
+/* ---------- Google Drive : sauvegarde / restauration ---------- */
+const GAPI='https://www.googleapis.com/',DFILE='EduVault_backup.json';
+async function dfetch(url,opt={}){
+  if(!tok)throw Error('Connectez-vous d\'abord à Google Drive (bouton ☁️)');
+  const r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+tok}});
+  if(r.status===401){tok=null;paintDrive();throw Error('Session Drive expirée : reconnectez-vous (☁️)')}
+  return r}
+async function drvFind(){
+  const r=await dfetch(GAPI+'drive/v3/files?q='+encodeURIComponent("name='"+DFILE+"' and trashed=false")+'&fields=files(id,modifiedTime)&orderBy=modifiedTime desc');
+  return((await r.json()).files||[])[0]||null}
+async function drvSave(silent){
+  const f=await drvFind(),form=new FormData();
+  form.append('metadata',new Blob([JSON.stringify(f?{}:{name:DFILE,mimeType:'application/json'})],{type:'application/json'}));
+  form.append('file',new Blob([JSON.stringify(A)],{type:'application/json'}));
+  const r=await dfetch(GAPI+'upload/drive/v3/files'+(f?'/'+f.id:'')+'?uploadType=multipart',{method:f?'PATCH':'POST',body:form});
+  if(!r.ok)throw Error('Échec de la sauvegarde Drive');
+  localStorage.setItem('eduVault_lastSync',new Date().toISOString());if(!silent)toast('Sauvegardé sur Drive ✔','ok')}
+async function drvLoad(){
+  const f=await drvFind();if(!f)throw Error('Aucune sauvegarde trouvée sur ce compte Drive');
+  const o=await(await dfetch(GAPI+'drive/v3/files/'+f.id+'?alt=media')).json();
+  if(!o||!Array.isArray(o.modules))throw Error('Sauvegarde Drive invalide');
+  if(!confirm('Remplacer toutes vos données par la sauvegarde Drive du '+new Date(f.modifiedTime).toLocaleString('fr-FR')+' ?'))return;
+  load(o);upd();toast('Restauré depuis Drive ✔','ok')}
 
 /* ---------- reminders / drive UI / boot ---------- */
 const fired=new Set();
