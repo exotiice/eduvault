@@ -72,7 +72,7 @@ const DAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const CATS=[['cours','📚 Cours'],['td','📝 TD / TP'],['examen','🎯 Examens'],['resume','⚡ Résumés']];
 const KEY='eduVaultData_vFinal3';
 const GEMINI_MODEL='gemini-2.5-flash'; /* verifie le nom actuel sur ai.google.dev/gemini-api/docs/models */
-const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'meta-llama/llama-4-scout-17b-16e-instruct'}}; /* modele vision : modifiable dans la fenetre d'import */
+const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'qwen/qwen3.8-27b'}}; /* modele vision : modifiable dans la fenetre d'import */
 const aiKey=p=>localStorage.getItem('eduVault_aiKey_'+p)||(p==='gemini'?localStorage.getItem('eduVault_aiKey'):'')||'';
 const aiModel=p=>localStorage.getItem('eduVault_aiModel_'+p)||AI[p].model;
 const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.';
@@ -274,7 +274,7 @@ async function aiCall(prov,key,model,imgs){
     if(!r.ok&&/model|not exist|access/i.test(r.j.error?.message||'')){
       /* modele inconnu pour cette cle : on liste les modeles du compte et on essaie les modeles vision */
       const ml=await fetch('https://api.groq.com/openai/v1/models',{headers:{Authorization:'Bearer '+key}}).then(x=>x.json()).catch(()=>({})),
-        ids=(ml.data||[]).map(x=>x.id),alt=ids.filter(i=>i!==model&&/llama-4|scout|maverick|vision|-vl/i.test(i)).slice(0,4);
+        ids=(ml.data||[]).map(x=>x.id),alt=ids.filter(i=>i!==model&&/llama-4|scout|maverick|vision|-vl|qwen/i.test(i)).slice(0,4);
       for(const m of alt){r=await call(m);if(r.ok){localStorage.setItem('eduVault_aiModel_groq',m);toast('Modèle utilisé : '+m,'ok');break}}
       if(!r.ok)throw Error((r.j.error?.message||'Erreur Groq')+(ids.length?' | Modèles disponibles : '+ids.slice(0,12).join(', '):''));
     }
