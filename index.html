@@ -72,6 +72,9 @@ const DAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const CATS=[['cours','📚 Cours'],['td','📝 TD / TP'],['examen','🎯 Examens'],['resume','⚡ Résumés']];
 const KEY='eduVaultData_vFinal3';
 const GEMINI_MODEL='gemini-2.5-flash'; /* verifie le nom actuel sur ai.google.dev/gemini-api/docs/models */
+const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'qwen/qwen3.6-27b'}}; /* modele vision : modifiable dans la fenetre d'import */
+const aiKey=p=>localStorage.getItem('eduVault_aiKey_'+p)||(p==='gemini'?localStorage.getItem('eduVault_aiKey'):'')||'';
+const aiModel=p=>localStorage.getItem('eduVault_aiModel_'+p)||AI[p].model;
 const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.';
 const CLIENT_ID='786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com';
 let A={activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[]};
@@ -210,7 +213,9 @@ const act={
   pmode:i=>{clearInterval(P.t);P.t=null;P.mode=i;P.total=P.left=PM[i][0];render()},
   ptoggle:()=>{if(P.t){clearInterval(P.t);P.t=null;P.left=Math.max(0,Math.round((P.end-Date.now())/1000))}else{P.end=Date.now()+P.left*1000;P.t=setInterval(ptick,300)}ppaint()},
   preset:()=>{clearInterval(P.t);P.t=null;P.left=P.total;ppaint()},
-  ai:()=>ask('Importation IA',[{k:'key',l:'Clé API Google Gemini (aistudio.google.com/apikey)',t:'password',r:1,v:localStorage.getItem('eduVault_aiKey')||''},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport),
+  ai:()=>{const p0=localStorage.getItem('eduVault_aiProv')||'gemini';
+    ask('Importation IA',[{k:'prov',l:'Fournisseur',t:'select',o:Object.keys(AI).map(k=>[k,AI[k].n]),v:p0},{k:'key',l:'Clé API (Gemini : aistudio.google.com/apikey · Groq : console.groq.com/keys)',t:'password',r:1,v:aiKey(p0)},{k:'model',l:'Modèle avec vision',r:1,v:aiModel(p0)},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport);
+    const f=$('dlg').querySelector('form'),sel=f.elements.prov;sel.onchange=()=>{f.elements.key.value=aiKey(sel.value);f.elements.model.value=aiModel(sel.value)}},
   drive:async()=>{if(tok){tok=null;paintDrive();return toast('Drive déconnecté')}
     try{await lib('https://accounts.google.com/gsi/client');tc=tc||google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.file',callback:r=>{if(r.error)return toast('Échec authentification Drive','er');tok=r.access_token;paintDrive();toast('Connecté à Google Drive','ok')}});tc.requestAccessToken()}catch(e){toast(e.message,'er')}},
   set:()=>settings(),
@@ -259,16 +264,26 @@ async function toImages(f){
   return[await shrink(f,1600,.85)];
 }
 const normDay=s=>{const x=String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return DAYS.find(d=>d.toLowerCase()===x)};
+const AI_PROMPT='Extrais l\'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"jour":"LUNDI","debut":"08:30","fin":"10:30","matiere":"Nom du module","salle":"Amphi A"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI).';
+async function aiCall(prov,key,model,imgs){
+  if(prov==='groq'){
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},
+      body:JSON.stringify({model,temperature:.1,max_completion_tokens:4096,messages:[{role:'user',content:[{type:'text',text:AI_PROMPT},...imgs.map(u=>({type:'image_url',image_url:{url:u}}))]}]})});
+    const j=await res.json().catch(()=>({}));if(!res.ok)throw Error(j.error?.message||'Erreur Groq HTTP '+res.status);
+    return j.choices?.[0]?.message?.content||'';
+  }
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[{text:AI_PROMPT},...imgs.map(i=>({inline_data:{mime_type:'image/jpeg',data:i.split(',')[1]}}))]}],generationConfig:{temperature:.1}})});
+  const j=await res.json().catch(()=>({}));if(!res.ok)throw Error(j.error?.message||'Erreur Gemini HTTP '+res.status);
+  return(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+}
 async function aiImport(v,fd){
   const f=fd.get('file');if(!f||!f.size)return toast('Sélectionnez un document','er');
-  localStorage.setItem('eduVault_aiKey',v.key.trim());toast('Analyse en cours...');
+  const prov=AI[v.prov]?v.prov:'gemini',key=v.key.trim(),model=v.model.trim();
+  localStorage.setItem('eduVault_aiProv',prov);localStorage.setItem('eduVault_aiKey_'+prov,key);localStorage.setItem('eduVault_aiModel_'+prov,model);
+  toast('Analyse en cours ('+AI[prov].n+')...');
   try{
-    const imgs=await toImages(f),parts=[{text:'Extrais l\'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"jour":"LUNDI","debut":"08:30","fin":"10:30","matiere":"Nom du module","salle":"Amphi A"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI).'}];
-    imgs.forEach(i=>parts.push({inline_data:{mime_type:'image/jpeg',data:i.split(',')[1]}}));
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(v.key.trim())}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:.1}})});
-    let j;try{j=await res.json()}catch(e){throw Error('Réponse invalide de l\'API (clé ou quota ?)')}
-    if(!res.ok)throw Error(j.error?.message||'Erreur HTTP '+res.status);
-    const raw=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').replace(/```(?:json)?/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
+    const raw=(await aiCall(prov,key,model,await toImages(f))).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```(?:json)?/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
     if(a<0||b<a)throw Error("L'IA n'a pas renvoyé de JSON valide.");
     const ss=JSON.parse(raw.slice(a,b+1)).filter(s=>s.matiere&&s.debut&&s.fin&&normDay(s.jour));
     if(!ss.length)throw Error('Aucun cours trouvé dans ce document.');
