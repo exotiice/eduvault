@@ -6,7 +6,6 @@
   <meta name="theme-color" content="#1e3a8a">
   <title>EduVault - Academic App</title>
   
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -15,16 +14,8 @@
     }
   </script>
 
-  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <!-- Google GIS (Drive) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  
-  <!-- PDF.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
-  <!-- Inter Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
@@ -300,9 +291,9 @@
       </div>
       <div class="space-y-3.5 text-xs">
         <div>
-          <label class="block font-medium mb-1">Clé API (Google Gemini recommandée ou Groq)</label>
+          <label class="block font-medium mb-1">Clé API (Google Gemini ou Groq)</label>
           <input type="password" id="aiApiKey" placeholder="AIzaSy... (Gemini) ou gsk_... (Groq)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100">
-          <p class="text-[10px] text-gray-400 mt-1">Clé gratuite sur <a href="https://aistudio.google.com/apikey" target="_blank" class="text-brand-500 underline">Google AI Studio</a>.</p>
+          <p class="text-[10px] text-gray-400 mt-1">Gratuit sur <a href="https://aistudio.google.com/apikey" target="_blank" class="text-brand-500 underline">Google AI Studio</a>.</p>
         </div>
         <div>
           <label class="block font-medium mb-1">Document (PDF ou Image)</label>
@@ -383,14 +374,8 @@
         <select id="moduleSemester" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none text-gray-900 dark:text-gray-100"></select>
         <input type="text" id="moduleName" required placeholder="Nom du Module (ex: Analyse 1)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
         <input type="text" id="moduleProf" placeholder="Professeur (Optionnel)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        <div class="grid grid-cols-2 gap-3">
-          <input type="number" step="0.25" min="0" max="20" id="moduleGrade" placeholder="Note /20" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-          <input type="number" step="1" min="1" id="moduleCoeff" placeholder="Coefficient" value="1" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        </div>
-        <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 text-white font-bold">Enregistrer</button>
-        </div>
+        <div class="grid grid-cols-2 gap-3"><input type="number" step="0.25" min="0" max="20" id="moduleGrade" placeholder="Note /20" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><input type="number" step="1" min="1" id="moduleCoeff" placeholder="Coefficient" value="1" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
+        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('moduleModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white font-bold">Enregistrer</button></div>
       </form>
     </div>
   </div>
@@ -402,17 +387,8 @@
       <form id="taskForm" onsubmit="saveTask(event)" class="space-y-3 text-xs font-medium">
         <input type="text" id="taskTitle" required placeholder="Titre (ex: Examen Final, Rendu TP)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
         <select id="taskModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
-        <div class="grid grid-cols-2 gap-3">
-          <select id="taskType" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-            <option value="exam">🚨 Examen</option>
-            <option value="homework">📝 Devoir</option>
-          </select>
-          <input type="datetime-local" id="taskDueDate" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        </div>
-        <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Créer</button>
-        </div>
+        <div class="grid grid-cols-2 gap-3"><select id="taskType" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><option value="exam">🚨 Examen</option><option value="homework">📝 Devoir</option></select><input type="datetime-local" id="taskDueDate" required class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
+        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Créer</button></div>
       </form>
     </div>
   </div>
@@ -425,10 +401,7 @@
         <select id="flashcardModuleSelect" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></select>
         <textarea id="cardQuestion" required rows="2" placeholder="Question (Recto)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
         <textarea id="cardAnswer" required rows="3" placeholder="Réponse (Verso)" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></textarea>
-        <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeModal('flashcardModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button>
-        </div>
+        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('flashcardModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Annuler</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold">Ajouter</button></div>
       </form>
     </div>
   </div>
@@ -436,10 +409,7 @@
   <!-- ADD RESOURCE MODAL -->
   <div id="resourceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 modal-backdrop" onclick="backdropClose(event, 'resourceModal')">
     <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-      <div class="flex justify-between border-b pb-3 dark:border-gray-700">
-        <h3 class="font-bold text-gray-900 dark:text-white">Ajouter un Document</h3>
-        <button onclick="closeModal('resourceModal')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
-      </div>
+      <div class="flex justify-between border-b pb-3 dark:border-gray-700"><h3 class="font-bold text-gray-900 dark:text-white">Ajouter un Document</h3><button onclick="closeModal('resourceModal')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button></div>
       <div class="flex border-b border-gray-200 dark:border-gray-700 text-xs">
         <button type="button" onclick="switchResourceTab('local')" id="resTab-local" class="flex-1 py-2 font-bold border-b-2 border-brand-600 text-brand-600">Local (PDF)</button>
         <button type="button" onclick="switchResourceTab('drive')" id="resTab-drive" class="flex-1 py-2 font-bold border-b-2 border-transparent text-gray-400">Drive Direct</button>
@@ -447,28 +417,12 @@
       </div>
       <form id="resourceForm" onsubmit="saveResource(event)" class="space-y-3 text-xs">
         <input type="hidden" id="resModuleId">
-        <select id="resCategory" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-          <option value="cours">📚 Cours</option>
-          <option value="td">📝 TD / TP</option>
-          <option value="examen">🎯 Examen</option>
-          <option value="resume">⚡ Résumé</option>
-        </select>
+        <select id="resCategory" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"><option value="cours">📚 Cours</option><option value="td">📝 TD / TP</option><option value="examen">🎯 Examen</option><option value="resume">⚡ Résumé</option></select>
         <input type="text" id="resTitle" required placeholder="Titre du document" class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        
-        <div id="resPanel-local" class="space-y-2 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-xl border dark:border-gray-700">
-          <input type="file" id="resLocalFileInput" class="w-full text-xs">
-        </div>
-        <div id="resPanel-drive" class="hidden space-y-2 bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800">
-          <input type="file" id="resDriveFileInput" class="w-full text-xs">
-        </div>
-        <div id="resPanel-manual" class="hidden space-y-2">
-          <input type="url" id="resUrlInput" placeholder="https://drive.google.com/..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none">
-        </div>
-        
-        <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeModal('resourceModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700">Annuler</button>
-          <button type="submit" id="saveResBtn" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button>
-        </div>
+        <div id="resPanel-local" class="space-y-2 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-xl border dark:border-gray-700"><input type="file" id="resLocalFileInput" class="w-full text-xs"></div>
+        <div id="resPanel-drive" class="hidden space-y-2 bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800"><input type="file" id="resDriveFileInput" class="w-full text-xs"></div>
+        <div id="resPanel-manual" class="hidden space-y-2"><input type="url" id="resUrlInput" placeholder="https://drive.google.com/..." class="w-full bg-gray-100 dark:bg-gray-700 rounded-xl p-2.5 border-none"></div>
+        <div class="flex justify-end space-x-2 pt-2"><button type="button" onclick="closeModal('resourceModal')" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700">Annuler</button><button type="submit" id="saveResBtn" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold">Enregistrer</button></div>
       </form>
     </div>
   </div>
@@ -477,9 +431,6 @@
   <div id="toastContainer" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] space-y-2 pointer-events-none w-11/12 sm:w-auto text-center"></div>
 
   <script>
-    /* ==========================================================================
-       INITIALISATION & NIVEAUX D'ÉTUDES
-       ========================================================================== */
     const LEVEL_SEMESTERS = {
       'CP1': ['S1', 'S2'],
       'CP2': ['S3', 'S4'],
@@ -501,10 +452,6 @@
     };
 
     window.addEventListener('DOMContentLoaded', async () => {
-      if (window.pdfjsLib) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-      }
-
       await initIndexedDB().catch(console.warn);
       loadData();
       initTheme();
@@ -543,14 +490,11 @@
     }
 
     function loadData() {
-      const saved = localStorage.getItem('eduVaultData_vFinal2');
+      const saved = localStorage.getItem('eduVaultData_vFixed');
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
-          appState = Object.assign(appState, parsed);
-        } catch(e) {
-          console.warn("Réinitialisation du cache des données");
-        }
+          appState = Object.assign(appState, JSON.parse(saved));
+        } catch(e) {}
       }
       
       if (!appState.modules) appState.modules = [];
@@ -572,7 +516,7 @@
     }
 
     function saveData() {
-      localStorage.setItem('eduVaultData_vFinal2', JSON.stringify(appState));
+      localStorage.setItem('eduVaultData_vFixed', JSON.stringify(appState));
       calculateSemesterAverage();
       checkComingUp();
       if (appState.settings.level) {
@@ -580,9 +524,6 @@
       }
     }
 
-    /* ==========================================================================
-       NAVIGATION & ONGLETS
-       ========================================================================== */
     function switchTab(tabId) {
       document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
       const target = document.getElementById(tabId);
@@ -593,7 +534,7 @@
       });
       const deskBtn = document.getElementById('tab-' + tabId);
       if (deskBtn) {
-        deskBtn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:brand-900/30 transition-colors';
+        deskBtn.className = 'tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-brand-600 bg-brand-50 dark:bg-brand-900/30 transition-colors';
       }
 
       document.querySelectorAll('.mob-btn').forEach(btn => {
@@ -631,11 +572,7 @@
       calculateSemesterAverage();
     }
 
-    /* ==========================================================================
-       COMING UP & NOTIFICATIONS
-       ========================================================================== */
     let notifiedTasks = new Set();
-
     function checkComingUp() {
       const now = new Date();
       const upcoming = appState.tasks
@@ -677,20 +614,14 @@
     }
 
     function showNativeNotification(title, body) {
-      if (Notification.permission === 'granted') {
-        new Notification(title, { body });
-      }
+      if (Notification.permission === 'granted') new Notification(title, { body });
       showToast(`${title} : ${body}`, 'warning');
       try { navigator.vibrate([200, 100, 200]); } catch(e) {}
     }
-
     if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
       Notification.requestPermission();
     }
 
-    /* ==========================================================================
-       GESTION DE L'EMPLOI DU TEMPS & NOTES
-       ========================================================================== */
     const joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     let currentClassIdForNote = null;
     let tempPhotos = [];
@@ -844,9 +775,6 @@
       showToast("Notes enregistrées", "success");
     }
 
-    /* ==========================================================================
-       GESTION DES MODULES
-       ========================================================================== */
     function openAddModuleModal() {
       const sems = appState.settings.level ? LEVEL_SEMESTERS[appState.settings.level] : ['S1', 'S2'];
       document.getElementById('moduleSemester').innerHTML = sems.map(s => `<option value="${s}">${s}</option>`).join('');
@@ -936,9 +864,6 @@
       }
     }
 
-    /* ==========================================================================
-       GESTION DES TÂCHES & EXAMENS
-       ========================================================================== */
     function openAddTaskModal() {
       const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
       if (!mods.length) return showToast("Ajoutez d'abord un module pour ce semestre", "error");
@@ -1017,9 +942,6 @@
       renderTasks();
     }
 
-    /* ==========================================================================
-       GESTION DES FLASHCARDS
-       ========================================================================== */
     function openAddFlashcardModal() {
       const mods = appState.modules.filter(m => m.semester === appState.activeSemester);
       if (!mods.length) return showToast("Ajoutez d'abord un module pour ce semestre", "error");
@@ -1088,11 +1010,7 @@
       renderFlashcards();
     }
 
-    /* ==========================================================================
-       GESTION DES RESSOURCES & FICHIERS
-       ========================================================================== */
     let currentResTab = 'local';
-
     function openAddResourceModal(id) {
       document.getElementById('resModuleId').value = id;
       document.getElementById('resourceForm').reset();
@@ -1173,9 +1091,6 @@
       }
     }
 
-    /* ==========================================================================
-       POMODORO TIMER
-       ========================================================================== */
     let pTime = 25 * 60, pTotal = 25 * 60, pInt = null;
 
     function updatePomoModuleDropdown() {
@@ -1237,55 +1152,26 @@
     }
 
     /* ==========================================================================
-       IMPORTATION IA (AVEC PDF.JS & ROBUSTE SANS ERREURS)
+       IMPORTATION IA (GEMINI NATIVE MULTIMODAL & GROQ)
        ========================================================================== */
     function openAiImportModal() {
       document.getElementById('aiApiKey').value = localStorage.getItem('eduVault_aiKey') || '';
       openModal('aiImportModal');
     }
 
-    async function fileToImages(file) {
-      const isPdfFile = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
-      const images = [];
-
-      if (isPdfFile) {
-        if (!window.pdfjsLib) {
-          throw new Error("Bibliothèque PDF.js non chargée");
-        }
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-        
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        const maxPages = Math.min(pdf.numPages, 3);
-
-        for (let i = 1; i <= maxPages; i++) {
-          const page = await pdf.getPage(i);
-          const viewport = page.getViewport({ scale: 1.5 });
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          await page.render({ canvasContext: ctx, viewport }).promise;
-          images.push(canvas.toDataURL('image/jpeg', 0.85));
-        }
-      } else {
-        const dataUrl = await new Promise((ok, ko) => {
-          const r = new FileReader();
-          r.onload = () => ok(r.result);
-          r.onerror = ko;
-          r.readAsDataURL(file);
-        });
-        images.push(dataUrl);
-      }
-      return images;
-    }
+    const b64 = f => new Promise((ok, ko) => {
+      const r = new FileReader();
+      r.onload = () => ok(r.result.split(',')[1]);
+      r.onerror = ko;
+      r.readAsDataURL(f);
+    });
 
     async function startAiImport() {
       const key = document.getElementById('aiApiKey').value.trim();
       const file = document.getElementById('aiFile').files[0];
 
       if (!key) return showToast("Entrez votre clé API", "warning");
-      if (!file) return showToast("Sélectionnez un fichier (PDF ou Image)", "warning");
+      if (!file) return showToast("Sélectionnez un document (PDF ou Image)", "warning");
 
       localStorage.setItem('eduVault_aiKey', key);
       const btn = document.getElementById('btnAiImport');
@@ -1293,21 +1179,18 @@
       btn.disabled = true;
 
       try {
-        const images = await fileToImages(file);
-        if (!images.length) throw new Error("Impossible de lire le document");
-
         let rawText = "";
-        if (key.startsWith("gsk_")) {
-          rawText = await callGroqAPI(key, images);
+        if (key.startsWith("AIzaSy")) {
+          rawText = await callGeminiAPI(key, file);
         } else {
-          rawText = await callGeminiAPI(key, images);
+          rawText = await callGroqAPI(key, file);
         }
 
         rawText = rawText.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/```(?:json)?/g, "").trim();
         const start = rawText.indexOf('[');
         const end = rawText.lastIndexOf(']');
         if (start < 0 || end < start) {
-          throw new Error("L'IA n'a pas renvoyé de tableau JSON valide");
+          throw new Error("L'IA n'a pas renvoyé de JSON valide: " + rawText.slice(0, 80));
         }
 
         const sessions = JSON.parse(rawText.slice(start, end + 1)).filter(s => s.matiere && s.debut && s.fin);
@@ -1349,37 +1232,33 @@
         showToast(`${count} séances importées avec succès !`, 'success');
 
       } catch (err) {
-        showToast("Erreur IA : " + err.message, "error");
+        showToast("Erreur IA: " + err.message, "error");
       } finally {
         btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyser et Importer';
         btn.disabled = false;
       }
     }
 
-    async function callGeminiAPI(key, images) {
-      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){encodeURIComponent(key)}`;
+    async function callGeminiAPI(key, file) {
+      const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+      const mimeType = isPdf ? "application/pdf" : (file.type || "image/jpeg");
+      const base64Data = await b64(file);
       
-      const parts = [
-        { text: "Extrais l'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON sans aucun texte explicatif : [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI)." }
-      ];
-
-      images.forEach(imgData => {
-        const b64Data = imgData.split(',')[1];
-        parts.push({
-          inline_data: {
-            mime_type: "image/jpeg",
-            data: b64Data
-          }
-        });
-      });
+      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){encodeURIComponent(key)}`;
+      const payload = {
+        contents: [{
+          parts: [
+            { text: "Extrais l'emploi du temps. Réponds STRICTEMENT avec un tableau JSON sans markdown: [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]. Jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI)." },
+            { inline_data: { mime_type: mimeType, data: base64Data } }
+          ]
+        }],
+        generationConfig: { temperature: 0.1 }
+      };
 
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: parts }],
-          generationConfig: { temperature: 0.1 }
-        })
+        body: JSON.stringify(payload)
       });
 
       const textResponse = await res.text();
@@ -1387,7 +1266,7 @@
       try {
         jsonRes = JSON.parse(textResponse);
       } catch (e) {
-        throw new Error("L'API a renvoyé du HTML au lieu de JSON (Vérifiez la clé API).");
+        throw new Error("L'API Google a renvoyé du HTML. Vérifiez votre clé API.");
       }
 
       if (!res.ok) {
@@ -1397,54 +1276,50 @@
       return jsonRes.candidates[0].content.parts[0].text;
     }
 
-    async function callGroqAPI(key, images) {
-      const endpoint = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
-      
-      const content = [
-        { type: "text", text: "Extrais l'emploi du temps. Réponds UNIQUEMENT avec un tableau JSON sans markdown: [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]" }
-      ];
+    async function callGroqAPI(key, file) {
+      const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+      if (isPdf) throw new Error("Groq ne supporte pas les PDFs directement. Utilisez une clé Gemini AI Studio.");
 
-      images.forEach(url => {
-        content.push({ type: "image_url", image_url: { url } });
+      const base64Data = await b64(file);
+      const dataUrl = `data:${file.type || 'image/jpeg'};base64,${base64Data}`;
+      const endpoint = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${key}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.2-11b-vision-preview",
+          temperature: 0.1,
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: "Extrais l'emploi du temps. Réponds UNIQUEMENT avec un tableau JSON: [{\"jour\":\"LUNDI\",\"debut\":\"08:30\",\"fin\":\"10:30\",\"matiere\":\"Nom du module\",\"salle\":\"Amphi A\"}]" },
+              { type: "image_url", image_url: { url: dataUrl } }
+            ]
+          }]
+        })
       });
 
-      // Essaie d'abord le modèle vision officiel de Groq
-      const models = ["llama-3.2-11b-vision-preview", "llama-3.2-90b-vision-preview"];
-      let lastErr = "";
-
-      for (const model of models) {
-        try {
-          const res = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${key}`
-            },
-            body: JSON.stringify({
-              model: model,
-              temperature: 0.1,
-              messages: [{ role: "user", content: content }]
-            })
-          });
-
-          const textResponse = await res.text();
-          const jsonRes = JSON.parse(textResponse);
-
-          if (res.ok) {
-            return jsonRes.choices[0].message.content;
-          } else {
-            lastErr = jsonRes.error?.message || `Erreur HTTP ${res.status}`;
-          }
-        } catch(e) {
-          lastErr = e.message;
-        }
+      const textResponse = await res.text();
+      let jsonRes;
+      try {
+        jsonRes = JSON.parse(textResponse);
+      } catch (e) {
+        throw new Error("Groq API a renvoyé du HTML. Vérifiez votre clé API Groq.");
       }
 
-      throw new Error(lastErr || "Échec avec Groq Vision. Utilisez une clé Gemini.");
+      if (!res.ok) {
+        throw new Error(jsonRes.error?.message || `Erreur HTTP ${res.status}`);
+      }
+
+      return jsonRes.choices[0].message.content;
     }
 
     /* ==========================================================================
-       STOCKAGE LOCAL (INDEXEDDB) & GOOGLE DRIVE
+       STOCKAGE LOCAL & DRIVE
        ========================================================================== */
     const DB_NAME = 'EduVaultLocalFiles';
     let dbInstance = null;
@@ -1471,7 +1346,6 @@
           tx.objectStore('files').put({ id, name: file.name, type: file.type, dataUrl: e.target.result });
           ok();
         };
-        reader.onerror = ko;
         reader.readAsDataURL(file);
       });
     }
@@ -1509,7 +1383,7 @@
     }
 
     function toggleDriveAuth() {
-      if (!tokenClient) return showToast("Initialisation de l'API Google en cours...", "warning");
+      if (!tokenClient) return showToast("Initialisation de l'API Google...", "warning");
       if (driveAccessToken) {
         driveAccessToken = null;
         updateDriveUI(false);
@@ -1524,9 +1398,6 @@
       document.getElementById('driveDot').className = connected ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' : 'w-2 h-2 rounded-full bg-red-500';
     }
 
-    /* ==========================================================================
-       OUTILS (MODALS, TOAST, THEME, MOYENNE)
-       ========================================================================== */
     function calculateSemesterAverage() {
       const semsMods = appState.modules.filter(m => m.semester === appState.activeSemester && m.grade !== null && m.grade !== undefined);
       const display = document.getElementById('semAverageDisplay');
