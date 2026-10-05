@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1e3a8a">
+<meta name="color-scheme" content="light dark">
 <title>EduVault</title>
+<link rel="icon" id="fav" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20512%20512%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%233b82f6%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%231e3a8a%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%22512%22%20height=%22512%22%20rx=%22112%22%20fill=%22url(%23g)%22/%3E%3Cpath%20d=%22M256%20120%20438%20204%20256%20288%2074%20204Z%22%20fill=%22%23fff%22/%3E%3Cpath%20d=%22M148%20252v80c0%2028%2048%2060%20108%2060s108-32%20108-60v-80l-108%2050Z%22%20fill=%22%23dbeafe%22/%3E%3Cpath%20d=%22M410%20222v96%22%20stroke=%22%23f59e0b%22%20stroke-width=%2214%22%20stroke-linecap=%22round%22/%3E%3Ccircle%20cx=%22410%22%20cy=%22336%22%20r=%2218%22%20fill=%22%23f59e0b%22/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#f3f4f6;--card:#fff;--tx:#111827;--mu:#6b7280;--ln:#e5e7eb;--br:#2563eb;--bs:#e0edff;--er:#dc2626;--ok:#059669;--in:#f3f4f6}
 .dark{--bg:#111827;--card:#1f2937;--tx:#f3f4f6;--mu:#9ca3af;--ln:#374151;--bs:#1e3a8a66;--in:#374151}
@@ -62,11 +66,69 @@ dialog[open]{animation:pop .18s ease-out}@keyframes pop{from{opacity:0;transform
 .okt{color:var(--ok);font-weight:700}.bad{color:var(--er);font-weight:700}
 .mh{flex-wrap:wrap;align-items:flex-start}.mh>div:first-child{flex:1 1 140px;min-width:0}.mh>div:last-child{flex-wrap:wrap}.mh b{overflow-wrap:anywhere}
 dialog textarea{min-height:140px}
+/* ===== design moderne ===== */
+:root{--r:20px;--sh:0 10px 30px -16px rgba(15,23,42,.4)}
+.dark{--bg:#0a1020;--card:#111a2f;--ln:#1f2b47;--in:#182440;--mu:#94a3b8}
+body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;font-size:15px;letter-spacing:-.005em;
+ background:radial-gradient(900px 420px at 50% -140px,color-mix(in srgb,var(--br) 20%,transparent),transparent),var(--bg);background-repeat:no-repeat;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+header{background:color-mix(in srgb,var(--card) 80%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);padding:10px 14px}
+h1{display:flex;align-items:center;gap:8px;font-size:19px;letter-spacing:-.02em}
+h1 .ic{width:30px;height:30px;padding:5px;border-radius:10px;background:var(--br);color:#fff;stroke-width:2.1}
+h2{font-size:22px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+h3{font-size:18px;letter-spacing:-.01em}h4{display:flex;align-items:center;gap:6px;font-size:11.5px}
+.ic{width:1.2em;height:1.2em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.22em}
+.c{border-radius:var(--r);padding:14px;box-shadow:var(--sh);transition:transform .15s,box-shadow .15s}
+@media(hover:hover){.c:hover{transform:translateY(-2px)}}
+.b{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:14px;padding:9px 14px;border:1px solid var(--ln);background:var(--card)}
+.b.p{border-color:transparent;background:linear-gradient(135deg,var(--br),color-mix(in srgb,var(--br) 70%,#000));box-shadow:0 8px 18px -8px var(--br)}
+.pills .b{padding:7px 16px;border-radius:99px;flex:none}.pills .b.cur::after{content:"";width:6px;height:6px;border-radius:50%;background:#f59e0b;margin-left:2px}
+nav{left:50%;right:auto;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(580px,calc(100% - 20px));border:1px solid var(--ln);border-radius:26px;padding:6px;
+ background:color-mix(in srgb,var(--card) 84%,transparent);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 18px 44px -14px rgba(0,0,0,.5)}
+nav button{padding:7px 2px 6px;font-size:10.5px;border-radius:18px;gap:3px}nav button span{display:flex}nav .ic{width:23px;height:23px}
+nav .on{background:var(--bs);color:var(--br)}
+.cl{border-radius:14px;padding:11px 12px;transition:filter .12s}.cl:hover{filter:brightness(1.04)}
+.x-btn{width:34px;height:34px;border-radius:10px;display:inline-grid;place-items:center;transition:background .12s}.x-btn:hover{background:var(--in)}.x-btn .ic{width:18px;height:18px}
+.hero{position:relative;overflow:hidden;border-radius:24px;padding:20px;background:linear-gradient(135deg,var(--br),color-mix(in srgb,var(--br) 55%,#000))}
+.hero::after{content:"";position:absolute;right:-34px;top:-34px;width:150px;height:150px;border-radius:50%;background:#ffffff22}.hero b{font-size:21px;letter-spacing:-.02em}
+input,select,textarea{border-radius:14px;border:1px solid transparent;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--br);box-shadow:0 0 0 3px color-mix(in srgb,var(--br) 25%,transparent)}
+dialog{border-radius:26px;padding:20px;box-shadow:0 30px 80px -20px #000b}dialog::backdrop{background:#0b122099;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.st>div{border-radius:18px}.opt{border-radius:16px}.fa,.fb{border-radius:20px}
+#ts div{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 10px 24px -10px #0008}
+.top{margin-bottom:14px}.rs{border-radius:14px}.e{border-radius:14px}
+
+/* ===== v3 : identite visuelle (icone) ===== */
+:root{--br:#2f6fe4;--bs:#e6efff;--ac:#f59e0b;--r:22px}
+.dark{--bg:#080e1d;--card:#0f1830;--ln:#1b2a4a;--in:#16223f;--bs:#2f6fe42b}
+body{background:radial-gradient(1000px 460px at 50% -160px,color-mix(in srgb,var(--br) 26%,transparent),transparent),radial-gradient(500px 300px at 100% 30%,color-mix(in srgb,var(--ac) 7%,transparent),transparent),var(--bg);background-repeat:no-repeat}
+h1 .logo{width:32px;height:32px;border-radius:10px;box-shadow:0 4px 12px -4px color-mix(in srgb,var(--br) 70%,#000)}
+header{border-bottom:1px solid color-mix(in srgb,var(--ln) 70%,transparent)}
+nav{border-radius:28px;padding:6px 8px}
+nav .on{background:linear-gradient(135deg,var(--br),color-mix(in srgb,var(--br) 62%,#000));color:#fff;box-shadow:0 8px 18px -8px var(--br)}
+nav button{transition:background .2s,color .2s,transform .15s}nav button:active{transform:scale(.92)}
+nav .ic{fill:none}
+.sbadge{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;border-radius:18px;background:var(--bs);border:1px solid color-mix(in srgb,var(--br) 28%,transparent)}
+.sbadge span{font-size:12px;font-weight:600;color:var(--mu)}.sbadge b{font-size:18px;color:#fff;background:linear-gradient(135deg,var(--br),color-mix(in srgb,var(--br) 60%,#000));padding:2px 14px;border-radius:99px}.sbadge small{margin-left:auto}
+.cl{position:relative;background:linear-gradient(135deg,var(--bs),transparent 85%),var(--card);border:1px solid var(--ln);box-shadow:0 6px 16px -12px #000}
+.cl .br{font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.cl b{font-size:15px;margin:2px 0}
+.tod{box-shadow:0 0 0 2px color-mix(in srgb,var(--br) 55%,transparent),var(--sh)}
+h4{color:var(--mu);font-weight:800}
+.top h2{font-size:23px}
+.hero{background:linear-gradient(135deg,var(--br),color-mix(in srgb,var(--br) 45%,#0b1b4a))}
+.hero::before{content:"";position:absolute;left:-30px;bottom:-50px;width:140px;height:140px;border-radius:50%;background:color-mix(in srgb,var(--ac) 30%,transparent);filter:blur(2px)}
+.c{background:linear-gradient(180deg,color-mix(in srgb,var(--card) 100%,#fff 3%),var(--card));border:1px solid var(--ln)}
+.chip{border:1px solid var(--ln)}
+.up{background:linear-gradient(135deg,var(--ac),#ea580c);box-shadow:0 10px 24px -12px var(--ac)}
+.pills{scrollbar-width:none}.pills::-webkit-scrollbar{display:none}
+.pills .b.p{box-shadow:0 8px 18px -8px var(--br)}
+@media(min-width:900px){main{padding:22px}.g{gap:16px}}
+@media print{header,nav,.b,.x-btn{display:none!important}body{background:#fff;color:#000}}
 </style>
 </head>
 <body>
 <header>
-  <h1 data-a="go" data-i="da">🎓 EduVault</h1>
+  <h1 data-a="go" data-i="da"><img class="logo" src="icon-192.png" alt="" width="32" height="32" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🎓'}))">EduVault</h1>
   <div class="s-bar"><input type="search" id="sq" placeholder="Rechercher..." oninput="doSearch()" aria-label="Rechercher"><div id="s-res"></div></div>
   <div style="display:flex;gap:6px;align-items:center">
     <button class="b" id="dv" data-a="dh" title="Google Drive">☁️ <span id="dd">●</span></button>
@@ -75,14 +137,14 @@ dialog textarea{min-height:140px}
 </header>
 <main id="v"></main>
 <nav id="nav">
-  <button data-t="da"><span>🏠</span>Auj.</button>
-  <button data-t="tt"><span>🗓</span>Horaires</button>
-  <button data-t="ag"><span>🔔</span>Agenda</button>
-  <button data-t="mo"><span>📚</span>Cours</button>
-  <button data-t="fc"><span>🃏</span>Fiches</button>
-  <button data-t="qz"><span>🧠</span>Quiz</button>
-  <button data-t="po"><span>⏱</span>Focus</button>
-  <button data-a="set"><span>⚙️</span>Plus</button>
+  <button data-t="da"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></span>Auj.</button>
+  <button data-t="tt"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="M8 14h3M13 14h3M8 17.5h3"/></svg></span>Horaires</button>
+  <button data-t="ag"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 004 0"/></svg></span>Agenda</button>
+  <button data-t="mo"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 21V5"/><path d="M9 7h6M9 11h6"/></svg></span>Cours</button>
+  <button data-t="fc"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="14" height="14" rx="3"/><path d="M7 3h12a2 2 0 012 2v12"/></svg></span>Fiches</button>
+  <button data-t="qz"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-1 .8-1.5 1.2-1.5 2.5M12 17.5v.01"/></svg></span>Quiz</button>
+  <button data-t="po"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg></span>Focus</button>
+  <button data-a="set"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3h0a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9v0a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></span>Plus</button>
 </nav>
 <dialog id="dlg"></dialog>
 <div id="ts" aria-live="polite"></div>
@@ -110,6 +172,10 @@ const uid=p=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)
 const iso=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
 const monday=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
 const sems=()=>LV[A.settings.level]||LV.CP1;
+const curSem=()=>sems().includes(A.settings.curSem)?A.settings.curSem:sems()[0];
+const visSems=()=>A.settings.showAll?ALLS:ALLS.slice(0,ALLS.indexOf(sems()[sems().length-1])+1);
+const CURV=['da','tt','ag'];
+const curIds=()=>new Set(A.modules.filter(m=>m.semester===curSem()).map(m=>m.id));
 const mods=()=>A.modules.filter(m=>m.semester===A.activeSemester);
 const modName=id=>A.modules.find(m=>m.id===id)?.name||'?';
 function toast(m,t=''){const e=document.createElement('div');e.className=t;e.textContent=m;$('ts').append(e);setTimeout(()=>e.remove(),3500)}
@@ -132,8 +198,12 @@ function load(o){
     delete m.grade;
   });
   A.flashcards.forEach(f=>{f.efactor=f.efactor||2.5;f.interval=f.interval||0;f.repetition=f.repetition||0;f.nextRev=f.nextRev||Date.now()});
+  if(!visSems().includes(A.activeSemester))A.activeSemester=curSem();
 }
-function save(){A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){toast('Stockage plein : supprimez des photos','er')}drvSchedule()}
+let svT=null;
+function flushSave(){clearTimeout(svT);svT=null;try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){toast('Stockage plein : supprimez des photos','er')}}
+function save(){A.updatedAt=Date.now();clearTimeout(svT);svT=setTimeout(flushSave,300);drvSchedule()}
+addEventListener('pagehide',flushSave);document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSave()});
 function upd(){save();render()}
 
 /* ---------- week A/B + holidays ---------- */
@@ -154,13 +224,15 @@ function ask(title,fields,ok){
 }
 
 /* ---------- views ---------- */
-const pills=()=>`<div class="pills">${ALLS.map(s=>`<button class="b${s===A.activeSemester?' p':''}" data-a="sem" data-i="${s}">${s}</button>`).join('')}</div>`;
+const semBadge=()=>`<div class="sbadge"><span>Semestre en cours</span><b>${curSem()}</b><small>${A.settings.level||''} · modifiable dans Réglages</small></div>`;
+const pills=()=>`<div class="pills">${visSems().map(s=>`<button class="b${s===A.activeSemester?' p':''}${s===curSem()?' cur':''}" data-a="sem" data-i="${s}">${s}</button>`).join('')}</div>`;
 function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&new Date(t.dueDate)>n).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];if(!t)return'';const h=Math.floor((new Date(t.dueDate)-n)/36e5),d=Math.floor(h/24);return`<div class="up" data-a="goAg">⏰ ${t.type==='exam'?'Examen':'Devoir'} : ${esc(t.title)} (${d>0?'dans '+d+' j':h>0?'dans '+h+' h':'très bientôt'})</div>`}
 const modCol=id=>A.modules.find(m=>m.id===id)?.color||'var(--br)';
 const mAvg=m=>{let t=0,d=0;[['ncc','ccc'],['ntp','ctp'],['nex','cex']].forEach(([n,c])=>{if(m[n]!=null&&m[c]>0){t+=m[n]*m[c];d+=m[c]}});return d?t/d:null};
 function calcSem(){let t=0,c=0;mods().forEach(m=>{const a=mAvg(m);if(a!=null){t+=a*(m.coeff||1);c+=m.coeff||1}});return c?(t/c).toFixed(2):'-'}
 
-function doSearch(){
+let sT;function doSearch(){clearTimeout(sT);sT=setTimeout(doSearch2,140)}
+function doSearch2(){
   const k=$('sq').value.trim().toLowerCase(),res=$('s-res');
   if(!k){res.style.display='none';return}
   let h='';
@@ -173,9 +245,9 @@ function doSearch(){
 const fmtMin=m=>m>=60?Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):''):m+' min';
 function rDa(){
   const t=Date.now(),n=new Date(),hol=isHol(iso(n)),nm=n.getHours()*60+n.getMinutes(),tm=x=>{const[h,m]=x.split(':');return+h*60+ +m};
-  const cls=hol?[]:A.timetable.filter(c=>c.day===TOD()&&(c.week==='all'||c.week===curWeek())).sort((a,b)=>a.startTime.localeCompare(b.startTime));
-  const due=A.tasks.filter(x=>!x.completed&&new Date(x.dueDate).getTime()<t+7*864e5).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
-  const nFc=A.flashcards.filter(f=>!f.nextRev||f.nextRev<=t).length,nx=cls.find(c=>tm(c.endTime)>nm);
+  const cls=hol?[]:A.timetable.filter(c=>curIds().has(c.moduleId)&&c.day===TOD()&&(c.week==='all'||c.week===curWeek())).sort((a,b)=>a.startTime.localeCompare(b.startTime));
+  const due=A.tasks.filter(x=>curIds().has(x.moduleId)&&!x.completed&&new Date(x.dueDate).getTime()<t+7*864e5).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  const nFc=A.flashcards.filter(f=>curIds().has(f.moduleId)&&(!f.nextRev||f.nextRev<=t)).length,nx=cls.find(c=>tm(c.endTime)>nm);
   const hist=A.quizHist,avgQ=hist.length?Math.round(hist.reduce((s,x)=>s+x.sc/x.n,0)/hist.length*100):null,focus=Math.round(A.modules.reduce((s,m)=>s+(m.pomo||0),0)/60);
   const gr=n.getHours()<12?'Bonjour':n.getHours()<18?'Bon après-midi':'Bonsoir';
   return `<div class="g"><div class="hero"><small>${gr} 👋 · ${n.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} · Sem. ${curWeek()}</small><b>${hol?'🌴 Vacances aujourd\'hui':nx?(tm(nx.startTime)<=nm?'En cours : ':'Prochain : ')+esc(modName(nx.moduleId)):'Plus de cours aujourd\'hui'}</b>${nx&&!hol?`<small>${esc(nx.startTime)} – ${esc(nx.endTime)} · 📍 ${esc(nx.room)}${tm(nx.startTime)>nm?' · dans '+fmtMin(tm(nx.startTime)-nm):''}</small>`:''}</div>
@@ -188,14 +260,14 @@ function rDa(){
 function rTT(){
   const wk=curWeek(),ids=mods().map(m=>m.id),tt=A.timetable.filter(c=>ids.includes(c.moduleId)&&(c.week==='all'||c.week===wk));
   const days=DAYS.filter((d,i)=>i<6||tt.some(c=>c.day===d));
-  return pills()+`<div class="top"><div><h2>Emploi du temps</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">+ Séance</button></div></div><div class="g">`+
+  return semBadge()+`<div class="top"><div><h2>Emploi du temps</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">+ Séance</button></div></div><div class="g">`+
   days.map(d=>`<div class="c${d===TOD()?' tod':''}"><h4>${d}${d===TOD()?' · aujourd’hui':''}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
     const n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
     return`<div class="cl${n?' nt':''}" data-a="cls" data-i="${c.id}" style="border-left:4px solid ${modCol(c.moduleId)}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||'<p class="mu e">Aucune séance</p>')+'</div>').join('')+'</div>';
 }
 function rAg(){
   const ids=mods().map(m=>m.id),l=A.tasks.filter(t=>ids.includes(t.moduleId)&&(filt==='all'||t.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
-  return pills()+`<div class="top"><h2>Examens & Devoirs</h2><div><button class="b p" data-a="addTask">+ Ajouter</button></div></div><div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${f[1]}</button>`).join('')}</div>`+
+  return semBadge()+`<div class="top"><h2>Examens & Devoirs</h2><div><button class="b p" data-a="addTask">+ Ajouter</button></div></div><div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${f[1]}</button>`).join('')}</div>`+
   (l.length?l.map(t=>`<div class="c t${t.type==='exam'?' x':''}${t.completed?' d':''}"><input type="checkbox" ${t.completed?'checked':''} data-a="done" data-i="${t.id}" aria-label="Terminé"><div><b>${t.type==='exam'?'🚨 ':'📝 '}${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))} • ${new Date(t.dueDate).toLocaleString('fr-FR')}</small></div><button class="x-btn" data-a="editTask" data-i="${t.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${t.id}" aria-label="Supprimer">🗑</button></div>`).join(''):'<p class="mu e">Aucune échéance</p>');
 }
 function mgrid(){
@@ -231,12 +303,12 @@ function ptick(){P.left=Math.max(0,Math.round((P.end-Date.now())/1000));ppaint()
 /* ---------- render ---------- */
 const R={da:rDa,tt:rTT,ag:rAg,mo:rMo,fc:rFc,qz:rQz,po:rPo};
 function render(){$('v').innerHTML=banner()+R[tab]();ppaint()}
-function go(t){if(t!=='qz')qTimerStop();tab=t;document.querySelectorAll('#nav [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render();
+function go(t){if(t!=='qz')qTimerStop();if(CURV.includes(t))A.activeSemester=curSem();tab=t;document.querySelectorAll('#nav [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render();
   try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission()}catch(e){}}
 
 /* ---------- actions ---------- */
 function modForm(m){ask(m?'Modifier le module':'Nouveau module',[
-  {k:'semester',l:'Semestre',t:'select',o:ALLS.map(s=>[s,s]),v:m?.semester||A.activeSemester},
+  {k:'semester',l:'Semestre',t:'select',o:visSems().map(s=>[s,s]),v:m?.semester||A.activeSemester},
   {k:'name',l:'Nom du module',r:1,v:m?.name},{k:'prof',l:'Professeur (optionnel)',v:m?.prof},
   {k:'color',l:'Couleur',t:'color',v:m?.color||'#2563eb'},
   {k:'coeff',l:'Coefficient du module (pour la moyenne du semestre)',t:'number',a:' min="0.5" step="0.5"',v:m?.coeff??1},
@@ -251,7 +323,7 @@ const act={
   flt:i=>{filt=i;render()},
   goAg:()=>go('ag'),
   theme:()=>cycleMode(),
-  lvl:i=>{A.settings.level=i;A.activeSemester=LV[i][0];$('dlg').oncancel=null;$('dlg').close();upd();toast('Niveau '+i+' configuré','ok')},
+  lvl:i=>{A.settings.level=i;A.activeSemester=A.settings.curSem=LV[i][0];$('dlg').oncancel=null;$('dlg').close();upd();toast('Niveau '+i+' configuré','ok')},
   addCls:()=>{if(needMod())return;ask('Séance',[{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'day',l:'Jour',t:'select',o:DAYS.map(d=>[d,d])},{k:'week',l:'Semaine',t:'select',o:[['all','Toutes les semaines'],['A','Semaine A'],['B','Semaine B']]},{k:'startTime',l:'Début',t:'time',r:1},{k:'endTime',l:'Fin',t:'time',r:1},{k:'room',l:'Salle ou amphi',r:1}],v=>{
     if(v.endTime<=v.startTime)return toast("L'heure de fin doit être après le début",'er');A.timetable.push({id:uid('c'),...v});upd();toast('Séance ajoutée','ok')})},
   addMod:()=>modForm(),
@@ -325,10 +397,13 @@ Object.assign(act,{
 const PALS={blue:['Bleu','#2563eb'],emerald:['Émeraude','#059669'],violet:['Violet','#7c3aed'],rose:['Rose','#e11d48'],orange:['Orange','#ea580c'],slate:['Ardoise','#475569']};
 const mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
 const getMode=()=>localStorage.getItem('eduMode')||localStorage.getItem('eduTheme')||'auto';
+const shade=(h,p)=>'#'+[1,3,5].map(i=>{const v=parseInt(h.slice(i,i+2),16);return Math.round(p<0?v*(1+p):v+(255-v)*p).toString(16).padStart(2,'0')}).join('');
+const favSvg=c=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${shade(c,.2)}"/><stop offset="1" stop-color="${shade(c,-.45)}"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#g)"/><path d="M256 120 438 204 256 288 74 204Z" fill="#fff"/><path d="M148 252v80c0 28 48 60 108 60s108-32 108-60v-80l-108 50Z" fill="#fff" fill-opacity=".85"/><path d="M410 222v96" stroke="#f59e0b" stroke-width="14" stroke-linecap="round"/><circle cx="410" cy="336" r="18" fill="#f59e0b"/></svg>`;
 function applyTheme(){
   const m=getMode(),dark=m==='dark'||(m==='auto'&&!!mq&&mq.matches),R=document.documentElement,pal=PALS[localStorage.getItem('eduPal')]?localStorage.getItem('eduPal'):'blue';
   R.classList.toggle('dark',dark);R.dataset.th=pal;
   const tc=document.querySelector('meta[name=theme-color]');if(tc)tc.content=PALS[pal][1];
+  const fav=document.getElementById('fav');if(fav)fav.href='data:image/svg+xml,'+encodeURIComponent(favSvg(PALS[pal][1]));
 }
 function setMode(m){localStorage.setItem('eduMode',m);applyTheme()}
 function cycleMode(){const o=['auto','light','dark'],m=o[(o.indexOf(getMode())+1)%3];setMode(m);toast('Thème : '+{auto:'Auto',light:'Clair',dark:'Sombre'}[m])}
@@ -460,7 +535,7 @@ Object.assign(act,{
     const p=n=>String(n).padStart(2,'0'),BY=['MO','TU','WE','TH','FR','SA','SU'],ie=x=>String(x||'').replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n'),
       mon=monday(new Date()),stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
     const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//EduVault//FR','CALSCALE:GREGORIAN'];
-    A.timetable.forEach(c=>{const di=DAYS.indexOf(c.day);if(di<0)return;
+    A.timetable.filter(c=>curIds().has(c.moduleId)).forEach(c=>{const di=DAYS.indexOf(c.day);if(di<0)return;
       const d=new Date(mon);d.setDate(mon.getDate()+di+(c.week!=='all'&&c.week!==curWeek()?7:0));
       const ds=d.getFullYear()+p(d.getMonth()+1)+p(d.getDate()),t=x=>String(x).replace(':','')+'00';
       L.push('BEGIN:VEVENT','UID:'+c.id+'@eduvault','DTSTAMP:'+stamp,'DTSTART:'+ds+'T'+t(c.startTime),'DTEND:'+ds+'T'+t(c.endTime),
@@ -487,6 +562,7 @@ function clsDlg(id){
 function settings(){
   const d=$('dlg'),s=A.settings;
   d.innerHTML=`<h3>⚙️ Réglages</h3><label>Couleur du thème</label><div class="row" style="justify-content:flex-start;margin:0 0 6px">${Object.entries(PALS).map(([k,v])=>`<button class="sw${(localStorage.getItem('eduPal')||'blue')===k?' sel':''}" data-a="pal" data-i="${k}" style="background:${v[1]}" aria-label="${v[0]}" title="${v[0]}"></button>`).join('')}</div><label>Apparence<select onchange="setMode(this.value)">${[['auto','Auto (comme le téléphone)'],['light','Clair'],['dark','Sombre']].map(o=>`<option value="${o[0]}"${getMode()===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label><label>Niveau actuel<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
+  <label>Semestre en cours<select onchange="chgSem(this.value)">${sems().map(x=>`<option${x===curSem()?' selected':''}>${x}</option>`).join('')}</select></label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${A.settings.showAll?'checked':''} onchange="chgAll(this.checked)"> Afficher aussi les anciens semestres (archives)</label>
   <label>Semaine actuelle (l'alternance A/B est automatique)<select onchange="chgWk(this.value)"><option value="A"${curWeek()==='A'?' selected':''}>Semaine A</option><option value="B"${curWeek()==='B'?' selected':''}>Semaine B</option></select></label>
   <label>Vacances & jours chômés (du / au)<span class="row" style="margin:4px 0 0"><input type="date" id="h1" aria-label="Du"><input type="date" id="h2" aria-label="Au"><button class="b p" data-a="addHol">+</button></span></label>
   <div>${ranges().map(r=>`<span class="chip">${r[0]===r[1]?r[0]:r[0]+' → '+r[1]}<button class="x-btn" data-a="delHol" data-i="${r[0]}|${r[1]}" aria-label="Supprimer">✕</button></span>`).join('')}</div>
@@ -497,7 +573,9 @@ function settings(){
   $('jf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||!Array.isArray(o.modules))throw 0;if(!confirm('Remplacer toutes vos données par cette sauvegarde ?'))return;load(o);upd();$('dlg').close();toast('Sauvegarde restaurée','ok')}catch(x){toast('Format JSON invalide','er')}};r.readAsText(f)};
   d.oncancel=null;if(!d.open)d.showModal();
 }
-function chgLvl(l){A.settings.level=l;A.activeSemester=LV[l][0];upd()}
+function chgLvl(l){A.settings.level=l;A.activeSemester=A.settings.curSem=LV[l][0];upd();settings()}
+function chgSem(v){A.settings.curSem=v;A.activeSemester=v;upd();settings()}
+function chgAll(c){A.settings.showAll=c;if(!visSems().includes(A.activeSemester))A.activeSemester=curSem();upd();settings()}
 function chgWk(w){A.settings.currentWeek=w;A.settings.weekRef=iso(monday(new Date()));upd()}
 
 /* ---------- local files (IndexedDB) ---------- */
@@ -659,7 +737,7 @@ async function drvSync(o={}){
   finally{drvBusy=false;paintDrive();if(drvQueued){drvQueued=false;drvSchedule()}}
 }
 function drvBoot(){
-  lib('https://accounts.google.com/gsi/client').catch(()=>{});paintDrive();
+  if(linked())lib('https://accounts.google.com/gsi/client').catch(()=>{});paintDrive();
   if(linked())armReconnect();
   setInterval(()=>{if(tok)drvSync()},5*60000);
   addEventListener('online',()=>{if(linked())drvSchedule()});
@@ -673,9 +751,57 @@ function chk(){const n=new Date();A.tasks.filter(t=>!t.completed).forEach(t=>{co
   if(d>36e5&&d<=864e5&&n.getHours()>=18&&!fired.has(t.id+'d')){fired.add(t.id+'d');notify('Demain : '+t.title,'Révisez ce soir !')}})}
 function onboard(){const d=$('dlg');d.innerHTML=`<h3>🎓 Bienvenue sur EduVault</h3><p class="mu">Sélectionnez votre niveau actuel :</p><div class="g" style="grid-template-columns:1fr 1fr;margin-top:12px">${Object.keys(LV).map(l=>`<button class="b" data-a="lvl" data-i="${l}">${l}<small class="mu">${LV[l].join(' & ')}</small></button>`).join('')}</div>`;d.oncancel=e=>e.preventDefault();d.showModal()}
 
+/* ---------- icônes (SVG, remplacent les emoji automatiquement) ---------- */
+const ICONS={
+cap:'<path d="M2.5 9 12 4l9.5 5-9.5 5z"/><path d="M6.5 11.5V16c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.5M21.5 9v6"/>',
+home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+calendar:'<rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',
+bell:'<path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9"/><path d="M10 19a2 2 0 0 0 4 0"/>',
+book:'<path d="M12 6c-1.5-1.3-3.7-2-6.5-2H3v14h2.5c2.8 0 5 .7 6.5 2 1.5-1.3 3.7-2 6.5-2H21V4h-2.5c-2.8 0-5 .7-6.5 2z"/><path d="M12 6v14"/>',
+cards:'<rect x="3" y="7" width="13" height="13" rx="2.5"/><path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h8A2.5 2.5 0 0 1 21 5.5v8a2.5 2.5 0 0 1-2.5 2.5H16"/>',
+quiz:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/>',
+timer:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 2.5h5"/>',
+sliders:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+cloud:'<path d="M7 18a4.5 4.5 0 0 1-.5-9 6 6 0 0 1 11.5 1.5A3.8 3.8 0 0 1 17.5 18z"/>',
+contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',
+sparkles:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+clip:'<path d="M20 11.5 12 19.5a5 5 0 0 1-7-7L13.5 4a3.3 3.3 0 0 1 4.7 4.7L9.7 17.2a1.7 1.7 0 0 1-2.4-2.4L15 7"/>',
+pencil:'<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+ban:'<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
+minus:'<path d="M5 12h14"/>',
+x:'<path d="M6 6l12 12M18 6 6 18"/>',
+target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
+file:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',
+alert:'<path d="M12 3 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+flame:'<path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-3-1-5 1-8z"/>',
+pin:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+palm:'<path d="M12 21V11M12 11c-1-4-4-5-7-4 2 .5 3.500 2 4 4M12 11c1-4 4-5 7-4-2 .5-3.500 2-4 4M12 11c-3-1-5.500 0-6.500 2.500M12 11c3-1 5.500 0 6.500 2.500"/>',
+key:'<circle cx="8" cy="14" r="4"/><path d="m11 11 8-8M16 6l3 3"/>',
+download:'<path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 20h14"/>',
+upload:'<path d="M12 20V9M7.5 13 12 8.500 16.500 13M5 4h14"/>'};
+const EMO={'🎓':'cap','🏠':'home','🗓':'calendar','📅':'calendar','🔔':'bell','📚':'book','🃏':'cards','🧠':'quiz','⏱':'timer','⚙':'sliders','☁':'cloud','🌓':'contrast','✨':'sparkles','📎':'clip','✏':'pencil','🗑':'trash','🚫':'ban','➖':'minus','✕':'x','🎯':'target','📝':'file','🚨':'alert','⚠':'alert','☀':'sun','📈':'chart','🔥':'flame','📍':'pin','🌴':'palm','🔑':'key','⬇':'download','⬆':'upload'};
+const ic=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||''}</svg>`;
+const EMO_SRC='('+Object.keys(EMO).join('|')+')\uFE0F?',EMO_T=new RegExp(EMO_SRC),SKIPN=new Set(['SCRIPT','STYLE','TEXTAREA','OPTION','SELECT','INPUT','TITLE','svg']);
+function iconize(root){
+  const tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>SKIPN.has(n.parentNode&&n.parentNode.nodeName)||!EMO_T.test(n.nodeValue)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT}),list=[];
+  while(tw.nextNode())list.push(tw.currentNode);
+  list.forEach(n=>{const re=new RegExp(EMO_SRC,'g'),v=n.nodeValue,fr=document.createDocumentFragment();let last=0,m;
+    while((m=re.exec(v))){if(m.index>last)fr.append(v.slice(last,m.index));const t=document.createElement('template');t.innerHTML=ic(EMO[m[1]]);fr.append(t.content);last=m.index+m[0].length}
+    if(last<v.length)fr.append(v.slice(last));n.replaceWith(fr)});
+}
+{const pend=new Set();let raf=0;
+ new MutationObserver(ms=>{ms.forEach(m=>m.addedNodes.forEach(n=>pend.add(n)));
+  if(!raf)raf=requestAnimationFrame(()=>{raf=0;[...pend].forEach(n=>{if(!n.isConnected)return;if(n.nodeType===3)n=n.parentNode;if(n&&n.nodeType===1)iconize(n)});pend.clear()})
+ }).observe(document.body,{childList:true,subtree:true});}
+iconize(document.body);
+
 load();
 applyTheme();
 drvBoot();go('da');
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(!A.settings.level)onboard();
 setInterval(chk,6e4);chk();
 </script>
