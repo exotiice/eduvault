@@ -124,6 +124,24 @@ h4{color:var(--mu);font-weight:800}
 .pills .b.p{box-shadow:0 8px 18px -8px var(--br)}
 @media(min-width:900px){main{padding:22px}.g{gap:16px}}
 @media print{header,nav,.b,.x-btn{display:none!important}body{background:#fff;color:#000}}
+
+/* ===== v4 : rattrapage/bilan, calendrier, about, i18n (AR/RTL), son ===== */
+html[dir="rtl"]{direction:rtl}
+html[dir="rtl"] body{font-family:'Segoe UI',Tahoma,system-ui,sans-serif}
+html[dir="rtl"] .cl[style*="border-left"]{border-left:0!important}
+.rat{display:flex;gap:8px;align-items:center;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:8px;margin:6px 0;font-size:12px}
+.dark .rat{background:#78350f26;border-color:#b45309}
+.rat input{margin:0;padding:6px;width:80px}
+.badge-ok{display:inline-block;background:var(--ok);color:#fff;border-radius:8px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:4px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .cw{text-align:center;font-size:10px;font-weight:800;color:var(--mu);padding:4px 0}
+.cal .cd{aspect-ratio:1;border-radius:10px;background:var(--in);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;cursor:pointer;position:relative}
+.cal .cd.today{box-shadow:0 0 0 2px var(--br)}
+.cal .cd.has::after{content:"";position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--ac,var(--br))}
+.cal .cd.off{opacity:.3;pointer-events:none}
+.about a{display:inline-flex;align-items:center;gap:6px;margin:0 10px 6px 0;color:var(--br);text-decoration:none;font-weight:700}
+.sheet{text-align:left;white-space:pre-wrap;font-size:13px;line-height:1.6;max-height:50vh;overflow-y:auto;background:var(--in);border-radius:14px;padding:12px}
+.cl.live{box-shadow:0 0 0 2px #f59e0b}
 </style>
 </head>
 <body>
@@ -146,6 +164,7 @@ h4{color:var(--mu);font-weight:800}
   <button data-t="po"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg></span>Focus</button>
   <button data-a="set"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3h0a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9v0a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></span>Plus</button>
 </nav>
+<input type="file" id="fcf" accept=".json,application/json" hidden>
 <dialog id="dlg"></dialog>
 <div id="ts" aria-live="polite"></div>
 
@@ -164,8 +183,34 @@ const aiKey=p=>localStorage.getItem('eduVault_aiKey_'+p)||(p==='gemini'?localSto
 const aiModel=p=>{const m=localStorage.getItem('eduVault_aiModel_'+p);return(!m||m==='gemini-2.5-flash')?AI[p].model:m};
 const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.';
 const CLIENT_ID='786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com';
+const LANGK='eduVault_lang';
+const LANG=()=>localStorage.getItem(LANGK)||'fr';
+const I18N={
+ 'Auj.':'اليوم','Horaires':'الجدول','Agenda':'المهام','Cours':'الدروس','Fiches':'البطاقات','Quiz':'اختبار','Focus':'تركيز','Plus':'المزيد','Rechercher...':'بحث...',
+ 'Emploi du temps':'جدول الحصص','Examens & Devoirs':'الامتحانات والواجبات','Modules & Cours':'المواد والدروس','Active Recall':'المراجعة النشطة',
+ '+ Séance':'+ حصة','+ Ajouter':'+ إضافة','+ Créer':'+ إنشاء','+ Module':'+ مادة','Fermer':'إغلاق','Annuler':'إلغاء','OK':'موافق','Modifier':'تعديل','Supprimer':'حذف',
+ 'Aucune séance':'لا توجد حصة','Aucune échéance':'لا توجد مواعيد','Tous':'الكل','Examens':'امتحانات','Devoirs':'واجبات',
+ '⚙️ Réglages':'⚙️ الإعدادات','Couleur du thème':'لون الواجهة','Apparence':'المظهر','Niveau actuel':'المستوى الحالي','Semestre en cours':'الفصل الحالي',
+ "Semaine actuelle (l'alternance A/B est automatique)":'الأسبوع الحالي (A/B تلقائي)','Vacances & jours chômés (du / au)':'العطل (من / إلى)',
+ '☁️ Sauvegarde Google Drive':'☁️ النسخ الاحتياطي على Google Drive','📅 Export .ics':'📅 تصدير .ics','⬇ Exporter':'⬇ تصدير','⬆ Importer':'⬆ استيراد',
+ 'Afficher aussi les anciens semestres (archives)':'إظهار الفصول القديمة أيضا (أرشيف)','Langue':'اللغة',
+ '🎓 Bienvenue sur EduVault':'🎓 مرحبا بك في EduVault','Sélectionnez votre niveau actuel :':'اختر مستواك الحالي:',
+ 'ℹ️ À propos':'ℹ️ حول التطبيق','Rattrapage':'الاستدراك','Note du rattrapage':'نقطة الاستدراك','Admis après rattrapage':'ناجح بعد الاستدراك',
+ '📊 Bilan annuel':'📊 الحصيلة السنوية','💬 Explique-moi':'💬 اشرح لي','🧾 Résumer':'🧾 لخّص','📅 Calendrier':'📅 التقويم','📋 Liste':'📋 قائمة',
+ '📤 Export fiches':'📤 تصدير البطاقات','📥 Import fiches':'📥 استيراد البطاقات','🔔 Son des alertes':'🔔 صوت التنبيهات',
+ 'Validé':'ناجح','Non validé':'غير ناجح','Moyenne combinée':'المعدل المشترك',
+ 'Rappel avant les cours':'تذكير قبل الحصص'
+};
+const tr=s=>LANG()==='ar'&&I18N[s]!=null?I18N[s]:s;
+function applyNavLang(){
+  const map={da:'Auj.',tt:'Horaires',ag:'Agenda',mo:'Cours',fc:'Fiches',qz:'Quiz',po:'Focus'};
+  document.querySelectorAll('#nav [data-t]').forEach(b=>{const tn=[...b.childNodes].find(n=>n.nodeType===3);if(tn)tn.nodeValue=tr(map[b.dataset.t])});
+  const sb=document.querySelector('#nav [data-a="set"]');if(sb){const tn=[...sb.childNodes].find(n=>n.nodeType===3);if(tn)tn.nodeValue=tr('Plus')}
+  const sq=$('sq');if(sq)sq.placeholder=tr('Rechercher...');
+}
+function setLang(l){localStorage.setItem(LANGK,l);document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';applyNavLang();render();settings()}
 let A={activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[],quizQs:[],quizHist:[]};
-let tab='da',fcAll=false,filt='all',cardMod='all',q='',cur={},tok=null,tc=null;
+let tab='da',fcAll=false,filt='all',cardMod='all',q='',cur={},tok=null,tc=null,fcTarget=null,agView='list',calMonth=new Date();
 
 /* ---------- utils ---------- */
 const uid=p=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -179,7 +224,20 @@ const curIds=()=>new Set(A.modules.filter(m=>m.semester===curSem()).map(m=>m.id)
 const mods=()=>A.modules.filter(m=>m.semester===A.activeSemester);
 const modName=id=>A.modules.find(m=>m.id===id)?.name||'?';
 function toast(m,t=''){const e=document.createElement('div');e.className=t;e.textContent=m;$('ts').append(e);setTimeout(()=>e.remove(),3500)}
-function notify(t,b){try{if(window.Notification&&Notification.permission==='granted')new Notification(t,{body:b})}catch(e){}toast(t+' : '+b);try{navigator.vibrate([200,100,200])}catch(e){}}
+function beep(n=3){if(localStorage.getItem('eduVault_sound')==='0')return;try{const Ctx=window.AudioContext||window.webkitAudioContext,ctx=new Ctx();let tm=ctx.currentTime;
+  for(let i=0;i<n;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;o.connect(g);g.connect(ctx.destination);
+    g.gain.setValueAtTime(.0001,tm);g.gain.exponentialRampToValueAtTime(.3,tm+.02);g.gain.exponentialRampToValueAtTime(.0001,tm+.25);o.start(tm);o.stop(tm+.3);tm+=.35}
+  setTimeout(()=>ctx.close().catch(()=>{}),n*400+300)}catch(e){}}
+async function notify(t,b,taskId){
+  beep();toast(t+' : '+b);try{navigator.vibrate([200,100,200])}catch(e){}
+  try{
+    if(!window.Notification||Notification.permission!=='granted')return;
+    const reg=navigator.serviceWorker&&navigator.serviceWorker.controller&&await navigator.serviceWorker.getRegistration().catch(()=>null);
+    if(reg&&taskId)reg.showNotification(t,{body:b,tag:'task-'+taskId,data:{taskId},actions:[{action:'done',title:'✅ '+t_('Terminé')}]});
+    else new Notification(t,{body:b});
+  }catch(e){}
+}
+const t_=s=>s; /* alias local pour eviter un conflit de nom avec t() dans ce contexte */
 const L={};const lib=s=>L[s]||(L[s]=new Promise((ok,ko)=>{const e=document.createElement('script');e.src=s;e.onload=ok;e.onerror=()=>{delete L[s];ko(new Error('Chargement impossible (connexion ?)'))};document.head.append(e)}));
 function dlBlob(n,b){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.append(a);a.click();a.remove()}
 function shrink(f,max=800,qa=.6){return new Promise((ok,ko)=>{const r=new FileReader();r.onerror=ko;r.onload=()=>{const im=new Image();im.onerror=ko;im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',qa))};im.src=r.result};r.readAsDataURL(f)})}
@@ -193,7 +251,7 @@ function load(o){
   A.modules.forEach(m=>{
     m.resources=m.resources||[];m.absences=m.absences||0;m.pomo=m.pomo||0;m.color=m.color||'#2563eb';m.coeff=m.coeff||1;
     m.ccc=+m.ccc||0;m.ctp=+m.ctp||0;m.cex=m.cex==null?1:+m.cex;
-    m.ncc=m.ncc==null?null:+m.ncc;m.ntp=m.ntp==null?null:+m.ntp;m.nex=m.nex==null?null:+m.nex;
+    m.ncc=m.ncc==null?null:+m.ncc;m.ntp=m.ntp==null?null:+m.ntp;m.nex=m.nex==null?null:+m.nex;m.nrat=m.nrat==null?null:+m.nrat;
     if(m.grade!=null&&m.nex==null&&m.ncc==null&&m.ntp==null){m.nex=+m.grade;m.cex=1;m.ccc=0;m.ctp=0}
     delete m.grade;
   });
@@ -218,7 +276,7 @@ function ask(title,fields,ok){
     f.t==='select'?`<select name="${f.k}">${f.o.map(o=>`<option value="${esc(o[0])}"${o[0]==f.v?' selected':''}>${esc(o[1])}</option>`).join('')}</select>`:
     f.t==='textarea'?`<textarea name="${f.k}" rows="3"${f.r?' required':''}>${esc(f.v)}</textarea>`:
     `<input name="${f.k}" type="${f.t||'text'}" value="${esc(f.v)}"${f.r?' required':''}${f.a||''}>`}</label>`).join('')}
-    <div class="row"><button type="button" class="b" onclick="$('dlg').close()">Annuler</button><button class="b p">OK</button></div></form>`;
+    <div class="row"><button type="button" class="b" onclick="$('dlg').close()">${tr('Annuler')}</button><button class="b p">${tr('OK')}</button></div></form>`;
   d.querySelector('form').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.target);d.close();ok(Object.fromEntries(fd),fd)};
   d.oncancel=null;d.showModal();
 }
@@ -229,7 +287,12 @@ const pills=()=>`<div class="pills">${visSems().map(s=>`<button class="b${s===A.
 function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&new Date(t.dueDate)>n).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];if(!t)return'';const h=Math.floor((new Date(t.dueDate)-n)/36e5),d=Math.floor(h/24);return`<div class="up" data-a="goAg">⏰ ${t.type==='exam'?'Examen':'Devoir'} : ${esc(t.title)} (${d>0?'dans '+d+' j':h>0?'dans '+h+' h':'très bientôt'})</div>`}
 const modCol=id=>A.modules.find(m=>m.id===id)?.color||'var(--br)';
 const mAvg=m=>{let t=0,d=0;[['ncc','ccc'],['ntp','ctp'],['nex','cex']].forEach(([n,c])=>{if(m[n]!=null&&m[c]>0){t+=m[n]*m[c];d+=m[c]}});return d?t/d:null};
-function calcSem(){let t=0,c=0;mods().forEach(m=>{const a=mAvg(m);if(a!=null){t+=a*(m.coeff||1);c+=m.coeff||1}});return c?(t/c).toFixed(2):'-'}
+/* rattrapage : la note de rattrapage remplace la note d'examen si elle donne un meilleur resultat */
+function mAvgF(m){const o=mAvg(m);if(o==null||m.nrat==null||!(m.cex>0))return o;
+  let t=0,d=0;[['ncc','ccc'],['ntp','ctp']].forEach(([n,c])=>{if(m[n]!=null&&m[c]>0){t+=m[n]*m[c];d+=m[c]}});
+  t+=m.nrat*m.cex;d+=m.cex;const r=d?t/d:o;return Math.max(o,r)}
+function calcSem(){let t=0,c=0;mods().forEach(m=>{const a=mAvgF(m);if(a!=null){t+=a*(m.coeff||1);c+=m.coeff||1}});return c?(t/c).toFixed(2):'-'}
+function semAvgNum(sem){let t=0,c=0;A.modules.filter(m=>m.semester===sem).forEach(m=>{const a=mAvgF(m);if(a!=null){t+=a*(m.coeff||1);c+=m.coeff||1}});return c?t/c:null}
 
 let sT;function doSearch(){clearTimeout(sT);sT=setTimeout(doSearch2,140)}
 function doSearch2(){
@@ -258,35 +321,54 @@ function rDa(){
   </div>`;
 }
 function rTT(){
-  const wk=curWeek(),ids=mods().map(m=>m.id),tt=A.timetable.filter(c=>ids.includes(c.moduleId)&&(c.week==='all'||c.week===wk));
+  const nowD=new Date(),nowM=nowD.getHours()*60+nowD.getMinutes(),tmin=x=>{const[h,m]=x.split(':');return+h*60+ +m},wk=curWeek(),ids=mods().map(m=>m.id),tt=A.timetable.filter(c=>ids.includes(c.moduleId)&&(c.week==='all'||c.week===wk));
   const days=DAYS.filter((d,i)=>i<6||tt.some(c=>c.day===d));
-  return semBadge()+`<div class="top"><div><h2>Emploi du temps</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">+ Séance</button></div></div><div class="g">`+
+  return semBadge()+`<div class="top"><div><h2>${tr('Emploi du temps')}</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">${tr('+ Séance')}</button></div></div><div class="g">`+
   days.map(d=>`<div class="c${d===TOD()?' tod':''}"><h4>${d}${d===TOD()?' · aujourd’hui':''}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
     const n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
-    return`<div class="cl${n?' nt':''}" data-a="cls" data-i="${c.id}" style="border-left:4px solid ${modCol(c.moduleId)}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||'<p class="mu e">Aucune séance</p>')+'</div>').join('')+'</div>';
+    const live=c.day===TOD()&&!isHol(iso(nowD))&&nowM>=tmin(c.startTime)&&nowM<tmin(c.endTime);
+    return`<div class="cl${n?' nt':''}${live?' live':''}" data-a="cls" data-i="${c.id}" style="border-left:4px solid ${modCol(c.moduleId)}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}${live?' · En cours':''}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||`<p class="mu e">${tr('Aucune séance')}</p>`)+'</div>').join('')+'</div>';
 }
 function rAg(){
-  const ids=mods().map(m=>m.id),l=A.tasks.filter(t=>ids.includes(t.moduleId)&&(filt==='all'||t.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
-  return semBadge()+`<div class="top"><h2>Examens & Devoirs</h2><div><button class="b p" data-a="addTask">+ Ajouter</button></div></div><div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${f[1]}</button>`).join('')}</div>`+
-  (l.length?l.map(t=>`<div class="c t${t.type==='exam'?' x':''}${t.completed?' d':''}"><input type="checkbox" ${t.completed?'checked':''} data-a="done" data-i="${t.id}" aria-label="Terminé"><div><b>${t.type==='exam'?'🚨 ':'📝 '}${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))} • ${new Date(t.dueDate).toLocaleString('fr-FR')}</small></div><button class="x-btn" data-a="editTask" data-i="${t.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${t.id}" aria-label="Supprimer">🗑</button></div>`).join(''):'<p class="mu e">Aucune échéance</p>');
+  const ids=mods().map(m=>m.id),l=A.tasks.filter(x=>ids.includes(x.moduleId)&&(filt==='all'||x.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  const head=semBadge()+`<div class="top"><h2>${tr('Examens & Devoirs')}</h2><div><button class="b" data-a="agView">${agView==='cal'?tr('📋 Liste'):tr('📅 Calendrier')}</button><button class="b p" data-a="addTask">${tr('+ Ajouter')}</button></div></div>`;
+  if(agView==='cal')return head+rCal();
+  return head+`<div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${tr(f[1])}</button>`).join('')}</div>`+
+  (l.length?l.map(x=>`<div class="c t${x.type==='exam'?' x':''}${x.completed?' d':''}"><input type="checkbox" ${x.completed?'checked':''} data-a="done" data-i="${x.id}" aria-label="Terminé"><div><b>${x.type==='exam'?'🚨 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))} • ${new Date(x.dueDate).toLocaleString('fr-FR')}</small></div><button class="x-btn" data-a="editTask" data-i="${x.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${x.id}" aria-label="Supprimer">🗑</button></div>`).join(''):`<p class="mu e">${tr('Aucune échéance')}</p>`);
 }
+function rCal(){
+  const ids=mods().map(m=>m.id),m0=new Date(calMonth.getFullYear(),calMonth.getMonth(),1),today=iso(new Date());
+  const byDay={};A.tasks.filter(x=>ids.includes(x.moduleId)).forEach(x=>{const d=iso(x.dueDate);(byDay[d]=byDay[d]||[]).push(x)});
+  const lead=(m0.getDay()+6)%7,days=new Date(m0.getFullYear(),m0.getMonth()+1,0).getDate();
+  let cells=`<div class="top" style="margin:0 0 8px"><button class="b" data-a="calNav" data-i="-1">‹</button><b>${m0.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</b><button class="b" data-a="calNav" data-i="1">›</button></div><div class="cal">`;
+  cells+=['L','M','M','J','V','S','D'].map(d=>`<div class="cw">${d}</div>`).join('');
+  for(let i=0;i<lead;i++)cells+='<div class="cd off"></div>';
+  for(let d=1;d<=days;d++){const ds=iso(new Date(m0.getFullYear(),m0.getMonth(),d)),tx=byDay[ds]||[];
+    cells+=`<div class="cd${ds===today?' today':''}${tx.length?' has':''}" title="${esc(tx.map(x=>x.title).join(', '))}" data-a="calDay" data-i="${ds}">${d}</div>`}
+  cells+='</div>';
+  const sel=byDay[lastCalDay]||[];
+  return cells+(lastCalDay?`<h4 style="margin-top:14px">${new Date(lastCalDay+'T00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</h4>`+(sel.length?sel.map(x=>`<div class="c t${x.type==='exam'?' x':''}"><div><b>${x.type==='exam'?'🚨 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div></div>`).join(''):`<p class="mu e">${tr('Aucune échéance')}</p>`):'');
+}
+let lastCalDay=null;
 function mgrid(){
   const l=mods().filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
   return l.length?l.map(m=>{
-    const a=mAvg(m),av=a==null?'-':a.toFixed(2);
+    const a0=mAvg(m),a=mAvgF(m),av=a==null?'-':a.toFixed(2),passedByRat=a0!=null&&a0<10&&a!=null&&a>=10;
     const inp=(k,c,lab)=>`<label>${lab} (coef ${m[c]})<input type="number" min="0" max="20" step="0.25" placeholder="-" value="${m[k]!=null?m[k]:''}" ${m[c]>0?'':'disabled'} onchange="act.sNote('${m.id}','${k}',this.value)"></label>`;
-    return`<div class="c" style="border-left:4px solid ${esc(m.color||'#2563eb')}"><div class="top mh" style="margin:0"><div><small class="br">${m.semester} · coef ${m.coeff} · Absences : <span style="color:${m.absences>=3?'var(--er)':'inherit'}">${m.absences||0}</span></small><b>${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="abs" data-i="${m.id}|1" title="Ajouter une absence">🚫</button>${m.absences?`<button class="x-btn" data-a="abs" data-i="${m.id}|-1" title="Retirer une absence">➖</button>`:''}<button class="x-btn" data-a="aiFc" data-i="${m.id}" title="Fiches par IA">✨</button><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>
+    return`<div class="c" style="border-left:4px solid ${esc(m.color||'#2563eb')}"><div class="top mh" style="margin:0"><div><small class="br">${m.semester} · coef ${m.coeff} · Absences : <span style="color:${m.absences>=3?'var(--er)':'inherit'}">${m.absences||0}</span></small><b>${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="abs" data-i="${m.id}|1" title="Ajouter une absence">🚫</button>${m.absences?`<button class="x-btn" data-a="abs" data-i="${m.id}|-1" title="Retirer une absence">➖</button>`:''}<button class="x-btn" data-a="aiFc" data-i="${m.id}" title="Fiches par IA">✨</button><button class="x-btn" data-a="explainMod" data-i="${m.id}" title="${tr('💬 Explique-moi')}">💬</button><button class="x-btn" data-a="sumMod" data-i="${m.id}" title="${tr('🧾 Résumer')}">🧾</button><button class="x-btn" data-a="fcExport" data-i="${m.id}" title="${tr('📤 Export fiches')}">📤</button><button class="x-btn" data-a="fcImport" data-i="${m.id}" title="${tr('📥 Import fiches')}">📥</button><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>
     <div class="row" style="margin:6px 0;justify-content:space-between;align-items:center"><span class="chip" style="margin:0;font-weight:700${a==null?'':';background:'+(a>=10?'var(--ok)':'var(--er)')+';color:#fff'}">Moy : ${av}/20</span><button class="b" data-a="chhal" data-i="${m.id}" style="padding:4px 8px;font-size:11px">🎯 Note à viser</button></div>
+    ${passedByRat?`<span class="badge-ok">✅ ${tr('Admis après rattrapage')}</span>`:''}
+    ${a0!=null&&a0<10?`<div class="rat"><span>📘 ${tr('Rattrapage')}</span><input type="number" min="0" max="20" step="0.25" placeholder="-" value="${m.nrat!=null?m.nrat:''}" onchange="act.sRat('${m.id}',this.value)"><small class="mu">/20</small></div>`:''}
     <div class="n3">${inp('ncc','ccc','CC')}${inp('ntp','ctp','TP')}${inp('nex','cex','Examen')}</div>`+
     CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>`<div>${x.isLocal?`<button class="l" data-a="openRes" data-i="${esc(x.localFileId)}">📄 ${esc(x.title)}</button>`:`<a href="${esc(x.url)}" target="_blank" rel="noopener">🔗 ${esc(x.title)}</a>`}<button class="x-btn" data-a="delRes" data-i="${m.id}|${x.id}" aria-label="Supprimer">✕</button></div>`).join('')}</div>`}).join('')+'</div>'
   }).join(''):`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`;
 }
-function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>Modules & Cours</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b p" data-a="addMod">+ Module</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
+function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
 function rFc(){
   const t=Date.now(),ms=mods(),ids=ms.map(m=>m.id);
   const all=A.flashcards.filter(f=>ids.includes(f.moduleId)&&(cardMod==='all'||f.moduleId===cardMod));
   const l=fcAll?all:all.filter(f=>!f.nextRev||f.nextRev<=t);
-  return pills()+`<div class="top"><div><h2>Active Recall</h2><small class="br">${all.filter(f=>!f.nextRev||f.nextRev<=t).length} à réviser · ${all.length} au total</small></div><div><button class="b${fcAll?' p':''}" data-a="fcAll">${fcAll?'Toutes':'À réviser'}</button><button class="b p" data-a="addFc">+ Créer</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
+  return pills()+`<div class="top"><div><h2>${tr('Active Recall')}</h2><small class="br">${all.filter(f=>!f.nextRev||f.nextRev<=t).length} à réviser · ${all.length} au total</small></div><div><button class="b${fcAll?' p':''}" data-a="fcAll">${fcAll?'Toutes':'À réviser'}</button><button class="b p" data-a="addFc">${tr('+ Créer')}</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
   (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu" style="color:${modCol(f.moduleId)}">● ${esc(modName(f.moduleId))}</small><span><button class="x-btn" data-a="editFc" data-i="${f.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></span></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div><div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><div class="row" style="justify-content:center;margin:0"><button class="b" style="background:#fecaca;color:#991b1b" data-a="sm2" data-i="${f.id}|1">Difficile</button><button class="b" style="background:#bbf7d0;color:#166534" data-a="sm2" data-i="${f.id}|2">Correct</button><button class="b p" data-a="sm2" data-i="${f.id}|3">Facile</button></div></div></div></div>`).join(''):'<p class="mu e" style="grid-column:1/-1">'+(all.length?'Rien à réviser aujourd\'hui. Bravo !':'Aucune fiche pour ce semestre')+'</p>')+'</div>';
 }
 
@@ -318,6 +400,7 @@ function modForm(m){ask(m?'Modifier le module':'Nouveau module',[
 const needMod=()=>mods().length?false:(toast("Ajoutez d'abord un module pour ce semestre",'er'),true);
 const modOpts=()=>mods().map(m=>[m.id,m.name]);
 
+let AIOUT='';
 const act={
   sem:i=>{A.activeSemester=i;cardMod='all';qcfg.mod='all';upd()},
   flt:i=>{filt=i;render()},
@@ -377,6 +460,8 @@ const act={
     if(tok){await drvSync();return toast(drvErr||'Drive synchronisé ✔','ok')}
     try{await drvAuth();await drvSync();toast(drvErr||'Drive reconnecté ✔',drvErr?'er':'ok')}catch(e){toast('Reconnexion impossible ('+e.message+')','er')}},
   set:()=>settings(),
+  setLang:i=>setLang(i),
+  copyAI:()=>{navigator.clipboard&&navigator.clipboard.writeText(AIOUT).catch(()=>{});toast('Copié','ok')},
   addHol:()=>{const a=$('h1').value,b=$('h2').value||a;if(!a||b<a)return toast('Dates invalides','er');const d=new Date(a+'T00:00');for(let n=0;iso(d)<=b&&n<400;n++){const s=iso(d);if(!isHol(s))A.settings.holidays.push(s);d.setDate(d.getDate()+1)}upd();settings()},
   delHol:i=>{const[a,b]=i.split('|');A.settings.holidays=A.settings.holidays.filter(d=>d<a||d>b);upd();settings()},
   exp:()=>{dlBlob('EduVault_Sauvegarde_'+iso(new Date())+'.json',new Blob([JSON.stringify(A,null,2)],{type:'application/json'}));toast('Sauvegarde exportée','ok')},
@@ -504,6 +589,7 @@ Object.assign(act,{
   sgo:i=>{const[t,sm]=i.split('|');if(sm)A.activeSemester=sm;$('sq').value='';$('s-res').style.display='none';go(t)},
   fcAll:()=>{fcAll=!fcAll;render()},
   sNote:(id,k,v)=>{const m=A.modules.find(x=>x.id===id);if(m){m[k]=v===''?null:Math.min(20,Math.max(0,+v));upd()}},
+  sRat:(id,v)=>{const m=A.modules.find(x=>x.id===id);if(m){m.nrat=v===''?null:Math.min(20,Math.max(0,+v));upd()}},
   abs:i=>{const[id,d]=i.split('|'),m=A.modules.find(x=>x.id===id);if(m){m.absences=Math.max(0,(m.absences||0)+(+d));upd()}},
   chhal:i=>{const m=A.modules.find(x=>x.id===i);if(!m)return;
     if(!(m.cex>0))return toast("Le poids de l'examen est nul : modifiez le module",'er');
@@ -543,6 +629,29 @@ Object.assign(act,{
         'SUMMARY:'+ie(modName(c.moduleId)),'LOCATION:'+ie(c.room),'BEGIN:VALARM','TRIGGER:-PT30M','ACTION:DISPLAY','DESCRIPTION:Cours dans 30 min','END:VALARM','END:VEVENT')});
     L.push('END:VCALENDAR');
     dlBlob('EmploiDuTemps.ics',new Blob([L.join('\r\n')+'\r\n'],{type:'text/calendar'}));toast('Calendrier .ics exporté','ok')},
+  explainMod:id=>ask('💬 '+tr('Explique-moi')+' · '+modName(id),[{k:'txt',l:'Collez le passage à expliquer',t:'textarea',r:1}],v=>act.aiRun(id,v.txt,'explain')),
+  sumMod:id=>ask('🧾 '+tr('Résumer')+' · '+modName(id),[{k:'txt',l:'Collez le texte du cours (long texte ou copié depuis un PDF)',t:'textarea',r:1}],v=>act.aiRun(id,v.txt,'sum')),
+  aiRun:async(id,txt,kind)=>{
+    const prov=localStorage.getItem('eduVault_aiProv')||'gemini',key=aiKey(prov);
+    if(!key)return toast("Configurez d'abord l'IA : bouton ✨ IA dans Horaires",'er');
+    if(!txt||!txt.trim())return;
+    toast(kind==='sum'?'Résumé en cours...':'Explication en cours...');
+    const prompt=kind==='sum'
+      ?'Résume ce cours en français, sous forme de points clés (bullet points courts), pour une révision rapide avant un examen. Pas de markdown, juste des lignes commençant par "- ". Texte :\n'+txt.slice(0,16000)
+      :"Explique ce concept de façon simple et claire en français, comme à un débutant complet qui découvre juste la matière. Utilise un exemple concret si possible. Reste concis (200 mots max). Pas de markdown. Concept :\n"+txt.slice(0,8000);
+    try{
+      const raw=(await aiCall(prov,key,aiModel(prov),[],prompt)).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```/g,'').trim();
+      if(!raw)throw Error('réponse vide');
+      AIOUT=raw;const d=$('dlg');d.innerHTML=`<h3>${kind==='sum'?'🧾 '+tr('Résumer'):'💬 '+tr('Explique-moi')} · ${esc(modName(id))}</h3><div class="sheet">${esc(raw)}</div><div class="row"><button class="b" data-a="copyAI">📋 Copier</button><button class="b p" onclick="$('dlg').close()">${tr('Fermer')}</button></div>`;d.oncancel=null;d.showModal();
+    }catch(e){toast(e instanceof TypeError?'Connexion impossible (internet, Brave Shields, VPN)':'Erreur IA : '+e.message,'er')}},
+  fcExport:id=>{const m=A.modules.find(x=>x.id===id),cards=A.flashcards.filter(f=>f.moduleId===id).map(f=>({q:f.q,a:f.a}));
+    if(!cards.length)return toast('Aucune fiche à exporter dans ce module','er');
+    dlBlob('Fiches_'+(m?m.name:'module').replace(/[^\w\- ]+/g,'')+'.json',new Blob([JSON.stringify({app:'eduvault-deck',module:m?m.name:'',cards},null,2)],{type:'application/json'}));toast('Fiches exportées','ok')},
+  fcImport:id=>{fcTarget=id;$('fcf').click()},
+  bilan:()=>bilanDlg(),
+  agView:()=>{agView=agView==='cal'?'list':'cal';render()},
+  calNav:i=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+(+i),1);lastCalDay=null;render()},
+  calDay:i=>{lastCalDay=i;render()},
   setCid:()=>ask('Client ID Google (OAuth)',[{k:'cid',l:"Client ID (…apps.googleusercontent.com). L'adresse de cette page doit être une origine autorisée dans Google Cloud.",v:localStorage.getItem('eduVault_cid')||''}],v=>{
     v.cid.trim()?localStorage.setItem('eduVault_cid',v.cid.trim()):localStorage.removeItem('eduVault_cid');tc=null;tok=null;LS('eduVault_linked',null);LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();toast('Client ID enregistré. Reconnectez Drive.','ok')})
 });
@@ -561,15 +670,26 @@ function clsDlg(id){
 /* ---------- settings ---------- */
 function settings(){
   const d=$('dlg'),s=A.settings;
-  d.innerHTML=`<h3>⚙️ Réglages</h3><label>Couleur du thème</label><div class="row" style="justify-content:flex-start;margin:0 0 6px">${Object.entries(PALS).map(([k,v])=>`<button class="sw${(localStorage.getItem('eduPal')||'blue')===k?' sel':''}" data-a="pal" data-i="${k}" style="background:${v[1]}" aria-label="${v[0]}" title="${v[0]}"></button>`).join('')}</div><label>Apparence<select onchange="setMode(this.value)">${[['auto','Auto (comme le téléphone)'],['light','Clair'],['dark','Sombre']].map(o=>`<option value="${o[0]}"${getMode()===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label><label>Niveau actuel<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
-  <label>Semestre en cours<select onchange="chgSem(this.value)">${sems().map(x=>`<option${x===curSem()?' selected':''}>${x}</option>`).join('')}</select></label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${A.settings.showAll?'checked':''} onchange="chgAll(this.checked)"> Afficher aussi les anciens semestres (archives)</label>
-  <label>Semaine actuelle (l'alternance A/B est automatique)<select onchange="chgWk(this.value)"><option value="A"${curWeek()==='A'?' selected':''}>Semaine A</option><option value="B"${curWeek()==='B'?' selected':''}>Semaine B</option></select></label>
-  <label>Vacances & jours chômés (du / au)<span class="row" style="margin:4px 0 0"><input type="date" id="h1" aria-label="Du"><input type="date" id="h2" aria-label="Au"><button class="b p" data-a="addHol">+</button></span></label>
+  d.innerHTML=`<h3>${tr('⚙️ Réglages')}</h3><label>${tr('Langue')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px"><button class="b${LANG()==='fr'?' p':''}" data-a="setLang" data-i="fr">Français</button><button class="b${LANG()==='ar'?' p':''}" data-a="setLang" data-i="ar">العربية</button></div><label>${tr('Couleur du thème')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px">${Object.entries(PALS).map(([k,v])=>`<button class="sw${(localStorage.getItem('eduPal')||'blue')===k?' sel':''}" data-a="pal" data-i="${k}" style="background:${v[1]}" aria-label="${v[0]}" title="${v[0]}"></button>`).join('')}</div><label>${tr('Apparence')}<select onchange="setMode(this.value)">${[['auto','Auto (comme le téléphone)'],['light','Clair'],['dark','Sombre']].map(o=>`<option value="${o[0]}"${getMode()===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label><label>${tr('Niveau actuel')}<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
+  <label>${tr('Semestre en cours')}<select onchange="chgSem(this.value)">${sems().map(x=>`<option${x===curSem()?' selected':''}>${x}</option>`).join('')}</select></label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${A.settings.showAll?'checked':''} onchange="chgAll(this.checked)"> ${tr('Afficher aussi les anciens semestres (archives)')}</label>
+  <label>${tr('Rappel avant les cours')}<select onchange="localStorage.setItem('eduVault_clsRem',this.value)">${[0,5,10,15,30].map(v=>`<option value="${v}"${(+(localStorage.getItem('eduVault_clsRem')||10))===v?' selected':''}>${v?v+' min':'Désactivé'}</option>`).join('')}</select></label>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${localStorage.getItem('eduVault_sound')!=='0'?'checked':''} onchange="localStorage.setItem('eduVault_sound',this.checked?'1':'0')"> ${tr('🔔 Son des alertes')}</label>
+  <label>${tr("Semaine actuelle (l'alternance A/B est automatique)")}<select onchange="chgWk(this.value)"><option value="A"${curWeek()==='A'?' selected':''}>Semaine A</option><option value="B"${curWeek()==='B'?' selected':''}>Semaine B</option></select></label>
+  <label>${tr('Vacances & jours chômés (du / au)')}<span class="row" style="margin:4px 0 0"><input type="date" id="h1" aria-label="Du"><input type="date" id="h2" aria-label="Au"><button class="b p" data-a="addHol">+</button></span></label>
   <div>${ranges().map(r=>`<span class="chip">${r[0]===r[1]?r[0]:r[0]+' → '+r[1]}<button class="x-btn" data-a="delHol" data-i="${r[0]}|${r[1]}" aria-label="Supprimer">✕</button></span>`).join('')}</div>
-  <label>☁️ Sauvegarde Google Drive</label>
+  <label>${tr('☁️ Sauvegarde Google Drive')}</label>
   <div class="rs" style="margin:0 0 6px">${driveStatusHTML()}</div>
-  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="expics">📅 Export .ics</button><button class="b p" data-a="drive">${linked()?'Déconnecter Drive':'Activer la sauvegarde auto'}</button>${linked()?'<button class="b" data-a="dsave">⬆ Envoyer</button><button class="b" data-a="dload">⬇ Restaurer</button>':''}<button class="b" data-a="setCid" title="Client ID Google">🔑</button></div>
-  <div class="row"><button class="b" data-a="exp">⬇ Exporter</button><button class="b" data-a="imp">⬆ Importer</button><button class="b p" onclick="$('dlg').close()">Fermer</button></div><input type="file" id="jf" accept=".json,application/json" hidden>`;
+  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="expics">${tr('📅 Export .ics')}</button><button class="b p" data-a="drive">${linked()?'Déconnecter Drive':'Activer la sauvegarde auto'}</button>${linked()?'<button class="b" data-a="dsave">⬆ Envoyer</button><button class="b" data-a="dload">⬇ Restaurer</button>':''}<button class="b" data-a="setCid" title="Client ID Google">🔑</button></div>
+  <label>${tr('ℹ️ À propos')}</label>
+  <div class="rs about" style="margin:0 0 6px">
+    <div style="display:flex;flex-wrap:wrap">
+      <a href="https://discord.gg/VOTRE-INVITE-DISCORD" target="_blank" rel="noopener">💬 Discord</a>
+      <a href="https://www.linkedin.com/in/VOTRE-PROFIL-LINKEDIN" target="_blank" rel="noopener">🌐 LinkedIn</a>
+      <a href="https://buymeacoffee.com/VOTRE-PAGE" target="_blank" rel="noopener">☕ Soutenir le projet</a>
+    </div>
+    <small class="mu">EduVault — fait avec ❤ pour les étudiants. Bugs et suggestions : Discord.</small>
+  </div>
+  <div class="row"><button class="b" data-a="exp">${tr('⬇ Exporter')}</button><button class="b" data-a="imp">${tr('⬆ Importer')}</button><button class="b p" onclick="$('dlg').close()">${tr('Fermer')}</button></div><input type="file" id="jf" accept=".json,application/json" hidden>`;
   $('jf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||!Array.isArray(o.modules))throw 0;if(!confirm('Remplacer toutes vos données par cette sauvegarde ?'))return;load(o);upd();$('dlg').close();toast('Sauvegarde restaurée','ok')}catch(x){toast('Format JSON invalide','er')}};r.readAsText(f)};
   d.oncancel=null;if(!d.open)d.showModal();
 }
@@ -577,6 +697,20 @@ function chgLvl(l){A.settings.level=l;A.activeSemester=A.settings.curSem=LV[l][0
 function chgSem(v){A.settings.curSem=v;A.activeSemester=v;upd();settings()}
 function chgAll(c){A.settings.showAll=c;if(!visSems().includes(A.activeSemester))A.activeSemester=curSem();upd();settings()}
 function chgWk(w){A.settings.currentWeek=w;A.settings.weekRef=iso(monday(new Date()));upd()}
+function bilanDlg(){
+  const lvl=A.settings.level||'CP1',S=LV[lvl]||LV.CP1,pairs=[];
+  for(let i=0;i<S.length;i+=2)pairs.push(S.slice(i,i+2));
+  const rows=pairs.map(p=>{
+    const avgs=p.map(semAvgNum),known=avgs.filter(a=>a!=null);
+    if(!known.length)return{p,txt:'—',ok:null};
+    let tt=0,cc=0;p.forEach(s=>A.modules.filter(m=>m.semester===s).forEach(m=>{const a=mAvgF(m);if(a!=null){tt+=a*(m.coeff||1);cc+=m.coeff||1}}));
+    const v=cc?tt/cc:null;return{p,v,avgs,ok:v!=null?v>=10:null}
+  });
+  const d=$('dlg');
+  d.innerHTML=`<h3>📊 ${tr('Bilan annuel')} · ${esc(lvl)}</h3>`+rows.map(r=>`<div class="rs" style="margin-top:8px"><b>${r.p.join(' + ')}</b><small class="mu">${r.avgs?r.p.map((s,i)=>s+' : '+(r.avgs[i]!=null?r.avgs[i].toFixed(2):'-')).join('  ·  '):''}</small>${r.v!=null?`<small><b>${tr('Moyenne combinée')} : ${r.v.toFixed(2)}/20</b></small><span class="badge-ok" style="background:${r.ok?'var(--ok)':'var(--er)'}">${r.ok?'✅ '+tr('Validé'):'❌ '+tr('Non validé')}</span>`:'<small class="mu">Pas encore de notes</small>'}</div>`).join('')+
+    `<div class="row"><button class="b p" onclick="$('dlg').close()">${tr('Fermer')}</button></div>`;
+  d.oncancel=null;d.showModal();
+}
 
 /* ---------- local files (IndexedDB) ---------- */
 let db;const idb=()=>db?Promise.resolve(db):new Promise((ok,ko)=>{const r=indexedDB.open('EduVaultLocalFiles',1);r.onupgradeneeded=()=>r.result.createObjectStore('files',{keyPath:'id'});r.onsuccess=()=>ok(db=r.result);r.onerror=()=>ko(r.error)});
@@ -747,9 +881,12 @@ function drvBoot(){
 /* ---------- reminders / drive UI / boot ---------- */
 const fired=new Set();
 function chk(){const n=new Date();A.tasks.filter(t=>!t.completed).forEach(t=>{const d=new Date(t.dueDate)-n;
-  if(d>0&&d<=36e5&&!fired.has(t.id+'h')){fired.add(t.id+'h');notify('Rappel : '+t.title,"Échéance dans moins d'une heure !")}
-  if(d>36e5&&d<=864e5&&n.getHours()>=18&&!fired.has(t.id+'d')){fired.add(t.id+'d');notify('Demain : '+t.title,'Révisez ce soir !')}})}
-function onboard(){const d=$('dlg');d.innerHTML=`<h3>🎓 Bienvenue sur EduVault</h3><p class="mu">Sélectionnez votre niveau actuel :</p><div class="g" style="grid-template-columns:1fr 1fr;margin-top:12px">${Object.keys(LV).map(l=>`<button class="b" data-a="lvl" data-i="${l}">${l}<small class="mu">${LV[l].join(' & ')}</small></button>`).join('')}</div>`;d.oncancel=e=>e.preventDefault();d.showModal()}
+  if(d>0&&d<=36e5&&!fired.has(t.id+'h')){fired.add(t.id+'h');notify('Rappel : '+t.title,"Échéance dans moins d'une heure !",t.id)}
+  if(d>36e5&&d<=864e5&&n.getHours()>=18&&!fired.has(t.id+'d')){fired.add(t.id+'d');notify('Demain : '+t.title,'Révisez ce soir !',t.id)}})}
+navigator.serviceWorker&&navigator.serviceWorker.addEventListener('message',e=>{
+  if(e.data&&e.data.type==='TASK_DONE'){const task=A.tasks.find(x=>x.id===e.data.id);if(task&&!task.completed){task.completed=true;upd();toast('Marqué comme terminé ✔','ok')}}
+});
+function onboard(){const d=$('dlg');d.innerHTML=`<h3>${tr('🎓 Bienvenue sur EduVault')}</h3><p class="mu">${tr('Sélectionnez votre niveau actuel :')}</p><div class="g" style="grid-template-columns:1fr 1fr;margin-top:12px">${Object.keys(LV).map(l=>`<button class="b" data-a="lvl" data-i="${l}">${l}<small class="mu">${LV[l].join(' & ')}</small></button>`).join('')}</div>`;d.oncancel=e=>e.preventDefault();d.showModal()}
 
 /* ---------- icônes (SVG, remplacent les emoji automatiquement) ---------- */
 const ICONS={
@@ -781,8 +918,11 @@ pin:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12
 palm:'<path d="M12 21V11M12 11c-1-4-4-5-7-4 2 .5 3.500 2 4 4M12 11c1-4 4-5 7-4-2 .5-3.500 2-4 4M12 11c-3-1-5.500 0-6.500 2.500M12 11c3-1 5.500 0 6.500 2.500"/>',
 key:'<circle cx="8" cy="14" r="4"/><path d="m11 11 8-8M16 6l3 3"/>',
 download:'<path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 20h14"/>',
+chat:'<path d="M4 5h16v11H8l-4 4z"/>',
+globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+receipt:'<path d="M5 2h14v20l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M8 7h8M8 11h8M8 15h5"/>',
 upload:'<path d="M12 20V9M7.5 13 12 8.500 16.500 13M5 4h14"/>'};
-const EMO={'🎓':'cap','🏠':'home','🗓':'calendar','📅':'calendar','🔔':'bell','📚':'book','🃏':'cards','🧠':'quiz','⏱':'timer','⚙':'sliders','☁':'cloud','🌓':'contrast','✨':'sparkles','📎':'clip','✏':'pencil','🗑':'trash','🚫':'ban','➖':'minus','✕':'x','🎯':'target','📝':'file','🚨':'alert','⚠':'alert','☀':'sun','📈':'chart','🔥':'flame','📍':'pin','🌴':'palm','🔑':'key','⬇':'download','⬆':'upload'};
+const EMO={'🎓':'cap','🏠':'home','🗓':'calendar','📅':'calendar','🔔':'bell','📚':'book','🃏':'cards','🧠':'quiz','⏱':'timer','⚙':'sliders','☁':'cloud','🌓':'contrast','✨':'sparkles','📎':'clip','✏':'pencil','🗑':'trash','🚫':'ban','➖':'minus','✕':'x','🎯':'target','📝':'file','🚨':'alert','⚠':'alert','☀':'sun','📈':'chart','🔥':'flame','📍':'pin','🌴':'palm','🔑':'key','⬇':'download','⬆':'upload','💬':'chat','🌐':'globe','🧾':'receipt','📊':'chart','☕':'cloud','📤':'upload','📥':'download'};
 const ic=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||''}</svg>`;
 const EMO_SRC='('+Object.keys(EMO).join('|')+')\uFE0F?',EMO_T=new RegExp(EMO_SRC),SKIPN=new Set(['SCRIPT','STYLE','TEXTAREA','OPTION','SELECT','INPUT','TITLE','svg']);
 function iconize(root){
@@ -798,12 +938,38 @@ function iconize(root){
  }).observe(document.body,{childList:true,subtree:true});}
 iconize(document.body);
 
+$('fcf').onchange=e=>{const f=e.target.files[0],target=fcTarget;if(!f||!target)return;const r=new FileReader();
+  r.onload=()=>{try{const o=JSON.parse(r.result),cards=Array.isArray(o)?o:Array.isArray(o.cards)?o.cards:null;
+    if(!cards)throw 0;let n=0;cards.forEach(c=>{if(c&&c.q&&c.a){A.flashcards.push(newCard({moduleId:target,q:String(c.q),a:String(c.a)}));n++}});
+    if(!n)throw 0;upd();toast(n+' fiches importées','ok')}catch(x){toast('Fichier de fiches invalide','er')}};
+  r.readAsText(f);e.target.value='';fcTarget=null};
+
+document.documentElement.lang=LANG();document.documentElement.dir=LANG()==='ar'?'rtl':'ltr';
 load();
-applyTheme();
+applyTheme();applyNavLang();
 drvBoot();go('da');
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw&&nw.addEventListener('statechange',()=>{
+      if(nw.state==='installed'&&navigator.serviceWorker.controller)showUpdateToast(reg)})});
+    setInterval(()=>reg.update().catch(()=>{}),6*60000);
+  }).catch(()=>{});
+  let swRefreshing=false;const hadCtrl=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(swRefreshing||!hadCtrl)return;swRefreshing=true;location.reload()});
+}
+function showUpdateToast(reg){
+  const e=document.createElement('div');e.style.cssText='cursor:pointer;pointer-events:auto';e.textContent='🔄 '+(LANG()==='ar'?'تحديث جديد متوفر، اضغط للتحديث!':'Mise à jour disponible, touchez pour actualiser.');
+  e.onclick=()=>{reg.waiting&&reg.waiting.postMessage({type:'SKIP_WAITING'})};$('ts').append(e);setTimeout(()=>e.remove(),20000);
+}
 if(!A.settings.level)onboard();
-setInterval(chk,6e4);chk();
+function chkCls(){
+  const mins=+(localStorage.getItem('eduVault_clsRem')||10);if(!mins)return;
+  const n=new Date();if(isHol(iso(n)))return;
+  const nm=n.getHours()*60+n.getMinutes(),ids=curIds(),k=iso(n);
+  A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&(c.week==='all'||c.week===curWeek())).forEach(c=>{
+    const[h,m]=c.startTime.split(':'),st=+h*60+ +m,key=k+c.id;
+    if(st-nm>0&&st-nm<=mins&&!fired.has(key)){fired.add(key);notify(modName(c.moduleId)+' · dans '+(st-nm)+' min','📍 '+(c.room||'')+' · '+c.startTime)}})}
+setInterval(()=>{chk();chkCls();if(!document.hidden&&(tab==='da'||tab==='tt'))render()},6e4);chk();chkCls();
 </script>
 </body>
 </html>
