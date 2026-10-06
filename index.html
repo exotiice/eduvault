@@ -142,6 +142,7 @@ html[dir="rtl"] .cl[style*="border-left"]{border-left:0!important}
 .about a{display:inline-flex;align-items:center;gap:6px;margin:0 10px 6px 0;color:var(--br);text-decoration:none;font-weight:700}
 .sheet{text-align:left;white-space:pre-wrap;font-size:13px;line-height:1.6;max-height:50vh;overflow-y:auto;background:var(--in);border-radius:14px;padding:12px}
 .cl.live{box-shadow:0 0 0 2px #f59e0b}
+.cl{color:var(--tx)}.cl b{color:var(--mc,inherit)}
 </style>
 </head>
 <body>
@@ -286,6 +287,9 @@ const semBadge=()=>`<div class="sbadge"><span>Semestre en cours</span><b>${curSe
 const pills=()=>`<div class="pills">${visSems().map(s=>`<button class="b${s===A.activeSemester?' p':''}${s===curSem()?' cur':''}" data-a="sem" data-i="${s}">${s}</button>`).join('')}</div>`;
 function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&new Date(t.dueDate)>n).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];if(!t)return'';const h=Math.floor((new Date(t.dueDate)-n)/36e5),d=Math.floor(h/24);return`<div class="up" data-a="goAg">⏰ ${t.type==='exam'?'Examen':'Devoir'} : ${esc(t.title)} (${d>0?'dans '+d+' j':h>0?'dans '+h+' h':'très bientôt'})</div>`}
 const modCol=id=>A.modules.find(m=>m.id===id)?.color||'var(--br)';
+const MPAL=['#2563eb','#059669','#7c3aed','#e11d48','#ea580c','#0d9488','#d97706','#4f46e5','#db2777','#0891b2','#65a30d','#9333ea'];
+const nextModColor=()=>MPAL[A.modules.length%MPAL.length];
+const tint=c=>`--mc:${c};background:color-mix(in srgb, ${c} 16%, var(--card));border:1px solid color-mix(in srgb, ${c} 35%, transparent);border-left:4px solid ${c}`;
 const mAvg=m=>{let t=0,d=0;[['ncc','ccc'],['ntp','ctp'],['nex','cex']].forEach(([n,c])=>{if(m[n]!=null&&m[c]>0){t+=m[n]*m[c];d+=m[c]}});return d?t/d:null};
 /* rattrapage : la note de rattrapage remplace la note d'examen si elle donne un meilleur resultat */
 function mAvgF(m){const o=mAvg(m);if(o==null||m.nrat==null||!(m.cex>0))return o;
@@ -314,8 +318,8 @@ function rDa(){
   const hist=A.quizHist,avgQ=hist.length?Math.round(hist.reduce((s,x)=>s+x.sc/x.n,0)/hist.length*100):null,focus=Math.round(A.modules.reduce((s,m)=>s+(m.pomo||0),0)/60);
   const gr=n.getHours()<12?'Bonjour':n.getHours()<18?'Bon après-midi':'Bonsoir';
   return `<div class="g"><div class="hero"><small>${gr} 👋 · ${n.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} · Sem. ${curWeek()}</small><b>${hol?'🌴 Vacances aujourd\'hui':nx?(tm(nx.startTime)<=nm?'En cours : ':'Prochain : ')+esc(modName(nx.moduleId)):'Plus de cours aujourd\'hui'}</b>${nx&&!hol?`<small>${esc(nx.startTime)} – ${esc(nx.endTime)} · 📍 ${esc(nx.room)}${tm(nx.startTime)>nm?' · dans '+fmtMin(tm(nx.startTime)-nm):''}</small>`:''}</div>
-  <div class="c tod"><h4>📚 Cours du jour</h4>${cls.map(c=>`<div class="cl" data-a="cls" data-i="${c.id}" style="border-left:4px solid ${modCol(c.moduleId)}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}</small></div>`).join('')||`<p class="mu e">${hol?'🌴 Vacances aujourd\'hui':'Aucun cours aujourd\'hui'}</p>`}</div>
-  <div class="c"><h4>⚠️ Échéances (7 jours)</h4>${due.map(x=>{const h=Math.floor((new Date(x.dueDate)-n)/36e5);return`<div class="cl" data-a="go" data-i="ag" style="border-left:4px solid ${modCol(x.moduleId)}"><small class="br">${h<0?'En retard':h<24?'Dans '+h+' h':'Dans '+Math.floor(h/24)+' j'}</small><b>${x.type==='exam'?'🚨':'📝'} ${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div>`}).join('')||'<p class="mu e">Rien dans les 7 jours</p>'}</div>
+  <div class="c tod"><h4>📚 Cours du jour</h4>${cls.map(c=>`<div class="cl" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}</small></div>`).join('')||`<p class="mu e">${hol?'🌴 Vacances aujourd\'hui':'Aucun cours aujourd\'hui'}</p>`}</div>
+  <div class="c"><h4>⚠️ Échéances (7 jours)</h4>${due.map(x=>{const h=Math.floor((new Date(x.dueDate)-n)/36e5);return`<div class="cl" data-a="go" data-i="ag" style="${tint(modCol(x.moduleId))}"><small class="br">${h<0?'En retard':h<24?'Dans '+h+' h':'Dans '+Math.floor(h/24)+' j'}</small><b>${x.type==='exam'?'🚨':'📝'} ${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div>`}).join('')||'<p class="mu e">Rien dans les 7 jours</p>'}</div>
   <div class="c"><h4>🧠 Réviser</h4><div class="e" style="padding:14px"><b style="font-size:30px;color:var(--br)">${nFc}</b><small class="mu">fiche(s) à réviser aujourd'hui</small></div><div class="row" style="justify-content:center"><button class="b" data-a="go" data-i="fc">🃏 Fiches</button><button class="b p" data-a="go" data-i="qz">🧠 Quiz</button></div></div>
   <div class="c"><h4>📈 Ma progression</h4><div class="st"><div><b>${qStreak()}🔥</b><small class="mu">série quiz</small></div><div><b>${avgQ==null?'-':avgQ+'%'}</b><small class="mu">score moyen</small></div><div><b>${focus}</b><small class="mu">min de focus</small></div></div></div>
   </div>`;
@@ -327,7 +331,7 @@ function rTT(){
   days.map(d=>`<div class="c${d===TOD()?' tod':''}"><h4>${d}${d===TOD()?' · aujourd’hui':''}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
     const n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
     const live=c.day===TOD()&&!isHol(iso(nowD))&&nowM>=tmin(c.startTime)&&nowM<tmin(c.endTime);
-    return`<div class="cl${n?' nt':''}${live?' live':''}" data-a="cls" data-i="${c.id}" style="border-left:4px solid ${modCol(c.moduleId)}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}${live?' · En cours':''}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||`<p class="mu e">${tr('Aucune séance')}</p>`)+'</div>').join('')+'</div>';
+    return`<div class="cl${n?' nt':''}${live?' live':''}" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}${live?' · En cours':''}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||`<p class="mu e">${tr('Aucune séance')}</p>`)+'</div>').join('')+'</div>';
 }
 function rAg(){
   const ids=mods().map(m=>m.id),l=A.tasks.filter(x=>ids.includes(x.moduleId)&&(filt==='all'||x.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
@@ -355,7 +359,7 @@ function mgrid(){
   return l.length?l.map(m=>{
     const a0=mAvg(m),a=mAvgF(m),av=a==null?'-':a.toFixed(2),passedByRat=a0!=null&&a0<10&&a!=null&&a>=10;
     const inp=(k,c,lab)=>`<label>${lab} (coef ${m[c]})<input type="number" min="0" max="20" step="0.25" placeholder="-" value="${m[k]!=null?m[k]:''}" ${m[c]>0?'':'disabled'} onchange="act.sNote('${m.id}','${k}',this.value)"></label>`;
-    return`<div class="c" style="border-left:4px solid ${esc(m.color||'#2563eb')}"><div class="top mh" style="margin:0"><div><small class="br">${m.semester} · coef ${m.coeff} · Absences : <span style="color:${m.absences>=3?'var(--er)':'inherit'}">${m.absences||0}</span></small><b>${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="abs" data-i="${m.id}|1" title="Ajouter une absence">🚫</button>${m.absences?`<button class="x-btn" data-a="abs" data-i="${m.id}|-1" title="Retirer une absence">➖</button>`:''}<button class="x-btn" data-a="aiFc" data-i="${m.id}" title="Fiches par IA">✨</button><button class="x-btn" data-a="explainMod" data-i="${m.id}" title="${tr('💬 Explique-moi')}">💬</button><button class="x-btn" data-a="sumMod" data-i="${m.id}" title="${tr('🧾 Résumer')}">🧾</button><button class="x-btn" data-a="fcExport" data-i="${m.id}" title="${tr('📤 Export fiches')}">📤</button><button class="x-btn" data-a="fcImport" data-i="${m.id}" title="${tr('📥 Import fiches')}">📥</button><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>
+    return`<div class="c" style="${tint(esc(m.color||'#2563eb'))}"><div class="top mh" style="margin:0"><div><small class="br">${m.semester} · coef ${m.coeff} · Absences : <span style="color:${m.absences>=3?'var(--er)':'inherit'}">${m.absences||0}</span></small><b style="color:${esc(m.color||'#2563eb')}">${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="abs" data-i="${m.id}|1" title="Ajouter une absence">🚫</button>${m.absences?`<button class="x-btn" data-a="abs" data-i="${m.id}|-1" title="Retirer une absence">➖</button>`:''}<button class="x-btn" data-a="aiFc" data-i="${m.id}" title="Fiches par IA">✨</button><button class="x-btn" data-a="explainMod" data-i="${m.id}" title="${tr('💬 Explique-moi')}">💬</button><button class="x-btn" data-a="sumMod" data-i="${m.id}" title="${tr('🧾 Résumer')}">🧾</button><button class="x-btn" data-a="fcExport" data-i="${m.id}" title="${tr('📤 Export fiches')}">📤</button><button class="x-btn" data-a="fcImport" data-i="${m.id}" title="${tr('📥 Import fiches')}">📥</button><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>
     <div class="row" style="margin:6px 0;justify-content:space-between;align-items:center"><span class="chip" style="margin:0;font-weight:700${a==null?'':';background:'+(a>=10?'var(--ok)':'var(--er)')+';color:#fff'}">Moy : ${av}/20</span><button class="b" data-a="chhal" data-i="${m.id}" style="padding:4px 8px;font-size:11px">🎯 Note à viser</button></div>
     ${passedByRat?`<span class="badge-ok">✅ ${tr('Admis après rattrapage')}</span>`:''}
     ${a0!=null&&a0<10?`<div class="rat"><span>📘 ${tr('Rattrapage')}</span><input type="number" min="0" max="20" step="0.25" placeholder="-" value="${m.nrat!=null?m.nrat:''}" onchange="act.sRat('${m.id}',this.value)"><small class="mu">/20</small></div>`:''}
@@ -392,7 +396,7 @@ function go(t){if(t!=='qz')qTimerStop();if(CURV.includes(t))A.activeSemester=cur
 function modForm(m){ask(m?'Modifier le module':'Nouveau module',[
   {k:'semester',l:'Semestre',t:'select',o:visSems().map(s=>[s,s]),v:m?.semester||A.activeSemester},
   {k:'name',l:'Nom du module',r:1,v:m?.name},{k:'prof',l:'Professeur (optionnel)',v:m?.prof},
-  {k:'color',l:'Couleur',t:'color',v:m?.color||'#2563eb'},
+  {k:'color',l:'Couleur du module',t:'color',v:m?.color||nextModColor()},
   {k:'coeff',l:'Coefficient du module (pour la moyenne du semestre)',t:'number',a:' min="0.5" step="0.5"',v:m?.coeff??1},
   {k:'ccc',l:'Poids du CC',t:'number',a:' min="0" step="0.5"',v:m?.ccc??0},{k:'ctp',l:'Poids du TP',t:'number',a:' min="0" step="0.5"',v:m?.ctp??0},{k:'cex',l:"Poids de l'examen",t:'number',a:' min="0" step="0.5"',v:m?.cex??1}],v=>{
   const o={semester:v.semester,name:v.name.trim(),prof:v.prof.trim(),color:v.color||'#2563eb',coeff:+v.coeff||1,ccc:+v.ccc||0,ctp:+v.ctp||0,cex:+v.cex||0};
@@ -772,7 +776,7 @@ async function aiImport(v,fd){
     let added=0;
     ss.forEach(s=>{const name=String(s.matiere).trim(),day=normDay(s.jour);
       let m=A.modules.find(x=>x.semester===A.activeSemester&&x.name.toLowerCase()===name.toLowerCase());
-      if(!m){m={id:uid('m'),semester:A.activeSemester,name,prof:s.prof||'',coeff:1,color:'#2563eb',ccc:0,ctp:0,cex:1,ncc:null,ntp:null,nex:null,absences:0,pomo:0,resources:[]};A.modules.push(m)}
+      if(!m){m={id:uid('m'),semester:A.activeSemester,name,prof:s.prof||'',coeff:1,color:nextModColor(),ccc:0,ctp:0,cex:1,ncc:null,ntp:null,nex:null,absences:0,pomo:0,resources:[]};A.modules.push(m)}
       if(!A.timetable.some(c=>c.moduleId===m.id&&c.day===day&&c.startTime===s.debut&&c.endTime===s.fin)){A.timetable.push({id:uid('c'),moduleId:m.id,day,week:'all',startTime:s.debut,endTime:s.fin,room:s.salle||'Salle'});added++}});
     upd();toast(added+' séances importées'+(added<ss.length?' ('+(ss.length-added)+' déjà présentes)':'')+' !','ok');
   }catch(e){toast(e instanceof TypeError?'Connexion impossible (internet, Brave Shields, VPN)':'Erreur IA : '+e.message,'er')}
