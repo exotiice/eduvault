@@ -143,6 +143,18 @@ html[dir="rtl"] .cl[style*="border-left"]{border-left:0!important}
 .sheet{text-align:left;white-space:pre-wrap;font-size:13px;line-height:1.6;max-height:50vh;overflow-y:auto;background:var(--in);border-radius:14px;padding:12px}
 .cl.live{box-shadow:0 0 0 2px #f59e0b}
 .cl{color:var(--tx)}.cl b{color:var(--mc,inherit)}
+
+/* ===== v7 : vue grille horaire ===== */
+.gridwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tgrid{display:grid;grid-template-columns:44px repeat(var(--nd),minmax(120px,1fr));min-width:calc(44px + var(--nd)*120px);position:relative}
+.tgrid .gh{grid-row:1;padding:6px 4px;text-align:center;font-size:11px;font-weight:800;color:var(--mu);position:sticky;top:0;background:var(--bg);z-index:2}
+.tgrid .gh.today{color:var(--br)}
+.tgrid .hourcol{grid-column:1;position:relative}
+.tgrid .hourlbl{position:absolute;right:4px;transform:translateY(-50%);font-size:10px;color:var(--mu);white-space:nowrap}
+.tgrid .daycol{grid-row:2;position:relative;border-left:1px solid var(--ln);background:repeating-linear-gradient(to bottom,transparent,transparent 59px,color-mix(in srgb,var(--ln) 70%,transparent) 60px)}
+.tgrid .ev{position:absolute;left:3px;right:3px;border-radius:10px;padding:5px 7px;overflow:hidden;font-size:10.5px;line-height:1.25;cursor:pointer;box-shadow:0 2px 6px -2px #0006}
+.tgrid .ev b{display:block;font-size:11px;white-space:normal}
+.tgrid .ev.live{box-shadow:0 0 0 2px #f59e0b}
 </style>
 </head>
 <body>
@@ -197,7 +209,7 @@ const I18N={
  'Afficher aussi les anciens semestres (archives)':'إظهار الفصول القديمة أيضا (أرشيف)','Langue':'اللغة',
  '🎓 Bienvenue sur EduVault':'🎓 مرحبا بك في EduVault','Sélectionnez votre niveau actuel :':'اختر مستواك الحالي:',
  'ℹ️ À propos':'ℹ️ حول التطبيق','Rattrapage':'الاستدراك','Note du rattrapage':'نقطة الاستدراك','Admis après rattrapage':'ناجح بعد الاستدراك',
- '📊 Bilan annuel':'📊 الحصيلة السنوية','💬 Explique-moi':'💬 اشرح لي','🧾 Résumer':'🧾 لخّص','📅 Calendrier':'📅 التقويم','📋 Liste':'📋 قائمة',
+ '📊 Bilan annuel':'📊 الحصيلة السنوية','💬 Explique-moi':'💬 اشرح لي','🧾 Résumer':'🧾 لخّص','📅 Calendrier':'📅 التقويم','📋 Liste':'📋 قائمة','🗓 Grille horaire':'🗓 جدول بالوقت','Cartes':'بطاقات','🎨 Varier les couleurs':'🎨 تلوين المواد',
  '📤 Export fiches':'📤 تصدير البطاقات','📥 Import fiches':'📥 استيراد البطاقات','🔔 Son des alertes':'🔔 صوت التنبيهات',
  'Validé':'ناجح','Non validé':'غير ناجح','Moyenne combinée':'المعدل المشترك',
  'Rappel avant les cours':'تذكير قبل الحصص'
@@ -212,6 +224,7 @@ function applyNavLang(){
 function setLang(l){localStorage.setItem(LANGK,l);document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';applyNavLang();render();settings()}
 let A={activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[],quizQs:[],quizHist:[]};
 let tab='da',fcAll=false,filt='all',cardMod='all',q='',cur={},tok=null,tc=null,fcTarget=null,agView='list',calMonth=new Date();
+let ttView=localStorage.getItem('eduVault_ttView')||'cards';
 
 /* ---------- utils ---------- */
 const uid=p=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -327,11 +340,35 @@ function rDa(){
 function rTT(){
   const nowD=new Date(),nowM=nowD.getHours()*60+nowD.getMinutes(),tmin=x=>{const[h,m]=x.split(':');return+h*60+ +m},wk=curWeek(),ids=mods().map(m=>m.id),tt=A.timetable.filter(c=>ids.includes(c.moduleId)&&(c.week==='all'||c.week===wk));
   const days=DAYS.filter((d,i)=>i<6||tt.some(c=>c.day===d));
-  return semBadge()+`<div class="top"><div><h2>${tr('Emploi du temps')}</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">${tr('+ Séance')}</button></div></div><div class="g">`+
+  const head=semBadge()+`<div class="top"><div><h2>${tr('Emploi du temps')}</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ttView">${ttView==='grid'?'📋 '+tr('Cartes'):'🗓 '+tr('Grille horaire')}</button><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">${tr('+ Séance')}</button></div></div>`;
+  if(ttView==='grid')return head+rTTGrid(tt,days,nowD,nowM,tmin);
+  return head+`<div class="g">`+
   days.map(d=>`<div class="c${d===TOD()?' tod':''}"><h4>${d}${d===TOD()?' · aujourd’hui':''}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
     const n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
     const live=c.day===TOD()&&!isHol(iso(nowD))&&nowM>=tmin(c.startTime)&&nowM<tmin(c.endTime);
     return`<div class="cl${n?' nt':''}${live?' live':''}" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}${live?' · En cours':''}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||`<p class="mu e">${tr('Aucune séance')}</p>`)+'</div>').join('')+'</div>';
+}
+
+/* Vue grille horaire (style agenda a colonnes, blocs colores positionnes selon l'heure) */
+function rTTGrid(tt,days,nowD,nowM,tmin){
+  if(!tt.length)return `<p class="mu e">${tr('Aucune séance')}</p>`;
+  let mn=Math.min(...tt.map(c=>tmin(c.startTime))),mx=Math.max(...tt.map(c=>tmin(c.endTime)));
+  mn=Math.floor(mn/60)*60-30;mx=Math.ceil(mx/60)*60+30;mn=Math.max(0,mn);mx=Math.min(24*60,mx);
+  const span=mx-mn,PX=56,H=span/60*PX;
+  let hours='';for(let h=Math.ceil(mn/60);h<=Math.floor(mx/60);h++)hours+=`<span class="hourlbl" style="top:${(h*60-mn)/span*H}px">${String(h).padStart(2,'0')}:00</span>`;
+  let cols='';
+  days.forEach(d=>{
+    let evs='';
+    tt.filter(c=>c.day===d).forEach(c=>{
+      const s=tmin(c.startTime),e=tmin(c.endTime),top=(s-mn)/span*H,h=Math.max(22,(e-s)/span*H),col=modCol(c.moduleId);
+      const live=d===TOD()&&!isHol(iso(nowD))&&nowM>=s&&nowM<e,n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
+      evs+=`<div class="ev${live?' live':''}" data-a="cls" data-i="${c.id}" style="top:${top}px;height:${h}px;${tint(col)}"><small class="br">${esc(c.startTime)}${h>34?'–'+esc(c.endTime):''}</small><b>${esc(modName(c.moduleId))}</b>${h>46?`<small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small>`:''}</div>`;
+    });
+    cols+=`<div class="daycol" style="height:${H}px">${evs}</div>`;
+  });
+  return `<div class="gridwrap"><div class="tgrid" style="--nd:${days.length}">`+
+    days.map(d=>`<div class="gh${d===TOD()?' today':''}">${d.slice(0,3)}${d===TOD()?' •':''}</div>`).join('')+
+    `<div class="hourcol" style="height:${H}px">${hours}</div>${cols}</div></div>`;
 }
 function rAg(){
   const ids=mods().map(m=>m.id),l=A.tasks.filter(x=>ids.includes(x.moduleId)&&(filt==='all'||x.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
@@ -367,7 +404,7 @@ function mgrid(){
     CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>`<div>${x.isLocal?`<button class="l" data-a="openRes" data-i="${esc(x.localFileId)}">📄 ${esc(x.title)}</button>`:`<a href="${esc(x.url)}" target="_blank" rel="noopener">🔗 ${esc(x.title)}</a>`}<button class="x-btn" data-a="delRes" data-i="${m.id}|${x.id}" aria-label="Supprimer">✕</button></div>`).join('')}</div>`}).join('')+'</div>'
   }).join(''):`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`;
 }
-function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
+function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="recolor" title="${tr('🎨 Varier les couleurs')}">🎨</button><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
 function rFc(){
   const t=Date.now(),ms=mods(),ids=ms.map(m=>m.id);
   const all=A.flashcards.filter(f=>ids.includes(f.moduleId)&&(cardMod==='all'||f.moduleId===cardMod));
@@ -654,6 +691,8 @@ Object.assign(act,{
   fcImport:id=>{fcTarget=id;$('fcf').click()},
   bilan:()=>bilanDlg(),
   agView:()=>{agView=agView==='cal'?'list':'cal';render()},
+  ttView:()=>{ttView=ttView==='grid'?'cards':'grid';localStorage.setItem('eduVault_ttView',ttView);render()},
+  recolor:()=>{if(!A.modules.length)return toast('Aucun module','er');if(!confirm('Attribuer une couleur différente à chaque module (tous semestres) ?'))return;A.modules.forEach((m,i)=>m.color=MPAL[i%MPAL.length]);upd();toast('Couleurs mises à jour ✔','ok')},
   calNav:i=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+(+i),1);lastCalDay=null;render()},
   calDay:i=>{lastCalDay=i;render()},
   setCid:()=>ask('Client ID Google (OAuth)',[{k:'cid',l:"Client ID (…apps.googleusercontent.com). L'adresse de cette page doit être une origine autorisée dans Google Cloud.",v:localStorage.getItem('eduVault_cid')||''}],v=>{
