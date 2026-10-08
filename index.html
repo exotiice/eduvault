@@ -144,17 +144,19 @@ html[dir="rtl"] .cl[style*="border-left"]{border-left:0!important}
 .cl.live{box-shadow:0 0 0 2px #f59e0b}
 .cl{color:var(--tx)}.cl b{color:var(--mc,inherit)}
 
-/* ===== v7 : vue grille horaire ===== */
+/* ===== v8 : vue grille horaire (flexbox, pas de CSS Grid -> pas de desalignement) ===== */
 .gridwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tgrid{display:grid;grid-template-columns:44px repeat(var(--nd),minmax(120px,1fr));min-width:calc(44px + var(--nd)*120px);position:relative}
-.tgrid .gh{grid-row:1;padding:6px 4px;text-align:center;font-size:11px;font-weight:800;color:var(--mu);position:sticky;top:0;background:var(--bg);z-index:2}
-.tgrid .gh.today{color:var(--br)}
-.tgrid .hourcol{grid-column:1;position:relative}
-.tgrid .hourlbl{position:absolute;right:4px;transform:translateY(-50%);font-size:10px;color:var(--mu);white-space:nowrap}
-.tgrid .daycol{grid-row:2;position:relative;border-left:1px solid var(--ln);background:repeating-linear-gradient(to bottom,transparent,transparent 59px,color-mix(in srgb,var(--ln) 70%,transparent) 60px)}
-.tgrid .ev{position:absolute;left:3px;right:3px;border-radius:10px;padding:5px 7px;overflow:hidden;font-size:10.5px;line-height:1.25;cursor:pointer;box-shadow:0 2px 6px -2px #0006}
-.tgrid .ev b{display:block;font-size:11px;white-space:normal}
-.tgrid .ev.live{box-shadow:0 0 0 2px #f59e0b}
+.tgrid2{display:flex;align-items:flex-start;min-width:max-content}
+.tgrid2 .gh2{height:26px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--mu);position:sticky;top:0;background:var(--bg);z-index:2;white-space:nowrap}
+.tgrid2 .gh2.today{color:var(--br)}
+.hourcol2{flex:none;width:46px}
+.hourcol2 .track{position:relative}
+.hourcol2 .hourlbl{position:absolute;right:4px;transform:translateY(-50%);font-size:10px;color:var(--mu);white-space:nowrap}
+.daycol2{flex:1 1 0;min-width:148px;border-left:1px solid var(--ln)}
+.daycol2 .track{position:relative;background:repeating-linear-gradient(to bottom,transparent,transparent 59px,color-mix(in srgb,var(--ln) 70%,transparent) 60px)}
+.tgrid2 .ev{position:absolute;left:3px;right:3px;border-radius:10px;padding:5px 7px;overflow:hidden;font-size:10.5px;line-height:1.25;cursor:pointer;box-shadow:0 2px 6px -2px #0006}
+.tgrid2 .ev b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:11px;margin:2px 0}
+.tgrid2 .ev.live{box-shadow:0 0 0 2px #f59e0b}
 </style>
 </head>
 <body>
@@ -349,26 +351,24 @@ function rTT(){
     return`<div class="cl${n?' nt':''}${live?' live':''}" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}${live?' · En cours':''}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small></div>`}).join('')||`<p class="mu e">${tr('Aucune séance')}</p>`)+'</div>').join('')+'</div>';
 }
 
-/* Vue grille horaire (style agenda a colonnes, blocs colores positionnes selon l'heure) */
+/* Vue grille horaire (flexbox : chaque jour contient son propre en-tete + sa piste,
+   donc l'alignement en-tete/colonne ne peut pas se decaler, contrairement a une grille CSS implicite) */
 function rTTGrid(tt,days,nowD,nowM,tmin){
   if(!tt.length)return `<p class="mu e">${tr('Aucune séance')}</p>`;
   let mn=Math.min(...tt.map(c=>tmin(c.startTime))),mx=Math.max(...tt.map(c=>tmin(c.endTime)));
-  mn=Math.floor(mn/60)*60-30;mx=Math.ceil(mx/60)*60+30;mn=Math.max(0,mn);mx=Math.min(24*60,mx);
-  const span=mx-mn,PX=56,H=span/60*PX;
-  let hours='';for(let h=Math.ceil(mn/60);h<=Math.floor(mx/60);h++)hours+=`<span class="hourlbl" style="top:${(h*60-mn)/span*H}px">${String(h).padStart(2,'0')}:00</span>`;
-  let cols='';
-  days.forEach(d=>{
+  mn=Math.max(0,Math.floor(mn/60)*60-30);mx=Math.min(24*60,Math.ceil(mx/60)*60+30);
+  const span=Math.max(60,mx-mn),PX=60,H=Math.round(span/60*PX);
+  let hours='';for(let h=Math.ceil(mn/60);h<=Math.floor(mx/60);h++)hours+=`<div class="hourlbl" style="top:${Math.round((h*60-mn)/span*H)}px">${String(h).padStart(2,'0')}:00</div>`;
+  const cols=days.map(d=>{
     let evs='';
-    tt.filter(c=>c.day===d).forEach(c=>{
-      const s=tmin(c.startTime),e=tmin(c.endTime),top=(s-mn)/span*H,h=Math.max(22,(e-s)/span*H),col=modCol(c.moduleId);
+    tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).forEach(c=>{
+      const s=tmin(c.startTime),e=tmin(c.endTime),top=Math.round((s-mn)/span*H),h=Math.max(26,Math.round((e-s)/span*H)),col=modCol(c.moduleId);
       const live=d===TOD()&&!isHol(iso(nowD))&&nowM>=s&&nowM<e,n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
-      evs+=`<div class="ev${live?' live':''}" data-a="cls" data-i="${c.id}" style="top:${top}px;height:${h}px;${tint(col)}"><small class="br">${esc(c.startTime)}${h>34?'–'+esc(c.endTime):''}</small><b>${esc(modName(c.moduleId))}</b>${h>46?`<small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small>`:''}</div>`;
+      evs+=`<div class="ev${live?' live':''}" data-a="cls" data-i="${c.id}" style="top:${top}px;height:${h}px;${tint(col)}"><small class="br">${esc(c.startTime)}${h>38?'–'+esc(c.endTime):''}${live?' · ●':''}</small><b>${esc(modName(c.moduleId))}</b>${h>56?`<small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small>`:''}</div>`;
     });
-    cols+=`<div class="daycol" style="height:${H}px">${evs}</div>`;
-  });
-  return `<div class="gridwrap"><div class="tgrid" style="--nd:${days.length}">`+
-    days.map(d=>`<div class="gh${d===TOD()?' today':''}">${d.slice(0,3)}${d===TOD()?' •':''}</div>`).join('')+
-    `<div class="hourcol" style="height:${H}px">${hours}</div>${cols}</div></div>`;
+    return `<div class="daycol2"><div class="gh2${d===TOD()?' today':''}">${d.slice(0,3)}${d===TOD()?' •':''}</div><div class="track" style="height:${H}px">${evs}</div></div>`;
+  }).join('');
+  return `<div class="gridwrap"><div class="tgrid2"><div class="hourcol2"><div class="gh2">&nbsp;</div><div class="track" style="height:${H}px">${hours}</div></div>${cols}</div></div>`;
 }
 function rAg(){
   const ids=mods().map(m=>m.id),l=A.tasks.filter(x=>ids.includes(x.moduleId)&&(filt==='all'||x.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
@@ -726,9 +726,8 @@ function settings(){
   <label>${tr('ℹ️ À propos')}</label>
   <div class="rs about" style="margin:0 0 6px">
     <div style="display:flex;flex-wrap:wrap">
-      <a href="https://discord.gg/VOTRE-INVITE-DISCORD" target="_blank" rel="noopener">💬 Discord</a>
-      <a href="https://www.linkedin.com/in/VOTRE-PROFIL-LINKEDIN" target="_blank" rel="noopener">🌐 LinkedIn</a>
-      <a href="https://buymeacoffee.com/VOTRE-PAGE" target="_blank" rel="noopener">☕ Soutenir le projet</a>
+      <a href="https://discord.gg/FzEymZsTGq" target="_blank" rel="noopener">💬 Discord</a>
+      <a href="https://www.linkedin.com/in/zakariae-rezine" target="_blank" rel="noopener">🌐 LinkedIn · Zakariae Rezine</a>
     </div>
     <small class="mu">EduVault — fait avec ❤ pour les étudiants. Bugs et suggestions : Discord.</small>
   </div>
