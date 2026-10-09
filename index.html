@@ -157,6 +157,9 @@ html[dir="rtl"] .cl[style*="border-left"]{border-left:0!important}
 .tgrid2 .ev{position:absolute;left:3px;right:3px;border-radius:10px;padding:5px 7px;overflow:hidden;font-size:10.5px;line-height:1.25;cursor:pointer;box-shadow:0 2px 6px -2px #0006}
 .tgrid2 .ev b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:11px;margin:2px 0}
 .tgrid2 .ev.live{box-shadow:0 0 0 2px #f59e0b}
+.av{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--br);color:#fff;font-size:12px;font-weight:800;line-height:1}
+.nudge{grid-column:1/-1;display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--bs);border:1px solid var(--br);border-radius:16px;padding:10px 12px;font-size:13px}
+#dlg .bad{min-height:1.2em;margin:4px 0 0}
 </style>
 </head>
 <body>
@@ -164,6 +167,7 @@ html[dir="rtl"] .cl[style*="border-left"]{border-left:0!important}
   <h1 data-a="go" data-i="da"><img class="logo" src="icon-192.png" alt="" width="32" height="32" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🎓'}))">EduVault</h1>
   <div class="s-bar"><input type="search" id="sq" placeholder="Rechercher..." oninput="doSearch()" aria-label="Rechercher"><div id="s-res"></div></div>
   <div style="display:flex;gap:6px;align-items:center">
+    <button class="b" id="ac" data-a="acct" title="Compte"><span id="acl">👤</span><span id="ad" style="display:none">●</span></button>
     <button class="b" id="dv" data-a="dh" title="Google Drive">☁️ <span id="dd">●</span></button>
     <button class="b" data-a="theme" title="Thème">🌓</button>
   </div>
@@ -190,7 +194,11 @@ const LV={CP1:['S1','S2'],CP2:['S3','S4'],CI1:['S5','S6'],CI2:['S7','S8'],CI3:['
 const ALLS=Object.values(LV).flat();
 const DAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const CATS=[['cours','📚 Cours'],['td','📝 TD / TP'],['examen','🎯 Examens'],['resume','⚡ Résumés']];
-const KEY='eduVaultData_vFinal3';
+const GUEST_KEY='eduVaultData_vFinal3';
+const acctInfo=()=>{try{return JSON.parse(localStorage.getItem('eduVault_acct')||'null')}catch(e){return null}};
+let UID=(acctInfo()||{}).uid||'';
+const keyFor=u=>u?'eduVault_u_'+u:GUEST_KEY;
+let KEY=keyFor(UID);
 const TOD=()=>DAYS[(new Date().getDay()+6)%7];
 const GEMINI_MODEL='gemini-3.8-flash'; /* verifie le nom actuel sur ai.google.dev/gemini-api/docs/models */
 const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'qwen/qwen3.8-27b'}}; /* modele vision : modifiable dans la fenetre d'import */
@@ -224,7 +232,9 @@ function applyNavLang(){
   const sq=$('sq');if(sq)sq.placeholder=tr('Rechercher...');
 }
 function setLang(l){localStorage.setItem(LANGK,l);document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';applyNavLang();render();settings()}
-let A={activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[],quizQs:[],quizHist:[]};
+const defaultA=()=>({activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[],quizQs:[],quizHist:[]});
+let A=defaultA();
+const resetA=()=>{Object.keys(A).forEach(k=>delete A[k]);Object.assign(A,defaultA())};
 let tab='da',fcAll=false,filt='all',cardMod='all',q='',cur={},tok=null,tc=null,fcTarget=null,agView='list',calMonth=new Date();
 let ttView=localStorage.getItem('eduVault_ttView')||'cards';
 
@@ -276,7 +286,7 @@ function load(o){
 }
 let svT=null;
 function flushSave(){clearTimeout(svT);svT=null;try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){toast('Stockage plein : supprimez des photos','er')}}
-function save(){A.updatedAt=Date.now();clearTimeout(svT);svT=setTimeout(flushSave,300);drvSchedule()}
+function save(){A.updatedAt=Date.now();clearTimeout(svT);svT=setTimeout(flushSave,300);drvSchedule();if(UID)fbSchedule()}
 addEventListener('pagehide',flushSave);document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSave()});
 function upd(){save();render()}
 
@@ -425,7 +435,8 @@ function ptick(){P.left=Math.max(0,Math.round((P.end-Date.now())/1000));ppaint()
 
 /* ---------- render ---------- */
 const R={da:rDa,tt:rTT,ag:rAg,mo:rMo,fc:rFc,qz:rQz,po:rPo};
-function render(){$('v').innerHTML=banner()+R[tab]();ppaint()}
+function acctNudge(){return(tab==='da'&&!UID&&!LS('eduVault_nudge'))?`<div class="g" style="margin-bottom:12px"><div class="nudge"><span>☁️ Crée un compte gratuit pour sauvegarder tes données et les retrouver sur tous tes appareils.</span><span style="display:flex;gap:6px"><button class="b p" data-a="acct">Créer</button><button class="b" data-a="nudgeOff" aria-label="Fermer">✕</button></span></div></div>`:''}
+function render(){$('v').innerHTML=banner()+acctNudge()+R[tab]();ppaint()}
 function go(t){if(t!=='qz')qTimerStop();if(CURV.includes(t))A.activeSemester=curSem();tab=t;document.querySelectorAll('#nav [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render();
   try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission()}catch(e){}}
 
@@ -492,6 +503,7 @@ const act={
     ask('Importation IA',[{k:'prov',l:'Fournisseur',t:'select',o:Object.keys(AI).map(k=>[k,AI[k].n]),v:p0},{k:'key',l:'Clé API (Gemini : aistudio.google.com/apikey · Groq : console.groq.com/keys)',t:'password',r:1,v:aiKey(p0)},{k:'model',l:'Modèle avec vision',r:1,v:aiModel(p0)},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport);
     const f=$('dlg').querySelector('form'),sel=f.elements.prov;sel.onchange=()=>{f.elements.key.value=aiKey(sel.value);f.elements.model.value=aiModel(sel.value)}},
   drive:async()=>{
+    if(UID)return toast('Ton compte EduVault synchronise déjà tes données.','ok');
     if(linked()){if(!confirm('Désactiver la sauvegarde automatique Google Drive sur cet appareil ?'))return;
       tok=null;clearTimeout(tokT);LS('eduVault_linked',null);LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();settings();return toast('Drive déconnecté')}
     try{toast('Connexion à Google Drive...');await drvAuth();toast('Connecté. Synchronisation...','ok');await drvSync();toast(drvErr||'Sauvegarde automatique activée ✔',drvErr?'er':'ok');settings()}
@@ -713,7 +725,7 @@ function clsDlg(id){
 /* ---------- settings ---------- */
 function settings(){
   const d=$('dlg'),s=A.settings;
-  d.innerHTML=`<h3>${tr('⚙️ Réglages')}</h3><label>${tr('Langue')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px"><button class="b${LANG()==='fr'?' p':''}" data-a="setLang" data-i="fr">Français</button><button class="b${LANG()==='ar'?' p':''}" data-a="setLang" data-i="ar">العربية</button></div><label>${tr('Couleur du thème')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px">${Object.entries(PALS).map(([k,v])=>`<button class="sw${(localStorage.getItem('eduPal')||'blue')===k?' sel':''}" data-a="pal" data-i="${k}" style="background:${v[1]}" aria-label="${v[0]}" title="${v[0]}"></button>`).join('')}</div><label>${tr('Apparence')}<select onchange="setMode(this.value)">${[['auto','Auto (comme le téléphone)'],['light','Clair'],['dark','Sombre']].map(o=>`<option value="${o[0]}"${getMode()===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label><label>${tr('Niveau actuel')}<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
+  d.innerHTML=`<h3>${tr('⚙️ Réglages')}</h3><div class="rs" style="display:block;margin-bottom:6px"><b>${UID?'👤 '+esc((acctInfo()||{}).email||''):'Mode invité'}</b><small class="mu">${UID?acctStatusTxt():'Tes données restent sur cet appareil. Crée un compte pour les sauvegarder et les retrouver sur tous tes appareils.'}</small></div><div class="row" style="justify-content:flex-start;margin:0 0 8px"><button class="b p" data-a="acct">${UID?'Gérer mon compte':'Se connecter / Créer un compte'}</button></div><label>${tr('Langue')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px"><button class="b${LANG()==='fr'?' p':''}" data-a="setLang" data-i="fr">Français</button><button class="b${LANG()==='ar'?' p':''}" data-a="setLang" data-i="ar">العربية</button></div><label>${tr('Couleur du thème')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px">${Object.entries(PALS).map(([k,v])=>`<button class="sw${(localStorage.getItem('eduPal')||'blue')===k?' sel':''}" data-a="pal" data-i="${k}" style="background:${v[1]}" aria-label="${v[0]}" title="${v[0]}"></button>`).join('')}</div><label>${tr('Apparence')}<select onchange="setMode(this.value)">${[['auto','Auto (comme le téléphone)'],['light','Clair'],['dark','Sombre']].map(o=>`<option value="${o[0]}"${getMode()===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label><label>${tr('Niveau actuel')}<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
   <label>${tr('Semestre en cours')}<select onchange="chgSem(this.value)">${sems().map(x=>`<option${x===curSem()?' selected':''}>${x}</option>`).join('')}</select></label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${A.settings.showAll?'checked':''} onchange="chgAll(this.checked)"> ${tr('Afficher aussi les anciens semestres (archives)')}</label>
   <label>${tr('Rappel avant les cours')}<select onchange="localStorage.setItem('eduVault_clsRem',this.value)">${[0,5,10,15,30].map(v=>`<option value="${v}"${(+(localStorage.getItem('eduVault_clsRem')||10))===v?' selected':''}>${v?v+' min':'Désactivé'}</option>`).join('')}</select></label>
   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${localStorage.getItem('eduVault_sound')!=='0'?'checked':''} onchange="localStorage.setItem('eduVault_sound',this.checked?'1':'0')"> ${tr('🔔 Son des alertes')}</label>
@@ -755,7 +767,7 @@ function bilanDlg(){
 }
 
 /* ---------- local files (IndexedDB) ---------- */
-let db;const idb=()=>db?Promise.resolve(db):new Promise((ok,ko)=>{const r=indexedDB.open('EduVaultLocalFiles',1);r.onupgradeneeded=()=>r.result.createObjectStore('files',{keyPath:'id'});r.onsuccess=()=>ok(db=r.result);r.onerror=()=>ko(r.error)});
+let db;const idb=()=>db?Promise.resolve(db):new Promise((ok,ko)=>{const r=indexedDB.open('EduVaultLocalFiles'+(UID?'_'+UID:''),1);r.onupgradeneeded=()=>r.result.createObjectStore('files',{keyPath:'id'});r.onsuccess=()=>ok(db=r.result);r.onerror=()=>ko(r.error)});
 const fst=async(m,...a)=>{const d=await idb();return new Promise((ok,ko)=>{const t=d.transaction('files',m==='get'?'readonly':'readwrite'),r=t.objectStore('files')[m](...a);t.oncomplete=()=>ok(r.result);t.onerror=()=>ko(t.error)})};
 
 /* ---------- AI import ---------- */
@@ -824,13 +836,13 @@ async function aiImport(v,fd){
 const GAPI='https://www.googleapis.com/',DFILE='EduVault_backup.json',SCOPE='https://www.googleapis.com/auth/drive.file';
 let tokT=null,drvBusy=false,drvQueued=false,drvErr='',syncT=null,armed=false;
 const LS=(k,v)=>v===undefined?localStorage.getItem(k):v===null?localStorage.removeItem(k):localStorage.setItem(k,v);
-const linked=()=>LS('eduVault_linked')==='1',lastTs=()=>+LS('eduVault_syncTs')||0;
+const linked=()=>LS('eduVault_linked')==='1'&&!UID,lastTs=()=>+LS('eduVault_syncTs')||0;
 const dstate=()=>tok?(drvBusy?'busy':'ok'):linked()?'wait':'off';
 const hasData=()=>!!(A.modules.length||A.tasks.length||A.flashcards.length||A.timetable.length||A.quizHist.length);
 function paintDrive(){const st=dstate(),e=$('dd'),b=$('dv');
   if(e)e.style.color={ok:'#10b981',busy:'#3b82f6',wait:'#f59e0b',off:'#ef4444'}[st];
   if(b)b.title={ok:'Drive : synchronisé',busy:'Drive : synchronisation...',wait:'Drive : reconnexion au prochain toucher',off:'Drive : non connecté'}[st]}
-function driveStatusHTML(){const st=dstate(),ts=lastTs();
+function driveStatusHTML(){if(UID)return '<b>Remplacé par ton compte EduVault</b><small class="mu">Ton compte synchronise déjà tes données sur tous tes appareils.</small>';const st=dstate(),ts=lastTs();
   return `<b>${{ok:'🟢 Connecté · sauvegarde automatique active',busy:'🔵 Synchronisation en cours...',wait:'🟠 Lié à Drive · reconnexion automatique au prochain toucher',off:'🔴 Non connecté'}[st]}</b>${ts?`<small class="mu">Dernière synchronisation : ${new Date(ts).toLocaleString('fr-FR')}</small>`:''}${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Modules, horaires, devoirs, fiches, quiz, notes et fichiers locaux sont envoyés automatiquement.</small>`}
 
 function drvAuth(){
@@ -920,6 +932,164 @@ function drvBoot(){
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&tok&&(A.updatedAt||0)>lastTs())drvSync()});
 }
 
+/* ---------- Comptes EduVault (Firebase Auth + Firestore) ---------- */
+const FB_CFG={apiKey:"AIzaSyBD3n4Bg6XxTBoi4KL7iL5-NeBHpYWpsg8",authDomain:"eduvault-22224.firebaseapp.com",projectId:"eduvault-22224",storageBucket:"eduvault-22224.firebasestorage.app",messagingSenderId:"566849218980",appId:"1:566849218980:web:104b65763b02f8d6973931"};
+const FB_URL=n=>'https://www.gstatic.com/firebasejs/10.12.2/firebase-'+n+'-compat.js',CH_SZ=300000;
+let fb=null,fbUser=null,fbBusy=false,fbQ=false,fbErr='',fbUnsub=null,fbT=null,fbReady=null,wipeNext=null,intentional=false,acMode='in',acEmail='';
+const fbTsKey=()=>'eduVault_fbTs_'+UID,fbHKey=()=>'eduVault_fbH_'+UID;
+const FBM={'auth/invalid-email':'Email invalide','auth/email-already-in-use':'Cet email a déjà un compte : connecte-toi','auth/weak-password':'Mot de passe trop faible (8 caractères minimum)','auth/invalid-credential':'Email ou mot de passe incorrect','auth/wrong-password':'Mot de passe incorrect','auth/user-not-found':'Aucun compte avec cet email','auth/too-many-requests':'Trop de tentatives : réessaie dans quelques minutes','auth/network-request-failed':'Pas de connexion internet','auth/requires-recent-login':'Reconnecte-toi puis réessaie','auth/user-disabled':'Ce compte est désactivé','permission-denied':"Accès refusé : les règles Firestore doivent être mises à jour",unavailable:'Serveur indisponible, nouvelle tentative automatique'};
+const fbMsg=e=>FBM[e&&e.code]||(e instanceof TypeError?'Pas de connexion internet':(e&&e.message)||'Erreur inconnue');
+const hash=str=>{let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)+str.length};
+const guestData=()=>{try{const o=JSON.parse(localStorage.getItem(GUEST_KEY)||'null');return o&&Array.isArray(o.modules)&&(o.modules.length||(o.timetable||[]).length)?o:null}catch(e){return null}};
+const closeOnboard=()=>{const d=$('dlg');if(d.open&&d.querySelector('[data-a=lvl]'))d.close()};
+const acctStatusTxt=()=>fbErr?'⚠️ '+fbErr:fbBusy?'Synchronisation...':(+LS('eduVault_fbLast')?'Synchronisé à '+new Date(+LS('eduVault_fbLast')).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'En attente de connexion...');
+function paintAcct(){
+  const l=$('acl'),d=$('ad'),b=$('ac');if(!l)return;const em=(acctInfo()||{}).email||'';
+  if(UID){l.textContent=(em[0]||'?').toUpperCase();l.className='av';d.style.display='';d.style.color=fbErr?'#f59e0b':fbBusy?'#3b82f6':fbUser?'#10b981':'#f59e0b';b.title=em+' · '+acctStatusTxt()}
+  else{l.className='';l.textContent='👤';d.style.display='none';b.title='Compte / Connexion'}
+  const dv=$('dv');if(dv)dv.style.display=UID?'none':'';
+}
+function fbLoad(){
+  if(fbReady)return fbReady;
+  fbReady=(async()=>{
+    await lib(FB_URL('app'));await lib(FB_URL('auth'));await lib(FB_URL('firestore'));
+    if(!firebase.apps.length)firebase.initializeApp(FB_CFG);
+    fb={auth:firebase.auth(),db:firebase.firestore()};try{fb.db.settings({ignoreUndefinedProperties:true})}catch(e){}
+    fb.auth.onAuthStateChanged(onAuth);return fb})().catch(e=>{fbReady=null;throw e});
+  return fbReady}
+async function switchUser(uid,email){
+  const leaving=UID,wiping=!!leaving&&wipeNext===leaving;
+  if(!wiping)flushSave();
+  UID=uid;KEY=keyFor(uid);db=null;
+  if(wiping){wipeLocal(leaving);wipeNext=null}
+  if(uid)localStorage.setItem('eduVault_acct',JSON.stringify({uid,email}));else localStorage.removeItem('eduVault_acct');
+  fbErr='';resetA();load();
+  if(!A.settings.level)onboard();else closeOnboard();
+  render();paintAcct();
+}
+async function onAuth(user){
+  if(user){
+    fbUser=user;
+    if(UID!==user.uid)await switchUser(user.uid,user.email);
+    else localStorage.setItem('eduVault_acct',JSON.stringify({uid:user.uid,email:user.email}));
+    paintAcct();startRealtime();await fbSync({first:true});
+  }else{
+    fbUser=null;stopRealtime();
+    const unexpected=!!UID&&!intentional;intentional=false;
+    if(UID)await switchUser('','');
+    paintAcct();
+    if(unexpected)setTimeout(()=>{toast('Session expirée : reconnecte-toi pour retrouver tes données','er');acMode='in';acctDlg()},300);
+  }
+}
+const fbRef=()=>fb.db.collection('users').doc(fbUser.uid);
+function startRealtime(){stopRealtime();try{fbUnsub=fbRef().onSnapshot(s=>{
+  if(!s.exists||(s.metadata&&s.metadata.hasPendingWrites))return;
+  const rts=(s.data()||{}).updatedAt||0;if(rts>(+LS(fbTsKey())||0)&&rts!==(A.updatedAt||0))fbSchedule(300)},()=>{})}catch(e){}}
+function stopRealtime(){if(fbUnsub){try{fbUnsub()}catch(e){}fbUnsub=null}}
+function fbSchedule(ms){clearTimeout(fbT);fbT=setTimeout(()=>fbSync(),ms==null?15000:ms)}
+async function fbPull(ref,m){
+  const n=m.n||0,docs=await Promise.all(Array.from({length:n},(_,i)=>ref.collection('c').doc(String(i)).get()));
+  let str='';docs.forEach((d,i)=>{if(!d.exists)throw Error('Données cloud incomplètes ('+i+')');str+=d.data().t});
+  const o=JSON.parse(str);if(!o||!Array.isArray(o.modules))throw Error('Données cloud invalides');
+  LS(fbHKey(),JSON.stringify(m.h||[]));return o}
+async function fbPush(ref,m){
+  const ts=A.updatedAt||(A.updatedAt=Date.now()),str=JSON.stringify(A);
+  if(str.length>9e6)throw Error('Données trop volumineuses : supprime quelques photos de notes');
+  const chunks=[];for(let i=0;i<str.length;i+=CH_SZ)chunks.push(str.slice(i,i+CH_SZ));
+  const hs=chunks.map(hash),prev=(m&&m.h)||[],batch=fb.db.batch();
+  chunks.forEach((t,i)=>{if(hs[i]!==prev[i])batch.set(ref.collection('c').doc(String(i)),{i,t,h:hs[i]})});
+  for(let i=chunks.length;i<prev.length;i++)batch.delete(ref.collection('c').doc(String(i)));
+  batch.set(ref,{updatedAt:ts,n:chunks.length,h:hs,v:1,email:fbUser.email||''});
+  await batch.commit();LS(fbTsKey(),String(ts));LS(fbHKey(),JSON.stringify(hs))}
+function applyRemoteFb(o,ts){
+  resetA();load(o);A.updatedAt=ts;try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){}
+  LS(fbTsKey(),String(ts));closeOnboard();if(!A.settings.level)onboard();render();toast('Données synchronisées ✔','ok')}
+async function fbSync(o={}){
+  if(!fbUser||!fb)return;if(fbBusy){fbQ=true;return}
+  fbBusy=true;paintAcct();
+  try{
+    const ref=fbRef(),snap=await ref.get(),last=+LS(fbTsKey())||0,local=A.updatedAt||0,dirty=local>last;
+    if(!snap.exists){
+      if(!hasData()){const g=guestData();if(g&&confirm('Importer les données de cet appareil (cours, horaires, fiches...) dans ton compte ?')){resetA();load(g);A.updatedAt=Date.now();flushSave();render()}}
+      if(hasData())await fbPush(ref,null);
+    }else{
+      const m=snap.data(),rts=m.updatedAt||0;
+      if(o.force==='up')await fbPush(ref,m);
+      else if(o.force==='down'){if(confirm('Remplacer les données de cet appareil par celles de ton compte ?'))applyRemoteFb(await fbPull(ref,m),rts)}
+      else if(rts>last&&rts!==local){const rm=await fbPull(ref,m);if(!dirty||!hasData())applyRemoteFb(rm,rts);else{mergeRemote(rm);await fbPush(ref,m);toast('Données fusionnées ✔','ok')}}
+      else if(dirty)await fbPush(ref,m);
+      else LS(fbTsKey(),String(Math.max(last,rts)));
+    }
+    fbErr='';LS('eduVault_fbLast',String(Date.now()));
+  }catch(e){fbErr=fbMsg(e)}
+  finally{fbBusy=false;paintAcct();if(fbQ){fbQ=false;fbSchedule(1500)}}
+}
+function wipeLocal(uid){['eduVault_u_','eduVault_fbTs_','eduVault_fbH_'].forEach(p=>localStorage.removeItem(p+uid));try{indexedDB.deleteDatabase('EduVaultLocalFiles_'+uid)}catch(e){}}
+async function fbDeleteCloud(){
+  const ref=fbRef(),cs=await ref.collection('c').get(),b=fb.db.batch();cs.docs.forEach(d=>b.delete(d.ref));b.delete(ref);await b.commit()}
+function acctDlg(){
+  const d=$('dlg');
+  if(UID){
+    d.innerHTML=`<h3>👤 Mon compte</h3><div class="rs" style="display:block;margin:8px 0"><b>${esc((acctInfo()||{}).email||'')}</b><small class="mu">${esc(acctStatusTxt())}</small></div>
+    <div class="row" style="justify-content:flex-start"><button class="b p" data-a="acSync">Synchroniser maintenant</button><button class="b" data-a="acReset">Changer le mot de passe</button></div>
+    <div class="row" style="justify-content:flex-start"><button class="b" data-a="acOut">Se déconnecter</button><button class="b" data-a="acWipe">Déconnecter et effacer cet appareil</button></div>
+    <small class="mu" style="margin-top:8px">Sur un appareil partagé, utilise « effacer cet appareil » : tes données restent dans ton compte.</small>
+    <div class="row"><button class="b" style="color:var(--er)" data-a="acDel">Supprimer mon compte</button><button class="b p" onclick="$('dlg').close()">Fermer</button></div>`;
+  }else{
+    const up=acMode==='up';
+    d.innerHTML=`<h3>👤 ${up?'Créer un compte':'Connexion'}</h3>
+    <div class="pills" style="margin:6px 0"><button class="b${up?'':' p'}" data-a="acMode" data-i="in">Connexion</button><button class="b${up?' p':''}" data-a="acMode" data-i="up">Inscription</button></div>
+    <form id="acf" novalidate><label>Email<input name="email" type="email" required autocomplete="email" value="${esc(acEmail)}"></label>
+    <label>Mot de passe${up?' (8 caractères minimum)':''}<input name="pw" type="password" required minlength="8" autocomplete="${up?'new-password':'current-password'}"></label>
+    ${up?'<label>Confirmer le mot de passe<input name="pw2" type="password" required minlength="8" autocomplete="new-password"></label>':''}
+    <p class="bad" id="acerr" role="alert"></p>
+    <div class="row"><button type="button" class="b" onclick="$('dlg').close()">Annuler</button><button class="b p" name="go">${up?'Créer mon compte':'Se connecter'}</button></div></form>
+    ${up?'':'<div class="row" style="justify-content:flex-start;margin-top:4px"><button type="button" class="b" data-a="acForgot">Mot de passe oublié ?</button></div>'}
+    <small class="mu" style="margin-top:8px">Ton compte sert à sauvegarder et synchroniser tes données entre tes appareils. L'application reste utilisable sans compte.</small>`;
+    $('acf').onsubmit=async e=>{
+      e.preventDefault();const f=e.target.elements,em=f.email.value.trim(),pw=f.pw.value,er=$('acerr');er.textContent='';
+      if(!em||!pw){er.textContent='Remplis l\'email et le mot de passe';return}
+      if(up&&pw.length<8){er.textContent=FBM['auth/weak-password'];return}
+      if(up&&pw!==f.pw2.value){er.textContent='Les deux mots de passe sont différents';return}
+      f.go.disabled=true;
+      try{await fbLoad();
+        if(up){const c=await fb.auth.createUserWithEmailAndPassword(em,pw);try{await c.user.sendEmailVerification()}catch(x){}}
+        else await fb.auth.signInWithEmailAndPassword(em,pw);
+        acEmail='';$('dlg').close();toast(up?'Compte créé ✔ Vérifie ta boîte mail (et les spams)':'Connecté ✔','ok')}
+      catch(x){er.textContent=fbMsg(x);f.go.disabled=false}};
+  }
+  d.oncancel=null;if(!d.open)d.showModal();
+}
+const askPw=(title,cb)=>ask(title,[{k:'pw',l:'Mot de passe',t:'password',r:1}],v=>cb(v.pw));
+Object.assign(act,{
+  acct:()=>{acMode='in';acEmail='';acctDlg()},
+  acMode:i=>{const f=$('acf');if(f)acEmail=f.elements.email.value;acMode=i;acctDlg()},
+  nudgeOff:()=>{LS('eduVault_nudge','1');render()},
+  acSync:async()=>{try{await fbLoad();await fbSync()}catch(e){fbErr=fbMsg(e)}toast(fbErr||'Synchronisé ✔',fbErr?'er':'ok');acctDlg()},
+  acForgot:async()=>{const f=$('acf'),em=f?f.elements.email.value.trim():'';if(!em)return toast('Écris d\'abord ton email','er');
+    try{await fbLoad();await fb.auth.sendPasswordResetEmail(em);toast('Email envoyé : vérifie ta boîte mail (et les spams)','ok')}catch(e){toast(fbMsg(e),'er')}},
+  acReset:async()=>{try{await fbLoad();await fb.auth.sendPasswordResetEmail(fbUser.email);toast('Email de changement de mot de passe envoyé','ok')}catch(e){toast(fbMsg(e),'er')}},
+  acOut:async()=>{try{await fbSync()}catch(e){}intentional=true;try{await fb.auth.signOut()}catch(e){intentional=false;return toast(fbMsg(e),'er')}$('dlg').close();toast('Déconnecté. Tes données restent dans ton compte.')},
+  acWipe:async()=>{if(!confirm('Se déconnecter et effacer toutes les données de cet appareil ? (elles restent dans ton compte)'))return;
+    try{await fbSync()}catch(e){}const uid=UID;wipeNext=uid;intentional=true;
+    try{await fb.auth.signOut()}catch(e){wipeNext=null;intentional=false;return toast(fbMsg(e),'er')}
+    setTimeout(()=>{if(wipeNext===uid){wipeLocal(uid);wipeNext=null}},3000);$('dlg').close();toast('Appareil effacé')},
+  acDel:()=>{if(!confirm('Supprimer définitivement ton compte ET toutes tes données dans le cloud ? Cette action est irréversible.'))return;
+    $('dlg').close();askPw('Confirme avec ton mot de passe',async pw=>{
+      const uid=UID;try{
+        await fbLoad();await fbUser.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(fbUser.email,pw));
+        await fbDeleteCloud();wipeNext=uid;intentional=true;await fbUser.delete();
+        setTimeout(()=>{if(wipeNext===uid){wipeLocal(uid);wipeNext=null}},3000);toast('Compte supprimé','ok')}
+      catch(e){wipeNext=null;intentional=false;toast(fbMsg(e),'er')}})}
+});
+function acctBoot(){
+  paintAcct();
+  if(UID)fbLoad().catch(()=>{});
+  addEventListener('online',()=>{if(UID){if(!fb)fbLoad().catch(()=>{});else fbSchedule(500)}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&fbUser&&(A.updatedAt||0)>(+LS(fbTsKey())||0)){clearTimeout(fbT);fbSync()}});
+  setInterval(()=>{if(fbUser&&!document.hidden)fbSync()},5*60000);
+}
+
 /* ---------- reminders / drive UI / boot ---------- */
 const fired=new Set();
 function chk(){const n=new Date();A.tasks.filter(t=>!t.completed).forEach(t=>{const d=new Date(t.dueDate)-n;
@@ -932,6 +1102,7 @@ function onboard(){const d=$('dlg');d.innerHTML=`<h3>${tr('🎓 Bienvenue sur Ed
 
 /* ---------- icônes (SVG, remplacent les emoji automatiquement) ---------- */
 const ICONS={
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
 cap:'<path d="M2.5 9 12 4l9.5 5-9.5 5z"/><path d="M6.5 11.5V16c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.5M21.5 9v6"/>',
 home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
 calendar:'<rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',
@@ -964,7 +1135,7 @@ chat:'<path d="M4 5h16v11H8l-4 4z"/>',
 globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
 receipt:'<path d="M5 2h14v20l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M8 7h8M8 11h8M8 15h5"/>',
 upload:'<path d="M12 20V9M7.5 13 12 8.500 16.500 13M5 4h14"/>'};
-const EMO={'🎓':'cap','🏠':'home','🗓':'calendar','📅':'calendar','🔔':'bell','📚':'book','🃏':'cards','🧠':'quiz','⏱':'timer','⚙':'sliders','☁':'cloud','🌓':'contrast','✨':'sparkles','📎':'clip','✏':'pencil','🗑':'trash','🚫':'ban','➖':'minus','✕':'x','🎯':'target','📝':'file','🚨':'alert','⚠':'alert','☀':'sun','📈':'chart','🔥':'flame','📍':'pin','🌴':'palm','🔑':'key','⬇':'download','⬆':'upload','💬':'chat','🌐':'globe','🧾':'receipt','📊':'chart','☕':'cloud','📤':'upload','📥':'download'};
+const EMO={'👤':'user','🎓':'cap','🏠':'home','🗓':'calendar','📅':'calendar','🔔':'bell','📚':'book','🃏':'cards','🧠':'quiz','⏱':'timer','⚙':'sliders','☁':'cloud','🌓':'contrast','✨':'sparkles','📎':'clip','✏':'pencil','🗑':'trash','🚫':'ban','➖':'minus','✕':'x','🎯':'target','📝':'file','🚨':'alert','⚠':'alert','☀':'sun','📈':'chart','🔥':'flame','📍':'pin','🌴':'palm','🔑':'key','⬇':'download','⬆':'upload','💬':'chat','🌐':'globe','🧾':'receipt','📊':'chart','☕':'cloud','📤':'upload','📥':'download'};
 const ic=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||''}</svg>`;
 const EMO_SRC='('+Object.keys(EMO).join('|')+')\uFE0F?',EMO_T=new RegExp(EMO_SRC),SKIPN=new Set(['SCRIPT','STYLE','TEXTAREA','OPTION','SELECT','INPUT','TITLE','svg']);
 function iconize(root){
@@ -989,7 +1160,7 @@ $('fcf').onchange=e=>{const f=e.target.files[0],target=fcTarget;if(!f||!target)r
 document.documentElement.lang=LANG();document.documentElement.dir=LANG()==='ar'?'rtl':'ltr';
 load();
 applyTheme();applyNavLang();
-drvBoot();go('da');
+drvBoot();acctBoot();go('da');
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   navigator.serviceWorker.register('sw.js').then(reg=>{
     reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw&&nw.addEventListener('statechange',()=>{
