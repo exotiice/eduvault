@@ -1,5 +1,5 @@
 /* EduVault : fonctionne hors-ligne + notifie quand une nouvelle version est prete. */
-const C = 'eduvault-v8';
+const C = 'eduvault-v9';
 const PRE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
