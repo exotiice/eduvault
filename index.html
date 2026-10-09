@@ -472,12 +472,12 @@ const act={
   addFc:()=>{if(needMod())return;ask('Nouvelle fiche',[{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'q',l:'Question (recto)',t:'textarea',r:1},{k:'a',l:'Réponse (verso)',t:'textarea',r:1}],v=>{A.flashcards.push({id:uid('f'),moduleId:v.moduleId,q:v.q.trim(),a:v.a.trim()});upd();toast('Fiche créée','ok')})},
   delFc:i=>{A.flashcards=A.flashcards.filter(x=>x.id!==i);upd()},
   flip:(i,b)=>b.classList.toggle('fl'),
-  addRes:i=>{const m=A.modules.find(x=>x.id===i);ask('Ajouter un document',[{k:'type',l:'Catégorie',t:'select',o:CATS},{k:'title',l:'Titre',r:1},{k:'src',l:'Source',t:'select',o:[['local','Fichier local (sur cet appareil)'],['drive','Téléverser sur Google Drive'],['url','Lien web']]},{k:'file',l:'Fichier (local / Drive)',t:'file'},{k:'url',l:'Lien (si Lien web)',t:'url'}],async(v,fd)=>{
+  addRes:i=>{const m=A.modules.find(x=>x.id===i);ask('Ajouter un document',[{k:'type',l:'Catégorie',t:'select',o:CATS},{k:'title',l:'Titre',r:1},{k:'src',l:'Où enregistrer ce fichier ?',t:'select',o:[['local','Sur cet appareil'+(UID?(dfOn()?' (+ copie dans mon Drive)':''):'')],['private','Sur cet appareil seulement (jamais envoyé)'],['drive','Dans mon Google Drive'],['url','Lien web']]},{k:'file',l:'Fichier',t:'file'},{k:'url',l:'Lien (si Lien web)',t:'url'}],async(v,fd)=>{
     try{const f=fd.get('file'),r={id:uid('r'),title:v.title.trim(),type:v.type};
       if(v.src==='url'){if(!v.url)throw Error('Saisissez une URL');r.url=v.url;r.isLocal=false}
       else{if(!f||!f.size)throw Error('Sélectionnez un fichier');
-        if(v.src==='local'){r.localFileId=uid('f');r.isLocal=true;await fst('put',{id:r.localFileId,name:f.name,type:f.type,blob:f})}
-        else{if(!tok)throw Error("Connectez-vous d'abord à Google Drive (bouton ☁️)");const form=new FormData();form.append('metadata',new Blob([JSON.stringify({name:v.title+' - '+f.name,mimeType:f.type})],{type:'application/json'}));form.append('file',f);
+        if(v.src==='local'||v.src==='private'){r.localFileId=uid('f');r.isLocal=true;if(v.src==='private')r.skipSync=true;await fst('put',{id:r.localFileId,name:f.name,type:f.type,blob:f})}
+        else{if(!tok){try{await drvAuth()}catch(e){throw Error('Connexion à Google Drive annulée ou impossible')}}const form=new FormData();form.append('metadata',new Blob([JSON.stringify({name:v.title+' - '+f.name,mimeType:f.type})],{type:'application/json'}));form.append('file',f);
           const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+tok},body:form}),d=await res.json();
           if(!d.id)throw Error('Échec du téléversement Google Drive');r.url='https://drive.google.com/file/d/'+d.id+'/view';r.isLocal=false}}
       (m.resources=m.resources||[]).push(r);upd();toast('Document enregistré','ok')}catch(e){toast(e.message,'er')}})},
@@ -503,9 +503,8 @@ const act={
     ask('Importation IA',[{k:'prov',l:'Fournisseur',t:'select',o:Object.keys(AI).map(k=>[k,AI[k].n]),v:p0},{k:'key',l:'Clé API (Gemini : aistudio.google.com/apikey · Groq : console.groq.com/keys)',t:'password',r:1,v:aiKey(p0)},{k:'model',l:'Modèle avec vision',r:1,v:aiModel(p0)},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport);
     const f=$('dlg').querySelector('form'),sel=f.elements.prov;sel.onchange=()=>{f.elements.key.value=aiKey(sel.value);f.elements.model.value=aiModel(sel.value)}},
   drive:async()=>{
-    if(UID)return toast('Ton compte EduVault synchronise déjà tes données.','ok');
     if(linked()){if(!confirm('Désactiver la sauvegarde automatique Google Drive sur cet appareil ?'))return;
-      tok=null;clearTimeout(tokT);LS('eduVault_linked',null);LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();settings();return toast('Drive déconnecté')}
+      tok=null;clearTimeout(tokT);LS(LK(),null);LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();settings();return toast('Drive déconnecté')}
     try{toast('Connexion à Google Drive...');await drvAuth();toast('Connecté. Synchronisation...','ok');await drvSync();toast(drvErr||'Sauvegarde automatique activée ✔',drvErr?'er':'ok');settings()}
     catch(e){toast('Connexion Drive impossible ('+e.message+')','er')}},
   dh:async()=>{
@@ -708,7 +707,7 @@ Object.assign(act,{
   calNav:i=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+(+i),1);lastCalDay=null;render()},
   calDay:i=>{lastCalDay=i;render()},
   setCid:()=>ask('Client ID Google (OAuth)',[{k:'cid',l:"Client ID (…apps.googleusercontent.com). L'adresse de cette page doit être une origine autorisée dans Google Cloud.",v:localStorage.getItem('eduVault_cid')||''}],v=>{
-    v.cid.trim()?localStorage.setItem('eduVault_cid',v.cid.trim()):localStorage.removeItem('eduVault_cid');tc=null;tok=null;LS('eduVault_linked',null);LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();toast('Client ID enregistré. Reconnectez Drive.','ok')})
+    v.cid.trim()?localStorage.setItem('eduVault_cid',v.cid.trim()):localStorage.removeItem('eduVault_cid');tc=null;tok=null;LS(LK(),null);LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();toast('Client ID enregistré. Reconnectez Drive.','ok')})
 });
 document.addEventListener('click',e=>{if(!e.target.closest('.s-bar'))$('s-res').style.display='none';const b=e.target.closest('[data-a]');if(b&&act[b.dataset.a])act[b.dataset.a](b.dataset.i,b)});
 $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)go(b.dataset.t)});
@@ -732,9 +731,10 @@ function settings(){
   <label>${tr("Semaine actuelle (l'alternance A/B est automatique)")}<select onchange="chgWk(this.value)"><option value="A"${curWeek()==='A'?' selected':''}>Semaine A</option><option value="B"${curWeek()==='B'?' selected':''}>Semaine B</option></select></label>
   <label>${tr('Vacances & jours chômés (du / au)')}<span class="row" style="margin:4px 0 0"><input type="date" id="h1" aria-label="Du"><input type="date" id="h2" aria-label="Au"><button class="b p" data-a="addHol">+</button></span></label>
   <div>${ranges().map(r=>`<span class="chip">${r[0]===r[1]?r[0]:r[0]+' → '+r[1]}<button class="x-btn" data-a="delHol" data-i="${r[0]}|${r[1]}" aria-label="Supprimer">✕</button></span>`).join('')}</div>
-  <label>${tr('☁️ Sauvegarde Google Drive')}</label>
+  <label>${UID?'☁️ Google Drive (optionnel)':tr('☁️ Sauvegarde Google Drive')}</label>
   <div class="rs" style="margin:0 0 6px">${driveStatusHTML()}</div>
-  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="expics">${tr('📅 Export .ics')}</button><button class="b p" data-a="drive">${linked()?'Déconnecter Drive':'Activer la sauvegarde auto'}</button>${linked()?'<button class="b" data-a="dsave">⬆ Envoyer</button><button class="b" data-a="dload">⬇ Restaurer</button>':''}<button class="b" data-a="setCid" title="Client ID Google">🔑</button></div>
+  ${UID?`<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${dfOn()?'checked':''} ${linked()?'':'disabled'} onchange="setDf(this.checked)"> Copier mes fichiers dans mon Google Drive</label>${linked()?'':'<small class="mu">Connecte d\'abord ton Drive (bouton ci-dessous).</small>'}`:''}
+  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="expics">${tr('📅 Export .ics')}</button><button class="b p" data-a="drive">${linked()?'Déconnecter Drive':(UID?'Connecter mon Drive':'Activer la sauvegarde auto')}</button>${linked()&&!UID?'<button class="b" data-a="dsave">⬆ Envoyer</button><button class="b" data-a="dload">⬇ Restaurer</button>':''}<button class="b" data-a="setCid" title="Client ID Google">🔑</button></div>
   <label>${tr('ℹ️ À propos')}</label>
   <div class="rs about" style="margin:0 0 6px">
     <div style="display:flex;flex-wrap:wrap">
@@ -836,13 +836,15 @@ async function aiImport(v,fd){
 const GAPI='https://www.googleapis.com/',DFILE='EduVault_backup.json',SCOPE='https://www.googleapis.com/auth/drive.file';
 let tokT=null,drvBusy=false,drvQueued=false,drvErr='',syncT=null,armed=false;
 const LS=(k,v)=>v===undefined?localStorage.getItem(k):v===null?localStorage.removeItem(k):localStorage.setItem(k,v);
-const linked=()=>LS('eduVault_linked')==='1'&&!UID,lastTs=()=>+LS('eduVault_syncTs')||0;
+const LK=()=>'eduVault_linked'+(UID?'_'+UID:''),DFK=()=>'eduVault_df'+(UID?'_'+UID:''),dfOn=()=>LS(DFK())==='1';
+const linked=()=>LS(LK())==='1',lastTs=()=>+LS('eduVault_syncTs')||0;
 const dstate=()=>tok?(drvBusy?'busy':'ok'):linked()?'wait':'off';
 const hasData=()=>!!(A.modules.length||A.tasks.length||A.flashcards.length||A.timetable.length||A.quizHist.length);
 function paintDrive(){const st=dstate(),e=$('dd'),b=$('dv');
   if(e)e.style.color={ok:'#10b981',busy:'#3b82f6',wait:'#f59e0b',off:'#ef4444'}[st];
   if(b)b.title={ok:'Drive : synchronisé',busy:'Drive : synchronisation...',wait:'Drive : reconnexion au prochain toucher',off:'Drive : non connecté'}[st]}
-function driveStatusHTML(){if(UID)return '<b>Remplacé par ton compte EduVault</b><small class="mu">Ton compte synchronise déjà tes données sur tous tes appareils.</small>';const st=dstate(),ts=lastTs();
+function driveStatusHTML(){const st=dstate(),ts=lastTs();
+  if(UID)return `<b>${{ok:'🟢 Drive connecté',busy:'🔵 Envoi des fichiers...',wait:'🟠 Drive lié · reconnexion au prochain toucher',off:'⚪ Drive non connecté (optionnel)'}[st]}</b><small class="mu">${dfOn()?'Tes fichiers sont aussi copiés dans TON Google Drive et disponibles sur tous tes appareils.':'Tes fichiers restent uniquement sur cet appareil.'}</small>${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Tes données (cours, horaires, notes...) sont sauvegardées par ton compte EduVault, pas par Drive.</small>`;
   return `<b>${{ok:'🟢 Connecté · sauvegarde automatique active',busy:'🔵 Synchronisation en cours...',wait:'🟠 Lié à Drive · reconnexion automatique au prochain toucher',off:'🔴 Non connecté'}[st]}</b>${ts?`<small class="mu">Dernière synchronisation : ${new Date(ts).toLocaleString('fr-FR')}</small>`:''}${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Modules, horaires, devoirs, fiches, quiz, notes et fichiers locaux sont envoyés automatiquement.</small>`}
 
 function drvAuth(){
@@ -850,7 +852,7 @@ function drvAuth(){
     tc=tc||google.accounts.oauth2.initTokenClient({client_id:cid(),scope:SCOPE,
       callback:r=>{if(r.error)return tc._ko&&tc._ko(Error(r.error));
         tok=r.access_token;clearTimeout(tokT);const ms=((+r.expires_in||3600)-90)*1000;tokT=setTimeout(()=>{tok=null;paintDrive();armReconnect()},ms);
-        LS('eduVault_linked','1');drvErr='';paintDrive();tc._ok&&tc._ok()},
+        LS(LK(),'1');drvErr='';paintDrive();tc._ok&&tc._ok()},
       error_callback:e=>tc._ko&&tc._ko(Error(e&&e.type||'popup'))});
     tc._ok=ok;tc._ko=ko;tc.requestAccessToken();
   }));
@@ -859,6 +861,7 @@ function drvAuth(){
 function armReconnect(){
   if(!linked()||tok||armed)return;armed=true;paintDrive();
   const run=()=>{armed=false;['pointerup','keydown'].forEach(t=>document.removeEventListener(t,run,true));
+    if(!linked())return;
     drvAuth().then(()=>drvSync()).catch(()=>{paintDrive();setTimeout(armReconnect,60000)})};
   ['pointerup','keydown'].forEach(t=>document.addEventListener(t,run,true));
 }
@@ -904,13 +907,14 @@ async function syncFiles(){
     const res=await dfetch(GAPI+'upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',body:form});
     if(!res.ok)throw Error("Envoi du fichier '"+r.title+"' impossible");
     r.driveId=(await res.json()).id;n++}
-  if(n){A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){}await drvPut(await drvFind())}}
+  if(n){A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){}if(UID)fbSchedule(300);else await drvPut(await drvFind())}}
 
 async function drvSync(o={}){
   if(!linked())return;if(!tok){armReconnect();return}
   if(drvBusy){drvQueued=true;return}
   drvBusy=true;paintDrive();
   try{
+    if(UID){if(dfOn())await syncFiles();drvErr='';return}
     const f=await drvFind(),dirty=(A.updatedAt||0)>lastTs();
     if(o.force==='up')await drvPut(f);
     else if(!f){if(hasData())await drvPut(null)}
@@ -947,7 +951,6 @@ function paintAcct(){
   const l=$('acl'),d=$('ad'),b=$('ac');if(!l)return;const em=(acctInfo()||{}).email||'';
   if(UID){l.textContent=(em[0]||'?').toUpperCase();l.className='av';d.style.display='';d.style.color=fbErr?'#f59e0b':fbBusy?'#3b82f6':fbUser?'#10b981':'#f59e0b';b.title=em+' · '+acctStatusTxt()}
   else{l.className='';l.textContent='👤';d.style.display='none';b.title='Compte / Connexion'}
-  const dv=$('dv');if(dv)dv.style.display=UID?'none':'';
 }
 function fbLoad(){
   if(fbReady)return fbReady;
@@ -960,10 +963,10 @@ function fbLoad(){
 async function switchUser(uid,email){
   const leaving=UID,wiping=!!leaving&&wipeNext===leaving;
   if(!wiping)flushSave();
-  UID=uid;KEY=keyFor(uid);db=null;
+  UID=uid;KEY=keyFor(uid);db=null;tok=null;clearTimeout(tokT);
   if(wiping){wipeLocal(leaving);wipeNext=null}
   if(uid)localStorage.setItem('eduVault_acct',JSON.stringify({uid,email}));else localStorage.removeItem('eduVault_acct');
-  fbErr='';resetA();load();
+  fbErr='';resetA();load();paintDrive();if(linked())armReconnect();
   if(!A.settings.level)onboard();else closeOnboard();
   render();paintAcct();
 }
@@ -1027,6 +1030,7 @@ async function fbSync(o={}){
 function wipeLocal(uid){['eduVault_u_','eduVault_fbTs_','eduVault_fbH_'].forEach(p=>localStorage.removeItem(p+uid));try{indexedDB.deleteDatabase('EduVaultLocalFiles_'+uid)}catch(e){}}
 async function fbDeleteCloud(){
   const ref=fbRef(),cs=await ref.collection('c').get(),b=fb.db.batch();cs.docs.forEach(d=>b.delete(d.ref));b.delete(ref);await b.commit()}
+function setDf(on){LS(DFK(),on?'1':'0');if(on&&tok)drvSync();else paintDrive();settings();toast(on?'Tes fichiers seront copiés dans ton Drive':'Tes fichiers resteront sur cet appareil','ok')}
 function acctDlg(){
   const d=$('dlg');
   if(UID){
