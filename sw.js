@@ -1,5 +1,5 @@
 /* EduVault : fonctionne hors-ligne + notifie quand une nouvelle version est prete. */
-const C = 'eduvault-v11';
+const C = 'eduvault-v12';
 const PRE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -42,4 +42,14 @@ self.addEventListener('notificationclick', e => {
       })
     );
   }
+});
+
+/* notifications push (Firebase Cloud Messaging / Web Push) : affichées même application fermée */
+self.addEventListener('push', e => {
+  let p = {};
+  try { p = e.data ? e.data.json() : {}; } catch (x) { try { p = { notification: { body: e.data.text() } }; } catch (y) {} }
+  const n = p.notification || p.data || {}, d = p.data || {};
+  e.waitUntil(self.registration.showNotification(n.title || 'EduVault', {
+    body: n.body || '', icon: 'icon-192.png', badge: 'icon-192.png', tag: d.tag || 'eduvault-announce', data: { url: d.url || './' }
+  }));
 });
