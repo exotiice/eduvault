@@ -160,6 +160,33 @@ html[dir="rtl"] .cl[style*="border-left"]{border-left:0!important}
 .av{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--br);color:#fff;font-size:12px;font-weight:800;line-height:1}
 .nudge{grid-column:1/-1;display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--bs);border:1px solid var(--br);border-radius:16px;padding:10px 12px;font-size:13px}
 #dlg .bad{min-height:1.2em;margin:4px 0 0}
+
+dialog{margin:auto}
+/* ===== v9 : états vides, statistiques, visite guidée, partage, accessibilité ===== */
+.emp{text-align:center;padding:26px 16px;border:1px dashed color-mix(in srgb,var(--br) 40%,var(--ln));border-radius:var(--r);background:color-mix(in srgb,var(--bs) 45%,transparent)}
+.emp-i{font-size:38px;line-height:1;margin-bottom:8px;color:var(--br)}.emp-i .ic{width:46px;height:46px}
+.emp b{display:block;font-size:17px;letter-spacing:-.01em}.emp p{max-width:38ch;margin:6px auto 0;font-size:13.5px}
+.chart text{font:600 10px system-ui,sans-serif;fill:var(--mu)}.chart .v{font-size:10px;fill:var(--tx)}
+.chart .ln{stroke:var(--ln);stroke-width:1}.chart .th{stroke:var(--mu);stroke-width:1;stroke-dasharray:3 3}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--mu);margin-top:6px;align-items:center}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:4px;vertical-align:-1px}
+.heat rect{rx:3}
+.tour .dots{display:flex;gap:6px;justify-content:center;margin:12px 0 2px}.tour .dots i{width:8px;height:8px;border-radius:50%;background:var(--in)}.tour .dots i.on{background:var(--br);width:22px;border-radius:99px;transition:width .2s}
+.tour .big{font-size:46px;text-align:center;margin:6px 0}.tour .big .ic{width:54px;height:54px;color:var(--br)}.tour p{line-height:1.55}
+.code{font:800 28px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-align:center;padding:14px 8px;border-radius:16px;background:var(--bs);color:var(--br);user-select:all;direction:ltr}
+.kv{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.warn{background:#fffbeb;border:1px solid #f59e0b;color:#78350f;border-radius:12px;padding:8px 10px;font-size:12px;margin:8px 0}.dark .warn{background:#78350f33;color:#fde68a}
+/* cibles tactiles >= 44 px sur téléphone / écran tactile */
+@media(pointer:coarse),(max-width:560px){.b{min-height:44px}.x-btn{width:44px;height:44px}nav button{min-height:54px}.pills .b{min-height:44px}.t input[type=checkbox]{width:26px;height:26px}.cal .cd{min-height:42px}.sw{width:44px;height:44px}input:not([type=checkbox]):not([type=color]),select,textarea{min-height:44px}.chip .x-btn{width:36px;height:36px}}
+/* mode gros texte */
+html.big body{font-size:18.5px;line-height:1.5}html.big small{font-size:14.5px}html.big h4{font-size:13.5px}html.big h2,html.big .top h2{font-size:26px}html.big h3{font-size:21px}
+html.big nav button{font-size:12.5px;min-width:64px}html.big nav .ic{width:27px;height:27px}html.big .b{font-size:17px;min-height:48px}html.big .cl b{font-size:17px}html.big label{font-size:14.5px}html.big .chip{font-size:13.5px}
+html.big .tgrid2 .ev{font-size:13px}html.big .tgrid2 .ev b{font-size:13.5px}html.big .opt{font-size:17px}html.big .code{font-size:32px}
+/* contraste élevé */
+html.hc{--mu:#374151;--ln:#6b7280}html.hc.dark{--mu:#d1d5db;--ln:#94a3b8}
+html.hc .c,html.hc .cl,html.hc .rs{border-width:2px}html.hc small.mu,html.hc .mu{color:var(--mu)}
+html.hc .b.p{background:var(--br);box-shadow:none}html.hc .b.p,html.hc nav .on,html.hc .sbadge b,html.hc .av,html.hc h1 .ic{color:var(--onbr,#fff)}
+html.hc nav .on{background:var(--br)}html.hc :focus-visible{outline:4px solid var(--tx);outline-offset:3px}
+@media(forced-colors:active){.b,.c,.cl{border:1px solid CanvasText}.b.p{forced-color-adjust:none;background:Highlight;color:HighlightText}}
 </style>
 </head>
 <body>
@@ -188,6 +215,67 @@ html[dir="rtl"] .cl[style*="border-left"]{border-left:0!important}
 <div id="ts" aria-live="polite"></div>
 
 <script>
+/* ===== dictionnaire UI : [français, English, العربية, الدارجة (vide = comme l'arabe)] ===== */
+const I18N_ROWS=[
+['Auj.','Today','اليوم',''],['Horaires','Timetable','الجدول',''],['Agenda','Agenda','المهام',''],['Cours','Courses','الدروس',''],['Fiches','Cards','البطاقات','الفيشات'],['Quiz','Quiz','اختبار','كويز'],['Focus','Focus','تركيز',''],['Plus','More','المزيد',''],
+['Rechercher...','Search...','بحث...','قلّب...'],['Emploi du temps','Timetable','جدول الحصص',''],['Examens & Devoirs','Exams & Homework','الامتحانات والواجبات',''],['Modules & Cours','Modules & Courses','المواد والدروس',''],['Active Recall','Active Recall','المراجعة النشطة',''],
+['+ Séance','+ Session','+ حصة',''],['+ Ajouter','+ Add','+ إضافة',''],['+ Créer','+ Create','+ إنشاء',''],['+ Module','+ Module','+ مادة',''],['Fermer','Close','إغلاق','سدّ'],['Annuler','Cancel','إلغاء','لغي'],['OK','OK','موافق',''],['Modifier','Edit','تعديل','بدّل'],['Supprimer','Delete','حذف','حيّد'],
+['Aucune séance','No session','لا توجد حصة',''],['Aucune échéance','No deadline','لا توجد مواعيد',''],['Tous','All','الكل',''],['Examens','Exams','امتحانات',''],['Devoirs','Homework','واجبات',''],
+['⚙️ Réglages','⚙️ Settings','⚙️ الإعدادات',''],['Couleur du thème','Theme color','لون الواجهة',''],['Apparence','Appearance','المظهر',''],['Niveau actuel','Current level','المستوى الحالي',''],['Semestre en cours','Current semester','الفصل الحالي',''],
+["Semaine actuelle (l'alternance A/B est automatique)","Current week (A/B alternation is automatic)",'الأسبوع الحالي (A/B تلقائي)',''],['Vacances & jours chômés (du / au)','Holidays & days off (from / to)','العطل (من / إلى)',''],
+['☁️ Sauvegarde Google Drive','☁️ Google Drive backup','☁️ النسخ الاحتياطي على Google Drive',''],['📅 Export .ics','📅 Export .ics','📅 تصدير .ics',''],['⬇ Exporter','⬇ Export','⬇ تصدير',''],['⬆ Importer','⬆ Import','⬆ استيراد',''],
+['Afficher aussi les anciens semestres (archives)','Also show past semesters (archive)','إظهار الفصول القديمة أيضا (أرشيف)',''],['Langue','Language','اللغة',''],
+['🎓 Bienvenue sur EduVault','🎓 Welcome to EduVault','🎓 مرحبا بك في EduVault',''],['Sélectionnez votre niveau actuel :','Select your current level:','اختر مستواك الحالي:',''],['ℹ️ À propos','ℹ️ About','ℹ️ حول التطبيق',''],
+['Rattrapage','Resit exam','الاستدراك',''],['Note du rattrapage','Resit grade','نقطة الاستدراك',''],['Admis après rattrapage','Passed after resit','ناجح بعد الاستدراك',''],['📊 Bilan annuel','📊 Yearly summary','📊 الحصيلة السنوية',''],
+['💬 Explique-moi','💬 Explain to me','💬 اشرح لي',''],['🧾 Résumer','🧾 Summarize','🧾 لخّص',''],['📅 Calendrier','📅 Calendar','📅 التقويم',''],['📋 Liste','📋 List','📋 قائمة',''],['🗓 Grille horaire','🗓 Hourly grid','🗓 جدول بالوقت',''],['Cartes','Cards','بطاقات',''],
+['🎨 Varier les couleurs','🎨 Vary colors','🎨 تلوين المواد',''],['📤 Export fiches','📤 Export cards','📤 تصدير البطاقات',''],['📥 Import fiches','📥 Import cards','📥 استيراد البطاقات',''],['🔔 Son des alertes','🔔 Alert sound','🔔 صوت التنبيهات',''],
+['Validé','Passed','ناجح',''],['Non validé','Not passed','غير ناجح',''],['Moyenne combinée','Combined average','المعدل المشترك',''],['Rappel avant les cours','Reminder before classes','تذكير قبل الحصص',''],
+['Cours du jour','Today\'s classes','حصص اليوم',''],['Échéances (7 jours)','Deadlines (7 days)','المواعيد (7 أيام)',''],['Réviser','Revise','المراجعة',''],['Ma progression','My progress','تقدمي',''],['série quiz','quiz streak','سلسلة الاختبارات',''],['score moyen','average score','المعدل',''],['min de focus','focus min','دقيقة تركيز',''],
+["fiche(s) à réviser aujourd'hui","card(s) to review today",'بطاقة للمراجعة اليوم',''],['Rien dans les 7 jours','Nothing in the next 7 days','لا شيء خلال 7 أيام',''],["Aucun cours aujourd'hui","No class today",'لا توجد حصص اليوم',''],["Plus de cours aujourd'hui","No more classes today",'انتهت حصص اليوم',''],["Vacances aujourd'hui","Holiday today",'عطلة اليوم',''],
+['En retard','Overdue','متأخر',''],['Bonjour','Good morning','صباح الخير',''],['Bon après-midi','Good afternoon','مساء الخير',''],['Bonsoir','Good evening','مساء الخير',''],['En cours','In progress','جارية',''],['aujourd’hui','today','اليوم',''],
+['Lundi','Monday','الإثنين',''],['Mardi','Tuesday','الثلاثاء',''],['Mercredi','Wednesday','الأربعاء',''],['Jeudi','Thursday','الخميس',''],['Vendredi','Friday','الجمعة',''],['Samedi','Saturday','السبت',''],['Dimanche','Sunday','الأحد',''],
+['✨ IA','✨ AI','✨ ذكاء اصطناعي',''],['Filtrer les modules...','Filter modules...','تصفية المواد...',''],['Enseignant non spécifié','Teacher not specified','الأستاذ غير محدد',''],['🎯 Note à viser','🎯 Target grade','🎯 النقطة المطلوبة',''],
+['Tous les modules','All modules','كل المواد',''],['À réviser','To review','للمراجعة',''],['Toutes','All','الكل',''],['RÉPONSE','ANSWER','الجواب',''],['Difficile','Hard','صعب',''],['Correct','Good','جيد',''],['Facile','Easy','سهل',''],['↻ Touchez pour la réponse','↻ Tap for the answer','↻ المس لرؤية الجواب',''],
+['Nouveau quiz','New quiz','اختبار جديد',''],['Module','Module','المادة',''],['Mode','Mode','النمط',''],['Nombre de questions','Number of questions','عدد الأسئلة',''],['▶ Commencer','▶ Start','▶ ابدأ',''],['Derniers résultats','Latest results','آخر النتائج',''],['✨ Quiz IA','✨ AI quiz','✨ اختبار بالذكاء الاصطناعي',''],
+['série (jours)','streak (days)','سلسلة (أيام)',''],['moyenne','average','المعدل',''],['meilleur','best','الأفضل',''],['Chrono de 20 s par question (QCM)','20 s timer per question (MCQ)','مؤقت 20 ثانية لكل سؤال',''],['QCM (4 choix)','MCQ (4 choices)','اختيار من متعدد (4)',''],['Autoévaluation (je me teste)','Self-assessment','تقييم ذاتي',''],
+['Concentration','Focus','تركيز',''],['Pause','Break','استراحة',''],['Longue pause','Long break','استراحة طويلة',''],['Travail (25m)','Work (25m)','عمل (25د)',''],['Pause (5m)','Break (5m)','استراحة (5د)',''],['Longue (15m)','Long (15m)','طويلة (15د)',''],['Focus libre','Free focus','تركيز حر',''],
+['Mode invité','Guest mode','وضع الضيف',''],['Se connecter / Créer un compte','Sign in / Create an account','تسجيل الدخول / إنشاء حساب',''],['Gérer mon compte','Manage my account','إدارة حسابي',''],['Auto (comme le téléphone)','Auto (like the phone)','تلقائي (مثل الهاتف)',''],['Clair','Light','فاتح',''],['Sombre','Dark','داكن',''],['Désactivé','Off','معطل',''],
+['Semaine A','Week A','الأسبوع A',''],['Semaine B','Week B','الأسبوع B',''],['Copier mes fichiers dans mon Google Drive','Copy my files to my Google Drive','نسخ ملفاتي إلى Google Drive',''],
+['Mon compte','My account','حسابي',''],['Connexion','Sign in','تسجيل الدخول',''],['Inscription','Sign up','إنشاء حساب',''],['Email','Email','البريد الإلكتروني',''],['Mot de passe','Password','كلمة المرور',''],['Confirmer le mot de passe','Confirm password','تأكيد كلمة المرور',''],['Créer un compte','Create an account','إنشاء حساب',''],
+['Créer mon compte','Create my account','إنشاء حسابي',''],['Se connecter','Sign in','دخول',''],['Mot de passe oublié ?','Forgot password?','نسيت كلمة المرور؟',''],['Synchroniser maintenant','Sync now','مزامنة الآن',''],['Changer le mot de passe','Change password','تغيير كلمة المرور',''],['Se déconnecter','Sign out','تسجيل الخروج',''],
+['Déconnecter et effacer cet appareil','Sign out and erase this device','خروج ومسح هذا الجهاز',''],['Supprimer mon compte','Delete my account','حذف حسابي',''],
+['Jour','Day','اليوم',''],['Semaine','Week','الأسبوع',''],['Début','Start','البداية',''],['Fin','End','النهاية',''],['Salle ou amphi','Room or lecture hall','القاعة أو المدرج',''],['Titre','Title','العنوان',''],['Type','Type','النوع',''],['Date et heure','Date and time','التاريخ والوقت',''],
+['Question (recto)','Question (front)','السؤال (الوجه)',''],['Réponse (verso)','Answer (back)','الجواب (الظهر)',''],['Nom du module','Module name','اسم المادة',''],['Professeur (optionnel)','Teacher (optional)','الأستاذ (اختياري)',''],['Couleur du module','Module color','لون المادة',''],
+['Semestre','Semester','الفصل',''],['Toutes les semaines','Every week','كل الأسابيع',''],['Séance','Session','حصة',''],['Nouveau module','New module','مادة جديدة',''],['Modifier le module','Edit module','تعديل المادة',''],['Modifier la séance','Edit session','تعديل الحصة',''],
+['Ajouter une échéance','Add a deadline','إضافة موعد',''],["Modifier l'échéance",'Edit deadline','تعديل الموعد',''],['Nouvelle fiche','New card','بطاقة جديدة',''],['Modifier la fiche','Edit card','تعديل البطاقة',''],['Importation IA','AI import','الاستيراد بالذكاء الاصطناعي',''],
+['Fournisseur','Provider','المزود',''],['Modèle avec vision','Vision model','نموذج بالرؤية',''],['Emploi du temps (PDF ou image)','Timetable (PDF or image)','جدول الحصص (PDF أو صورة)',''],['Notes','Notes','ملاحظات',''],['Enregistrer','Save','حفظ',''],
+['Séance ajoutée','Session added','تمت إضافة الحصة',''],['Séance enregistrée','Session saved','تم حفظ الحصة',''],['Module enregistré','Module saved','تم حفظ المادة',''],['Échéance ajoutée','Deadline added','تمت إضافة الموعد',''],['Échéance enregistrée','Deadline saved','تم حفظ الموعد',''],['Fiche créée','Card created','تم إنشاء البطاقة',''],['Fiche enregistrée','Card saved','تم حفظ البطاقة',''],
+['Notes enregistrées','Notes saved','تم حفظ الملاحظات',''],['Document enregistré','Document saved','تم حفظ المستند',''],['Connecté ✔','Signed in ✔','تم الدخول ✔',''],['Synchronisé ✔','Synced ✔','تمت المزامنة ✔',''],['Copié','Copied','تم النسخ',''],['Sauvegarde exportée','Backup exported','تم تصدير النسخة',''],
+['Données synchronisées ✔','Data synced ✔','تمت مزامنة البيانات ✔',''],['Données fusionnées ✔','Data merged ✔','تم دمج البيانات ✔',''],['Appareil effacé','Device erased','تم مسح الجهاز',''],['Compte supprimé','Account deleted','تم حذف الحساب',''],
+['Ajoutez d\'abord un module pour ce semestre','Add a module for this semester first','أضف مادة لهذا الفصل أولا',''],['Sauvegarde restaurée','Backup restored','تمت استعادة النسخة',''],['Format JSON invalide','Invalid JSON format','صيغة JSON غير صالحة',''],
+['Absences','Absences','الغيابات',''],['Examen','Exam','الامتحان',''],['Série de bonnes réponses','Streak','سلسلة',''],['Terminé','Done','منتهي',''],['Recherche','Search','بحث',''],['Aucun résultat','No result','لا نتيجة',''],
+/* --- nouveautés --- */
+['📊 Statistiques','📊 Statistics','📊 الإحصائيات',''],['Statistiques','Statistics','الإحصائيات',''],['Heures de révision par semaine','Revision hours per week','ساعات المراجعة في الأسبوع',''],['Activité des 16 dernières semaines','Activity over the last 16 weeks','النشاط خلال آخر 16 أسبوعا',''],['Moyenne par semestre','Average per semester','المعدل حسب الفصل',''],
+['Cette semaine','This week','هذا الأسبوع',''],['Total du mois','This month','مجموع الشهر',''],['Jours actifs (30 j)','Active days (30 d)','أيام النشاط (30 ي)',''],['Retour','Back','رجوع',''],
+['Pas encore de notes','No grades yet','لا توجد نقط بعد',''],['Pas encore de révision enregistrée','No revision logged yet','لا توجد مراجعة مسجلة بعد',''],
+['Moins','Less','أقل',''],['Plus ','More','أكثر',''],
+['Suivant','Next','التالي',''],['Passer','Skip','تخطي',''],["C'est parti !","Let's go!",'هيا نبدأ!',''],['Visite guidée','Guided tour','جولة تعريفية',''],['Revoir la visite guidée','Replay the guided tour','إعادة الجولة التعريفية',''],
+['Accessibilité','Accessibility','إمكانية الوصول',''],['Gros texte','Large text','نص كبير',''],['Contraste élevé','High contrast','تباين عال',''],['Vérification des couleurs','Color check','فحص الألوان',''],
+['Partager mon emploi du temps','Share my timetable','مشاركة جدولي',''],['Rejoindre avec un code','Join with a code','الانضمام برمز',''],['Code de classe','Class code','رمز القسم',''],['Copier le lien','Copy link','نسخ الرابط',''],['Copier le code','Copy code','نسخ الرمز',''],
+['Mettre à jour le partage','Update the share','تحديث المشاركة',''],['Arrêter le partage','Stop sharing','إيقاف المشاركة',''],['Importer','Import','استيراد',''],['Partager','Share','مشاركة',''],['🔗 Partager','🔗 Share','🔗 مشاركة',''],
+['🔐 Chiffrement','🔐 Encryption','🔐 التشفير',''],['Activer le chiffrement','Enable encryption','تفعيل التشفير',''],['Déverrouiller','Unlock','فتح القفل',''],['Désactiver le chiffrement','Disable encryption','تعطيل التشفير',''],
+['Commence par ajouter un module','Start by adding a module','ابدأ بإضافة مادة',''],['Aucun module','No module','لا توجد مواد',''],['Aucune fiche','No card','لا توجد بطاقات',''],['Aucun emploi du temps','No timetable','لا يوجد جدول',''],['Aucune échéance pour le moment','No deadline for now','لا مواعيد حاليا',''],
+['Importer avec l\'IA','Import with AI','استيراد بالذكاء الاصطناعي',''],['Ajouter une séance','Add a session','إضافة حصة',''],['Ajouter un module','Add a module','إضافة مادة',''],['Créer une fiche','Create a card','إنشاء بطاقة',''],['Ajouter une échéance ','Add a deadline','إضافة موعد',''],
+['Crée un compte gratuit pour sauvegarder tes données et les retrouver sur tous tes appareils.','Create a free account to back up your data and find it on all your devices.','أنشئ حسابا مجانيا لحفظ بياناتك واسترجاعها على كل أجهزتك.',''],
+['Tes données restent sur cet appareil. Crée un compte pour les sauvegarder et les retrouver sur tous tes appareils.','Your data stays on this device. Create an account to back it up and find it on all your devices.','تبقى بياناتك على هذا الجهاز. أنشئ حسابا لحفظها واسترجاعها على كل أجهزتك.',''],
+['Créer','Create','إنشاء',''],['🔴 Non connecté','🔴 Not signed in','🔴 غير متصل',''],['Modules, horaires, devoirs, fiches, quiz, notes et fichiers locaux sont envoyés automatiquement.','Modules, timetable, homework, cards, quizzes, notes and local files are uploaded automatically.','تُرسل المواد والجداول والواجبات والبطاقات والاختبارات والملاحظات والملفات المحلية تلقائيا.',''],
+['EduVault — fait avec ❤ pour les étudiants. Bugs et suggestions : Discord.','EduVault — made with ❤ for students. Bugs and suggestions: Discord.','EduVault — صُنع بـ ❤ للطلبة. للأخطاء والاقتراحات: Discord.',''],
+['Drive : non connecté','Drive: not connected','Drive: غير متصل',''],['Thème','Theme','المظهر',''],['Ajouter une absence','Add an absence','إضافة غياب',''],['Ajouter un document','Add a document','إضافة مستند',''],
+];
+const I18N_X={en:{},ar:{},ary:{}};
+I18N_ROWS.forEach(r=>{I18N_X.en[r[0]]=r[1];I18N_X.ar[r[0]]=r[2];I18N_X.ary[r[0]]=r[3]||r[2]});
+</script>
+<script>
 const $=i=>document.getElementById(i);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LV={CP1:['S1','S2'],CP2:['S3','S4'],CI1:['S5','S6'],CI2:['S7','S8'],CI3:['S9','S10']};
@@ -208,7 +296,7 @@ const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.';
 const CLIENT_ID='786113410432-5c5gh5craje2k8aq6jbgjd35jn7f1eur.apps.googleusercontent.com';
 const LANGK='eduVault_lang';
 const LANG=()=>localStorage.getItem(LANGK)||'fr';
-const I18N={
+const I18N_AR={
  'Auj.':'اليوم','Horaires':'الجدول','Agenda':'المهام','Cours':'الدروس','Fiches':'البطاقات','Quiz':'اختبار','Focus':'تركيز','Plus':'المزيد','Rechercher...':'بحث...',
  'Emploi du temps':'جدول الحصص','Examens & Devoirs':'الامتحانات والواجبات','Modules & Cours':'المواد والدروس','Active Recall':'المراجعة النشطة',
  '+ Séance':'+ حصة','+ Ajouter':'+ إضافة','+ Créer':'+ إنشاء','+ Module':'+ مادة','Fermer':'إغلاق','Annuler':'إلغاء','OK':'موافق','Modifier':'تعديل','Supprimer':'حذف',
@@ -224,17 +312,48 @@ const I18N={
  'Validé':'ناجح','Non validé':'غير ناجح','Moyenne combinée':'المعدل المشترك',
  'Rappel avant les cours':'تذكير قبل الحصص'
 };
-const tr=s=>LANG()==='ar'&&I18N[s]!=null?I18N[s]:s;
+const I18N={ar:Object.assign({},I18N_X.ar,I18N_AR),en:I18N_X.en,ary:Object.assign({},I18N_AR,I18N_X.ary)};
+const LOC=()=>({fr:'fr-FR',en:'en-GB',ar:'ar-MA',ary:'ar-MA'}[LANG()]||'fr-FR');
+const isRTL=()=>LANG()==='ar'||LANG()==='ary';
+const Lg=(fr,en,ar,ary)=>({fr:fr,en:en==null?fr:en,ar:ar==null?fr:ar,ary:ary||(ar==null?fr:ar)}[LANG()]||fr);
+const tr=s=>{const d=I18N[LANG()];return d&&d[s]!=null?d[s]:s};
+const EMO_LEAD=/^[\s\p{Extended_Pictographic}\uFE0F\u200d]+/u,stripE=s=>s.replace(EMO_LEAD,'');
+const PAT={
+ en:[[/^[Dd]ans (\d+) j$/,'in $1 d'],[/^[Dd]ans (\d+) h$/,'in $1 h'],[/^dans (\d+) min$/,'in $1 min'],[/^Moyenne (\S+) : (.*)$/,'Average $1: $2'],[/^(\d+) à réviser · (\d+) au total$/,'$1 to review · $2 in total'],[/^Semaine ([AB])(.*)$/,'Week $1$2'],
+  [/^(En cours|Prochain) : (.*)$/,(m,a,b)=>(a==='Prochain'?'Next: ':'Now: ')+b],[/^(.+) · aujourd’hui$/,(m,d)=>T(d)+' · today'],[/^(\d+) fiches · (\d+) questions IA \((.*)\)$/,'$1 cards · $2 AI questions ($3)'],[/^(\d+) séances importées(.*)$/,'$1 sessions imported$2'],
+  [/^(Cours|TD \/ TP|Examens|Résumés) \((\d+)\)$/,(m,a,n)=>({'Cours':'Courses','TD / TP':'Tutorials / Labs','Examens':'Exams','Résumés':'Summaries'}[a])+' ('+n+')'],[/^Prochaine révision dans (\d+) j$/,'Next review in $1 d'],[/^Aucun module dans (\S+)$/,'No module in $1'],[/^Mettre à jour$/,'Update'],[/^Niveau (\S+) configuré$/,'Level $1 set']],
+ ar:[[/^[Dd]ans (\d+) j$/,'بعد $1 يوم'],[/^[Dd]ans (\d+) h$/,'بعد $1 ساعة'],[/^dans (\d+) min$/,'بعد $1 دقيقة'],[/^Moyenne (\S+) : (.*)$/,'المعدل $1 : $2'],[/^(\d+) à réviser · (\d+) au total$/,'$1 للمراجعة · $2 في المجموع'],[/^Semaine ([AB])(.*)$/,'الأسبوع $1$2'],
+  [/^(En cours|Prochain) : (.*)$/,(m,a,b)=>(a==='Prochain'?'التالي : ':'الآن : ')+b],[/^(.+) · aujourd’hui$/,(m,d)=>T(d)+' · اليوم'],[/^(\d+) fiches · (\d+) questions IA \((.*)\)$/,'$1 بطاقة · $2 سؤال ذكاء اصطناعي ($3)'],[/^Prochaine révision dans (\d+) j$/,'المراجعة القادمة بعد $1 يوم'],[/^Aucun module dans (\S+)$/,'لا توجد مواد في $1'],[/^(Cours|TD \/ TP|Examens|Résumés) \((\d+)\)$/,(m,a,n)=>({'Cours':'الدروس','TD / TP':'الأعمال التطبيقية','Examens':'الامتحانات','Résumés':'الملخصات'}[a])+' ('+n+')'],[/^Niveau (\S+) configuré$/,'تم ضبط المستوى $1']]
+};PAT.ary=PAT.ar;
+const _nd={};function ndict(l){return _nd[l]||(_nd[l]=Object.fromEntries(Object.entries(I18N[l]||{}).map(([k,v])=>[stripE(k),stripE(v)])))}
+function T(s){const l=LANG();if(l==='fr'||typeof s!=='string')return s;const d=I18N[l]||{},core=s.trim();if(!core)return s;
+  const lead=s.slice(0,s.indexOf(core)),trail=s.slice(lead.length+core.length);
+  if(d[core]!=null)return lead+d[core]+trail;
+  const sc=stripE(core),pre=core.slice(0,core.length-sc.length),nd=ndict(l);
+  if(nd[sc]!=null)return lead+pre+nd[sc]+trail;
+  for(const[re,rp]of(PAT[l]||[]))if(re.test(sc))return lead+pre+sc.replace(re,rp)+trail;
+  return s}
+function trDom(root){
+  if(LANG()==='fr'||!root)return;
+  if(root.nodeType===3){const v=T(root.nodeValue);if(v!==root.nodeValue)root.nodeValue=v;return}
+  if(root.nodeType!==1)return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>{const p=n.parentNode&&n.parentNode.nodeName;return(p==='SCRIPT'||p==='STYLE'||p==='TEXTAREA'||p==='TITLE'||!n.nodeValue.trim())?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT}}),L=[];
+  while(w.nextNode())L.push(w.currentNode);
+  L.forEach(n=>{const v=T(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v});
+  [root,...root.querySelectorAll('[placeholder],[title],[aria-label]')].forEach(e=>['placeholder','title','aria-label'].forEach(a=>{const x=e.getAttribute(a);if(x){const y=T(x);if(y!==x)e.setAttribute(a,y)}}))}
+{const pd=new Set();let qd=0;new MutationObserver(ms=>{if(LANG()==='fr')return;ms.forEach(m=>m.addedNodes.forEach(n=>pd.add(n)));
+  if(!qd){qd=1;Promise.resolve().then(()=>{qd=0;[...pd].forEach(n=>{if(n.isConnected)trDom(n)});pd.clear()})}}).observe(document.documentElement,{childList:true,subtree:true})}
 function applyNavLang(){
   const map={da:'Auj.',tt:'Horaires',ag:'Agenda',mo:'Cours',fc:'Fiches',qz:'Quiz',po:'Focus'};
   document.querySelectorAll('#nav [data-t]').forEach(b=>{const tn=[...b.childNodes].find(n=>n.nodeType===3);if(tn)tn.nodeValue=tr(map[b.dataset.t])});
   const sb=document.querySelector('#nav [data-a="set"]');if(sb){const tn=[...sb.childNodes].find(n=>n.nodeType===3);if(tn)tn.nodeValue=tr('Plus')}
   const sq=$('sq');if(sq)sq.placeholder=tr('Rechercher...');
 }
-function setLang(l){localStorage.setItem(LANGK,l);document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';applyNavLang();render();settings()}
-const defaultA=()=>({activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[],quizQs:[],quizHist:[]});
+function setLang(l){localStorage.setItem(LANGK,l);document.documentElement.lang=l==='ary'?'ar':l;document.documentElement.dir=isRTL()?'rtl':'ltr';applyNavLang();render();settings()}
+const defaultA=()=>({activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[],quizQs:[],quizHist:[],act:{}});
 let A=defaultA();
 const resetA=()=>{Object.keys(A).forEach(k=>delete A[k]);Object.assign(A,defaultA())};
+const emptyBox=(ic,ti,tx,btns)=>`<div class="emp" style="grid-column:1/-1"><div class="emp-i" aria-hidden="true">${ic}</div><b>${ti}</b><p class="mu">${tx}</p><div class="row" style="justify-content:center;margin:12px 0 0">${(btns||[]).map(b=>`<button class="b${b[2]?' p':''}" data-a="${b[1]}">${b[0]}</button>`).join('')}</div></div>`;
 let tab='da',fcAll=false,filt='all',cardMod='all',q='',cur={},tok=null,tc=null,fcTarget=null,agView='list',calMonth=new Date();
 let ttView=localStorage.getItem('eduVault_ttView')||'cards';
 
@@ -249,7 +368,7 @@ const CURV=['da','tt','ag'];
 const curIds=()=>new Set(A.modules.filter(m=>m.semester===curSem()).map(m=>m.id));
 const mods=()=>A.modules.filter(m=>m.semester===A.activeSemester);
 const modName=id=>A.modules.find(m=>m.id===id)?.name||'?';
-function toast(m,t=''){const e=document.createElement('div');e.className=t;e.textContent=m;$('ts').append(e);setTimeout(()=>e.remove(),3500)}
+function toast(m,t=''){const e=document.createElement('div');e.className=t;e.textContent=T(m);$('ts').append(e);setTimeout(()=>e.remove(),3500)}
 function beep(n=3){if(localStorage.getItem('eduVault_sound')==='0')return;try{const Ctx=window.AudioContext||window.webkitAudioContext,ctx=new Ctx();let tm=ctx.currentTime;
   for(let i=0;i<n;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;o.connect(g);g.connect(ctx.destination);
     g.gain.setValueAtTime(.0001,tm);g.gain.exponentialRampToValueAtTime(.3,tm+.02);g.gain.exponentialRampToValueAtTime(.0001,tm+.25);o.start(tm);o.stop(tm+.3);tm+=.35}
@@ -268,10 +387,14 @@ const L={};const lib=s=>L[s]||(L[s]=new Promise((ok,ko)=>{const e=document.creat
 function dlBlob(n,b){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.append(a);a.click();a.remove()}
 function shrink(f,max=800,qa=.6){return new Promise((ok,ko)=>{const r=new FileReader();r.onerror=ko;r.onload=()=>{const im=new Image();im.onerror=ko;im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',qa))};im.src=r.result};r.readAsDataURL(f)})}
 
+/* ---------- journal d'activité (statistiques) : A.act['YYYY-MM-DD']={m:min de focus, c:fiches révisées, q:questions de quiz} ---------- */
+function logAct(k,v){const d=iso(new Date()),o=A.act[d]||(A.act[d]={});o[k]=Math.round(((o[k]||0)+v)*10)/10;
+  const lim=iso(new Date(Date.now()-400*864e5));Object.keys(A.act).forEach(x=>{if(x<lim)delete A.act[x]})}
 /* ---------- data ---------- */
 function load(o){
   try{Object.assign(A,o||JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
   for(const k of ['modules','tasks','flashcards','timetable','notes','quizQs','quizHist'])if(!Array.isArray(A[k]))A[k]=[];
+  if(!A.act||typeof A.act!=='object'||Array.isArray(A.act))A.act={};
   A.settings=Object.assign({level:null,currentWeek:'A',weekRef:'',holidays:[]},A.settings);
   if(!Array.isArray(A.settings.holidays))A.settings.holidays=[];
   A.modules.forEach(m=>{
@@ -314,7 +437,14 @@ function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&new Date(
 const modCol=id=>A.modules.find(m=>m.id===id)?.color||'var(--br)';
 const MPAL=['#2563eb','#059669','#7c3aed','#e11d48','#ea580c','#0d9488','#d97706','#4f46e5','#db2777','#0891b2','#65a30d','#9333ea'];
 const nextModColor=()=>MPAL[A.modules.length%MPAL.length];
-const tint=c=>`--mc:${c};background:color-mix(in srgb, ${c} 16%, var(--card));border:1px solid color-mix(in srgb, ${c} 35%, transparent);border-left:4px solid ${c}`;
+const lumOf=h=>{const c=[1,3,5].map(i=>{const v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+const crat=(a,b)=>{const x=lumOf(a),y=lumOf(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+const isDarkUI=()=>document.documentElement.classList.contains('dark');
+const normHex=c=>/^#[0-9a-f]{6}$/i.test(c)?c.toLowerCase():'#2563eb';
+const mixHex=(a,b,p)=>'#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-p)+parseInt(b.slice(i,i+2),16)*p).toString(16).padStart(2,'0')).join('');
+/* couleur de texte lisible (WCAG AA >= 4.5) pour une couleur de module posée sur le fond teinté d'une séance */
+function readable(c,bg,min){c=normHex(c);min=min||4.5;bg=bg||(isDarkUI()?'#0f1830':'#ffffff');const eff=mixHex(bg,c,.16),to=isDarkUI()?'#ffffff':'#000000';let x=c,n=0;while(crat(x,eff)<min&&n++<24)x=mixHex(x,to,.1);return x}
+const tint=c=>`--mc:${readable(c)};background:color-mix(in srgb, ${c} 16%, var(--card));border:1px solid color-mix(in srgb, ${c} 35%, transparent);border-left:4px solid ${c}`;
 const mAvg=m=>{let t=0,d=0;[['ncc','ccc'],['ntp','ctp'],['nex','cex']].forEach(([n,c])=>{if(m[n]!=null&&m[c]>0){t+=m[n]*m[c];d+=m[c]}});return d?t/d:null};
 /* rattrapage : la note de rattrapage remplace la note d'examen si elle donne un meilleur resultat */
 function mAvgF(m){const o=mAvg(m);if(o==null||m.nrat==null||!(m.cex>0))return o;
@@ -342,17 +472,18 @@ function rDa(){
   const nFc=A.flashcards.filter(f=>curIds().has(f.moduleId)&&(!f.nextRev||f.nextRev<=t)).length,nx=cls.find(c=>tm(c.endTime)>nm);
   const hist=A.quizHist,avgQ=hist.length?Math.round(hist.reduce((s,x)=>s+x.sc/x.n,0)/hist.length*100):null,focus=Math.round(A.modules.reduce((s,m)=>s+(m.pomo||0),0)/60);
   const gr=n.getHours()<12?'Bonjour':n.getHours()<18?'Bon après-midi':'Bonsoir';
-  return `<div class="g"><div class="hero"><small>${gr} 👋 · ${n.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} · Sem. ${curWeek()}</small><b>${hol?'🌴 Vacances aujourd\'hui':nx?(tm(nx.startTime)<=nm?'En cours : ':'Prochain : ')+esc(modName(nx.moduleId)):'Plus de cours aujourd\'hui'}</b>${nx&&!hol?`<small>${esc(nx.startTime)} – ${esc(nx.endTime)} · 📍 ${esc(nx.room)}${tm(nx.startTime)>nm?' · dans '+fmtMin(tm(nx.startTime)-nm):''}</small>`:''}</div>
+  return `<div class="g">${curIds().size?'':emptyBox('🎓',Lg('Commence par ajouter un module','Start by adding a module','ابدأ بإضافة مادة'),Lg('Ajoute tes matières ou importe ton emploi du temps : ton tableau de bord se remplit tout seul.','Add your subjects or import your timetable: your dashboard fills itself.','أضف موادك أو استورد جدولك وستمتلئ لوحتك تلقائيا.'),[['✨ '+Lg('Importer avec l\'IA','Import with AI','استيراد بالذكاء الاصطناعي'),'ai',1],['+ '+Lg('Ajouter un module','Add a module','إضافة مادة'),'addMod'],['👥 '+Lg('Rejoindre avec un code','Join with a code','الانضمام برمز'),'shJoin']])}<div class="hero"><small>${gr} 👋 · ${n.toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'long'})} · Sem. ${curWeek()}</small><b>${hol?'🌴 Vacances aujourd\'hui':nx?(tm(nx.startTime)<=nm?'En cours : ':'Prochain : ')+esc(modName(nx.moduleId)):'Plus de cours aujourd\'hui'}</b>${nx&&!hol?`<small>${esc(nx.startTime)} – ${esc(nx.endTime)} · 📍 ${esc(nx.room)}${tm(nx.startTime)>nm?' · dans '+fmtMin(tm(nx.startTime)-nm):''}</small>`:''}</div>
   <div class="c tod"><h4>📚 Cours du jour</h4>${cls.map(c=>`<div class="cl" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}</small><b>${esc(modName(c.moduleId))}</b><small class="mu">📍 ${esc(c.room)}</small></div>`).join('')||`<p class="mu e">${hol?'🌴 Vacances aujourd\'hui':'Aucun cours aujourd\'hui'}</p>`}</div>
   <div class="c"><h4>⚠️ Échéances (7 jours)</h4>${due.map(x=>{const h=Math.floor((new Date(x.dueDate)-n)/36e5);return`<div class="cl" data-a="go" data-i="ag" style="${tint(modCol(x.moduleId))}"><small class="br">${h<0?'En retard':h<24?'Dans '+h+' h':'Dans '+Math.floor(h/24)+' j'}</small><b>${x.type==='exam'?'🚨':'📝'} ${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div>`}).join('')||'<p class="mu e">Rien dans les 7 jours</p>'}</div>
   <div class="c"><h4>🧠 Réviser</h4><div class="e" style="padding:14px"><b style="font-size:30px;color:var(--br)">${nFc}</b><small class="mu">fiche(s) à réviser aujourd'hui</small></div><div class="row" style="justify-content:center"><button class="b" data-a="go" data-i="fc">🃏 Fiches</button><button class="b p" data-a="go" data-i="qz">🧠 Quiz</button></div></div>
-  <div class="c"><h4>📈 Ma progression</h4><div class="st"><div><b>${qStreak()}🔥</b><small class="mu">série quiz</small></div><div><b>${avgQ==null?'-':avgQ+'%'}</b><small class="mu">score moyen</small></div><div><b>${focus}</b><small class="mu">min de focus</small></div></div></div>
+  <div class="c"><h4>📈 Ma progression</h4><div class="st"><div><b>${qStreak()}🔥</b><small class="mu">série quiz</small></div><div><b>${avgQ==null?'-':avgQ+'%'}</b><small class="mu">score moyen</small></div><div><b>${focus}</b><small class="mu">min de focus</small></div></div><div class="row" style="justify-content:center"><button class="b" data-a="stats">📊 Statistiques</button></div></div>
   </div>`;
 }
 function rTT(){
   const nowD=new Date(),nowM=nowD.getHours()*60+nowD.getMinutes(),tmin=x=>{const[h,m]=x.split(':');return+h*60+ +m},wk=curWeek(),ids=mods().map(m=>m.id),tt=A.timetable.filter(c=>ids.includes(c.moduleId)&&(c.week==='all'||c.week===wk));
   const days=DAYS.filter((d,i)=>i<6||tt.some(c=>c.day===d));
   const head=semBadge()+`<div class="top"><div><h2>${tr('Emploi du temps')}</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ttView">${ttView==='grid'?'📋 '+tr('Cartes'):'🗓 '+tr('Grille horaire')}</button><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">${tr('+ Séance')}</button></div></div>`;
+  if(!tt.length)return head+`<div class="g">${emptyBox('📅',Lg('Aucun emploi du temps','No timetable yet','لا يوجد جدول بعد'),Lg("Importe ton emploi du temps avec l'IA, rejoins ta classe avec un code, ou ajoute une séance à la main.",'Import your timetable with AI, join your class with a code, or add a session by hand.','استورد جدولك بالذكاء الاصطناعي، أو انضم إلى قسمك برمز، أو أضف حصة يدويا.'),[['✨ '+Lg('Importer avec l\'IA','Import with AI','استيراد بالذكاء الاصطناعي'),'ai',1],['👥 '+Lg('Rejoindre avec un code','Join with a code','الانضمام برمز'),'shJoin'],['+ '+Lg('Ajouter une séance','Add a session','إضافة حصة'),'addCls']])}</div>`;
   if(ttView==='grid')return head+rTTGrid(tt,days,nowD,nowM,tmin);
   return head+`<div class="g">`+
   days.map(d=>`<div class="c${d===TOD()?' tod':''}"><h4>${d}${d===TOD()?' · aujourd’hui':''}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
@@ -385,20 +516,20 @@ function rAg(){
   const head=semBadge()+`<div class="top"><h2>${tr('Examens & Devoirs')}</h2><div><button class="b" data-a="agView">${agView==='cal'?tr('📋 Liste'):tr('📅 Calendrier')}</button><button class="b p" data-a="addTask">${tr('+ Ajouter')}</button></div></div>`;
   if(agView==='cal')return head+rCal();
   return head+`<div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${tr(f[1])}</button>`).join('')}</div>`+
-  (l.length?l.map(x=>`<div class="c t${x.type==='exam'?' x':''}${x.completed?' d':''}"><input type="checkbox" ${x.completed?'checked':''} data-a="done" data-i="${x.id}" aria-label="Terminé"><div><b>${x.type==='exam'?'🚨 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))} • ${new Date(x.dueDate).toLocaleString('fr-FR')}</small></div><button class="x-btn" data-a="editTask" data-i="${x.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${x.id}" aria-label="Supprimer">🗑</button></div>`).join(''):`<p class="mu e">${tr('Aucune échéance')}</p>`);
+  (l.length?l.map(x=>`<div class="c t${x.type==='exam'?' x':''}${x.completed?' d':''}"><input type="checkbox" ${x.completed?'checked':''} data-a="done" data-i="${x.id}" aria-label="Terminé"><div><b>${x.type==='exam'?'🚨 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))} • ${new Date(x.dueDate).toLocaleString(LOC())}</small></div><button class="x-btn" data-a="editTask" data-i="${x.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${x.id}" aria-label="Supprimer">🗑</button></div>`).join(''):(filt==='all'?`<div class="g">${emptyBox('⏰',Lg('Aucune échéance pour le moment','No deadline for now','لا مواعيد حاليا'),Lg('Ajoute tes examens et devoirs : tu seras prévenu avant la date.','Add your exams and homework: you will be reminded before the date.','أضف امتحاناتك وواجباتك وسنذكّرك قبل الموعد.'),[['+ '+Lg('Ajouter une échéance','Add a deadline','إضافة موعد'),'addTask',1]])}</div>`:`<p class="mu e">${tr('Aucune échéance')}</p>`));
 }
 function rCal(){
   const ids=mods().map(m=>m.id),m0=new Date(calMonth.getFullYear(),calMonth.getMonth(),1),today=iso(new Date());
   const byDay={};A.tasks.filter(x=>ids.includes(x.moduleId)).forEach(x=>{const d=iso(x.dueDate);(byDay[d]=byDay[d]||[]).push(x)});
   const lead=(m0.getDay()+6)%7,days=new Date(m0.getFullYear(),m0.getMonth()+1,0).getDate();
-  let cells=`<div class="top" style="margin:0 0 8px"><button class="b" data-a="calNav" data-i="-1">‹</button><b>${m0.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</b><button class="b" data-a="calNav" data-i="1">›</button></div><div class="cal">`;
+  let cells=`<div class="top" style="margin:0 0 8px"><button class="b" data-a="calNav" data-i="-1">‹</button><b>${m0.toLocaleDateString(LOC(),{month:'long',year:'numeric'})}</b><button class="b" data-a="calNav" data-i="1">›</button></div><div class="cal">`;
   cells+=['L','M','M','J','V','S','D'].map(d=>`<div class="cw">${d}</div>`).join('');
   for(let i=0;i<lead;i++)cells+='<div class="cd off"></div>';
   for(let d=1;d<=days;d++){const ds=iso(new Date(m0.getFullYear(),m0.getMonth(),d)),tx=byDay[ds]||[];
     cells+=`<div class="cd${ds===today?' today':''}${tx.length?' has':''}" title="${esc(tx.map(x=>x.title).join(', '))}" data-a="calDay" data-i="${ds}">${d}</div>`}
   cells+='</div>';
   const sel=byDay[lastCalDay]||[];
-  return cells+(lastCalDay?`<h4 style="margin-top:14px">${new Date(lastCalDay+'T00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</h4>`+(sel.length?sel.map(x=>`<div class="c t${x.type==='exam'?' x':''}"><div><b>${x.type==='exam'?'🚨 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div></div>`).join(''):`<p class="mu e">${tr('Aucune échéance')}</p>`):'');
+  return cells+(lastCalDay?`<h4 style="margin-top:14px">${new Date(lastCalDay+'T00:00').toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'long'})}</h4>`+(sel.length?sel.map(x=>`<div class="c t${x.type==='exam'?' x':''}"><div><b>${x.type==='exam'?'🚨 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div></div>`).join(''):`<p class="mu e">${tr('Aucune échéance')}</p>`):'');
 }
 let lastCalDay=null;
 function mgrid(){
@@ -406,13 +537,13 @@ function mgrid(){
   return l.length?l.map(m=>{
     const a0=mAvg(m),a=mAvgF(m),av=a==null?'-':a.toFixed(2),passedByRat=a0!=null&&a0<10&&a!=null&&a>=10;
     const inp=(k,c,lab)=>`<label>${lab} (coef ${m[c]})<input type="number" min="0" max="20" step="0.25" placeholder="-" value="${m[k]!=null?m[k]:''}" ${m[c]>0?'':'disabled'} onchange="act.sNote('${m.id}','${k}',this.value)"></label>`;
-    return`<div class="c" style="${tint(esc(m.color||'#2563eb'))}"><div class="top mh" style="margin:0"><div><small class="br">${m.semester} · coef ${m.coeff} · Absences : <span style="color:${m.absences>=3?'var(--er)':'inherit'}">${m.absences||0}</span></small><b style="color:${esc(m.color||'#2563eb')}">${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="abs" data-i="${m.id}|1" title="Ajouter une absence">🚫</button>${m.absences?`<button class="x-btn" data-a="abs" data-i="${m.id}|-1" title="Retirer une absence">➖</button>`:''}<button class="x-btn" data-a="aiFc" data-i="${m.id}" title="Fiches par IA">✨</button><button class="x-btn" data-a="explainMod" data-i="${m.id}" title="${tr('💬 Explique-moi')}">💬</button><button class="x-btn" data-a="sumMod" data-i="${m.id}" title="${tr('🧾 Résumer')}">🧾</button><button class="x-btn" data-a="fcExport" data-i="${m.id}" title="${tr('📤 Export fiches')}">📤</button><button class="x-btn" data-a="fcImport" data-i="${m.id}" title="${tr('📥 Import fiches')}">📥</button><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>
+    return`<div class="c" style="${tint(esc(m.color||'#2563eb'))}"><div class="top mh" style="margin:0"><div><small class="br">${m.semester} · coef ${m.coeff} · Absences : <span style="color:${m.absences>=3?'var(--er)':'inherit'}">${m.absences||0}</span></small><b style="color:${readable(m.color||'#2563eb')}">${esc(m.name)}</b><small class="mu">${esc(m.prof||'Enseignant non spécifié')}</small></div><div><button class="x-btn" data-a="abs" data-i="${m.id}|1" title="Ajouter une absence">🚫</button>${m.absences?`<button class="x-btn" data-a="abs" data-i="${m.id}|-1" title="Retirer une absence">➖</button>`:''}<button class="x-btn" data-a="aiFc" data-i="${m.id}" title="Fiches par IA">✨</button><button class="x-btn" data-a="explainMod" data-i="${m.id}" title="${tr('💬 Explique-moi')}">💬</button><button class="x-btn" data-a="sumMod" data-i="${m.id}" title="${tr('🧾 Résumer')}">🧾</button><button class="x-btn" data-a="fcExport" data-i="${m.id}" title="${tr('📤 Export fiches')}">📤</button><button class="x-btn" data-a="fcImport" data-i="${m.id}" title="${tr('📥 Import fiches')}">📥</button><button class="x-btn" data-a="addRes" data-i="${m.id}" title="Ajouter un document">📎</button><button class="x-btn" data-a="editMod" data-i="${m.id}" title="Modifier">✏️</button><button class="x-btn" data-a="delMod" data-i="${m.id}" title="Supprimer">🗑</button></div></div>
     <div class="row" style="margin:6px 0;justify-content:space-between;align-items:center"><span class="chip" style="margin:0;font-weight:700${a==null?'':';background:'+(a>=10?'var(--ok)':'var(--er)')+';color:#fff'}">Moy : ${av}/20</span><button class="b" data-a="chhal" data-i="${m.id}" style="padding:4px 8px;font-size:11px">🎯 Note à viser</button></div>
     ${passedByRat?`<span class="badge-ok">✅ ${tr('Admis après rattrapage')}</span>`:''}
     ${a0!=null&&a0<10?`<div class="rat"><span>📘 ${tr('Rattrapage')}</span><input type="number" min="0" max="20" step="0.25" placeholder="-" value="${m.nrat!=null?m.nrat:''}" onchange="act.sRat('${m.id}',this.value)"><small class="mu">/20</small></div>`:''}
     <div class="n3">${inp('ncc','ccc','CC')}${inp('ntp','ctp','TP')}${inp('nex','cex','Examen')}</div>`+
     CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>`<div>${x.isLocal?`<button class="l" data-a="openRes" data-i="${esc(x.localFileId)}">📄 ${esc(x.title)}</button>`:`<a href="${esc(x.url)}" target="_blank" rel="noopener">🔗 ${esc(x.title)}</a>`}<button class="x-btn" data-a="delRes" data-i="${m.id}|${x.id}" aria-label="Supprimer">✕</button></div>`).join('')}</div>`}).join('')+'</div>'
-  }).join(''):`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`;
+  }).join(''):(q?`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`:emptyBox('📚',Lg('Aucun module en '+A.activeSemester,'No module in '+A.activeSemester,'لا توجد مواد في '+A.activeSemester),Lg('Ajoute tes matières pour suivre tes notes, tes cours et tes fiches.','Add your subjects to track grades, courses and cards.','أضف موادك لتتبع النقط والدروس والبطاقات.'),[['+ '+Lg('Ajouter un module','Add a module','إضافة مادة'),'addMod',1]]));
 }
 function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="recolor" title="${tr('🎨 Varier les couleurs')}">🎨</button><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
 function rFc(){
@@ -420,7 +551,7 @@ function rFc(){
   const all=A.flashcards.filter(f=>ids.includes(f.moduleId)&&(cardMod==='all'||f.moduleId===cardMod));
   const l=fcAll?all:all.filter(f=>!f.nextRev||f.nextRev<=t);
   return pills()+`<div class="top"><div><h2>${tr('Active Recall')}</h2><small class="br">${all.filter(f=>!f.nextRev||f.nextRev<=t).length} à réviser · ${all.length} au total</small></div><div><button class="b${fcAll?' p':''}" data-a="fcAll">${fcAll?'Toutes':'À réviser'}</button><button class="b p" data-a="addFc">${tr('+ Créer')}</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
-  (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu" style="color:${modCol(f.moduleId)}">● ${esc(modName(f.moduleId))}</small><span><button class="x-btn" data-a="editFc" data-i="${f.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></span></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div><div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><div class="row" style="justify-content:center;margin:0"><button class="b" style="background:#fecaca;color:#991b1b" data-a="sm2" data-i="${f.id}|1">Difficile</button><button class="b" style="background:#bbf7d0;color:#166534" data-a="sm2" data-i="${f.id}|2">Correct</button><button class="b p" data-a="sm2" data-i="${f.id}|3">Facile</button></div></div></div></div>`).join(''):'<p class="mu e" style="grid-column:1/-1">'+(all.length?'Rien à réviser aujourd\'hui. Bravo !':'Aucune fiche pour ce semestre')+'</p>')+'</div>';
+  (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu" style="color:${readable(modCol(f.moduleId))}">● ${esc(modName(f.moduleId))}</small><span><button class="x-btn" data-a="editFc" data-i="${f.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></span></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div><div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><div class="row" style="justify-content:center;margin:0"><button class="b" style="background:#fecaca;color:#991b1b" data-a="sm2" data-i="${f.id}|1">Difficile</button><button class="b" style="background:#bbf7d0;color:#166534" data-a="sm2" data-i="${f.id}|2">Correct</button><button class="b p" data-a="sm2" data-i="${f.id}|3">Facile</button></div></div></div></div>`).join(''):(all.length?'<p class="mu e" style="grid-column:1/-1">Rien à réviser aujourd\'hui. Bravo !</p>':emptyBox('🃏',Lg('Aucune fiche pour ce semestre','No cards for this semester','لا توجد بطاقات لهذا الفصل'),Lg('Crée des fiches question/réponse : l\'appli te les représente au bon moment (révision espacée).','Create question/answer cards: the app shows them again at the right time (spaced repetition).','أنشئ بطاقات سؤال/جواب وسيعرضها التطبيق عليك في الوقت المناسب.'),[['+ '+Lg('Créer une fiche','Create a card','إنشاء بطاقة'),'addFc',1],['🔗 '+Lg('Rejoindre avec un code','Join with a code','الانضمام برمز'),'shJoin']])))+'</div>';
 }
 
 /* ---------- pomodoro ---------- */
@@ -430,6 +561,7 @@ function rPo(){return`<div class="c pm"><div class="row">${Object.keys(PM).map(k
 function ppaint(){if(!$('pt'))return;$('pt').textContent=String(Math.floor(P.left/60)).padStart(2,'0')+':'+String(P.left%60).padStart(2,'0');$('pl').textContent=PM[P.mode][1];$('pp').style.strokeDashoffset=283-((P.total-P.left)/P.total)*283;$('pb').textContent=P.t?'⏸':'▶'}
 function ptick(){P.left=Math.max(0,Math.round((P.end-Date.now())/1000));ppaint();
   if(!P.left){clearInterval(P.t);P.t=null;P.left=P.total;
+    if(P.mode==='work'){logAct('m',PM.work[0]/60);save()}
     if(P.mode==='work'&&P.mod){const m=A.modules.find(x=>x.id===P.mod);if(m){m.pomo=(m.pomo||0)+PM.work[0];save()}}
     notify('Pomodoro','Session terminée !');if(tab==='po')render();else ppaint()}}
 
@@ -458,7 +590,7 @@ const act={
   flt:i=>{filt=i;render()},
   goAg:()=>go('ag'),
   theme:()=>cycleMode(),
-  lvl:i=>{A.settings.level=i;A.activeSemester=A.settings.curSem=LV[i][0];$('dlg').oncancel=null;$('dlg').close();upd();toast('Niveau '+i+' configuré','ok')},
+  lvl:i=>{A.settings.level=i;A.activeSemester=A.settings.curSem=LV[i][0];$('dlg').oncancel=null;$('dlg').close();upd();toast('Niveau '+i+' configuré','ok');if(!LS('eduVault_tour'))setTimeout(()=>{typeof tourStart==='function'&&tourStart()},500)},
   addCls:()=>{if(needMod())return;ask('Séance',[{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'day',l:'Jour',t:'select',o:DAYS.map(d=>[d,d])},{k:'week',l:'Semaine',t:'select',o:[['all','Toutes les semaines'],['A','Semaine A'],['B','Semaine B']]},{k:'startTime',l:'Début',t:'time',r:1},{k:'endTime',l:'Fin',t:'time',r:1},{k:'room',l:'Salle ou amphi',r:1}],v=>{
     if(v.endTime<=v.startTime)return toast("L'heure de fin doit être après le début",'er');A.timetable.push({id:uid('c'),...v});upd();toast('Séance ajoutée','ok')})},
   addMod:()=>modForm(),
@@ -541,10 +673,11 @@ function applyTheme(){
   R.classList.toggle('dark',dark);R.dataset.th=pal;
   const tc=document.querySelector('meta[name=theme-color]');if(tc)tc.content=PALS[pal][1];
   const fav=document.getElementById('fav');if(fav)fav.href='data:image/svg+xml,'+encodeURIComponent(favSvg(PALS[pal][1]));
+  if(typeof applyA11y==='function')applyA11y();
 }
-function setMode(m){localStorage.setItem('eduMode',m);applyTheme()}
+function setMode(m){localStorage.setItem('eduMode',m);applyTheme();try{render()}catch(e){}}
 function cycleMode(){const o=['auto','light','dark'],m=o[(o.indexOf(getMode())+1)%3];setMode(m);toast('Thème : '+{auto:'Auto',light:'Clair',dark:'Sombre'}[m])}
-if(mq&&mq.addEventListener)mq.addEventListener('change',()=>{if(getMode()==='auto')applyTheme()});
+if(mq&&mq.addEventListener)mq.addEventListener('change',()=>{if(getMode()==='auto'){applyTheme();try{render()}catch(e){}}});
 
 /* ---------- quiz ---------- */
 let QZ=null,QT=null;const qcfg={mod:'all',n:10,mode:'qcm',timer:false};
@@ -572,7 +705,7 @@ function qAnswer(txt,selfOk){
   const c=q.card&&A.flashcards.find(f=>f.id===q.card);if(c&&!ok){c.nextRev=Date.now();c.repetition=0;c.interval=0}
   save();render();
 }
-function qFinish(){QZ.done=true;qTimerStop();A.quizHist.push({d:Date.now(),sc:QZ.sc,n:QZ.qs.length,mod:qcfg.mod});A.quizHist=A.quizHist.slice(-60);save();render()}
+function qFinish(){QZ.done=true;qTimerStop();logAct('q',QZ.qs.length);A.quizHist.push({d:Date.now(),sc:QZ.sc,n:QZ.qs.length,mod:qcfg.mod});A.quizHist=A.quizHist.slice(-60);save();render()}
 function rQz(){
   if(QZ&&QZ.done)return qResult();
   if(QZ){if(!QT)qTimerStart();return qPlay()}
@@ -589,7 +722,7 @@ function qHome(){
   <label>Nombre de questions<select onchange="qcfg.n=+this.value">${[5,10,20].map(n=>`<option${qcfg.n===n?' selected':''}>${n}</option>`).join('')}</select></label>
   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${qcfg.timer?'checked':''} onchange="qcfg.timer=this.checked"> Chrono de 20 s par question (QCM)</label>
   <div class="row"><button class="b p" data-a="qgo">▶ Commencer</button></div></div>
-  ${h.length?`<div class="c" style="margin-top:12px"><h4>Derniers résultats</h4>${h.slice(-5).reverse().map(x=>`<div class="cl" style="cursor:default"><b>${Math.round(x.sc/x.n*100)}% <span class="mu">(${x.sc}/${x.n})</span></b><small class="mu">${new Date(x.d).toLocaleString('fr-FR')}</small></div>`).join('')}</div>`:''}
+  ${h.length?`<div class="c" style="margin-top:12px"><h4>Derniers résultats</h4>${h.slice(-5).reverse().map(x=>`<div class="cl" style="cursor:default"><b>${Math.round(x.sc/x.n*100)}% <span class="mu">(${x.sc}/${x.n})</span></b><small class="mu">${new Date(x.d).toLocaleString(LOC())}</small></div>`).join('')}</div>`:''}
   ${bank?`<div class="row" style="justify-content:flex-start"><button class="b" data-a="qclear">🗑 Vider la banque IA</button></div>`:''}`;
 }
 function qPlay(){
@@ -648,7 +781,7 @@ Object.assign(act,{
     let t=m.cex,s=0;[['ncc','ccc'],['ntp','ctp']].forEach(([n,c])=>{if(m[n]!=null&&m[c]>0){t+=m[c];s+=m[n]*m[c]}});
     const req=(10*t-s)/m.cex;
     alert(req>20?'Impossible de valider à 10 : il faudrait '+req.toFixed(2)+'/20 à l\'examen.':req<=0?'Module déjà validé : même 0/20 à l\'examen suffit.':'Il te faut '+req.toFixed(2)+'/20 à l\'examen pour avoir 10 de moyenne.')},
-  sm2:i=>{const[id,qs]=i.split('|'),q=+qs,c=A.flashcards.find(f=>f.id===id);if(!c)return;
+  sm2:i=>{const[id,qs]=i.split('|'),q=+qs,c=A.flashcards.find(f=>f.id===id);if(!c)return;logAct('c',1);
     c.efactor=c.efactor||2.5;c.repetition=c.repetition||0;c.interval=c.interval||0;
     if(q===1){c.repetition=0;c.interval=1}
     else{c.interval=c.repetition===0?1:c.repetition===1?(q===3?8:6):Math.max(1,Math.round(c.interval*c.efactor*(q===3?1.3:1)));c.repetition++}
@@ -724,7 +857,7 @@ function clsDlg(id){
 /* ---------- settings ---------- */
 function settings(){
   const d=$('dlg'),s=A.settings;
-  d.innerHTML=`<h3>${tr('⚙️ Réglages')}</h3><div class="rs" style="display:block;margin-bottom:6px"><b>${UID?'👤 '+esc((acctInfo()||{}).email||''):'Mode invité'}</b><small class="mu">${UID?acctStatusTxt():'Tes données restent sur cet appareil. Crée un compte pour les sauvegarder et les retrouver sur tous tes appareils.'}</small></div><div class="row" style="justify-content:flex-start;margin:0 0 8px"><button class="b p" data-a="acct">${UID?'Gérer mon compte':'Se connecter / Créer un compte'}</button></div><label>${tr('Langue')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px"><button class="b${LANG()==='fr'?' p':''}" data-a="setLang" data-i="fr">Français</button><button class="b${LANG()==='ar'?' p':''}" data-a="setLang" data-i="ar">العربية</button></div><label>${tr('Couleur du thème')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px">${Object.entries(PALS).map(([k,v])=>`<button class="sw${(localStorage.getItem('eduPal')||'blue')===k?' sel':''}" data-a="pal" data-i="${k}" style="background:${v[1]}" aria-label="${v[0]}" title="${v[0]}"></button>`).join('')}</div><label>${tr('Apparence')}<select onchange="setMode(this.value)">${[['auto','Auto (comme le téléphone)'],['light','Clair'],['dark','Sombre']].map(o=>`<option value="${o[0]}"${getMode()===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label><label>${tr('Niveau actuel')}<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
+  d.innerHTML=`<h3>${tr('⚙️ Réglages')}</h3><div class="rs" style="display:block;margin-bottom:6px"><b>${UID?'👤 '+esc((acctInfo()||{}).email||''):'Mode invité'}</b><small class="mu">${UID?acctStatusTxt():'Tes données restent sur cet appareil. Crée un compte pour les sauvegarder et les retrouver sur tous tes appareils.'}</small></div><div class="row" style="justify-content:flex-start;margin:0 0 8px"><button class="b p" data-a="acct">${UID?'Gérer mon compte':'Se connecter / Créer un compte'}</button></div><label>${tr('Langue')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px"><button class="b${LANG()==='fr'?' p':''}" data-a="setLang" data-i="fr">Français</button><button class="b${LANG()==='en'?' p':''}" data-a="setLang" data-i="en">English</button><button class="b${LANG()==='ar'?' p':''}" data-a="setLang" data-i="ar">العربية</button><button class="b${LANG()==='ary'?' p':''}" data-a="setLang" data-i="ary">الدارجة</button></div><label>${tr('Couleur du thème')}</label><div class="row" style="justify-content:flex-start;margin:0 0 6px">${Object.entries(PALS).map(([k,v])=>`<button class="sw${(localStorage.getItem('eduPal')||'blue')===k?' sel':''}" data-a="pal" data-i="${k}" style="background:${v[1]}" aria-label="${v[0]}" title="${v[0]}"></button>`).join('')}</div><label>${tr('Apparence')}<select onchange="setMode(this.value)">${[['auto','Auto (comme le téléphone)'],['light','Clair'],['dark','Sombre']].map(o=>`<option value="${o[0]}"${getMode()===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label><label>${tr('Niveau actuel')}<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
   <label>${tr('Semestre en cours')}<select onchange="chgSem(this.value)">${sems().map(x=>`<option${x===curSem()?' selected':''}>${x}</option>`).join('')}</select></label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${A.settings.showAll?'checked':''} onchange="chgAll(this.checked)"> ${tr('Afficher aussi les anciens semestres (archives)')}</label>
   <label>${tr('Rappel avant les cours')}<select onchange="localStorage.setItem('eduVault_clsRem',this.value)">${[0,5,10,15,30].map(v=>`<option value="${v}"${(+(localStorage.getItem('eduVault_clsRem')||10))===v?' selected':''}>${v?v+' min':'Désactivé'}</option>`).join('')}</select></label>
   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${localStorage.getItem('eduVault_sound')!=='0'?'checked':''} onchange="localStorage.setItem('eduVault_sound',this.checked?'1':'0')"> ${tr('🔔 Son des alertes')}</label>
@@ -735,6 +868,9 @@ function settings(){
   <div class="rs" style="margin:0 0 6px">${driveStatusHTML()}</div>
   ${UID?`<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${dfOn()?'checked':''} ${linked()?'':'disabled'} onchange="setDf(this.checked)"> Copier mes fichiers dans mon Google Drive</label>${linked()?'':'<small class="mu">Connecte d\'abord ton Drive (bouton ci-dessous).</small>'}`:''}
   <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="expics">${tr('📅 Export .ics')}</button><button class="b p" data-a="drive">${linked()?'Déconnecter Drive':(UID?'Connecter mon Drive':'Activer la sauvegarde auto')}</button>${linked()&&!UID?'<button class="b" data-a="dsave">⬆ Envoyer</button><button class="b" data-a="dload">⬇ Restaurer</button>':''}<button class="b" data-a="setCid" title="Client ID Google">🔑</button></div>
+  ${typeof a11ySection==='function'?a11ySection():''}
+  <label>${Lg('👥 Partage','👥 Sharing','👥 المشاركة')}</label>
+  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="shHub">${Lg('Partage & code de classe','Sharing & class code','المشاركة ورمز القسم')}</button><button class="b" data-a="stats">${tr('📊 Statistiques')}</button><button class="b" data-a="tour">${tr('Revoir la visite guidée')}</button></div>
   <label>${tr('ℹ️ À propos')}</label>
   <div class="rs about" style="margin:0 0 6px">
     <div style="display:flex;flex-wrap:wrap">
@@ -845,7 +981,7 @@ function paintDrive(){const st=dstate(),e=$('dd'),b=$('dv');
   if(b)b.title={ok:'Drive : synchronisé',busy:'Drive : synchronisation...',wait:'Drive : reconnexion au prochain toucher',off:'Drive : non connecté'}[st]}
 function driveStatusHTML(){const st=dstate(),ts=lastTs();
   if(UID)return `<b>${{ok:'🟢 Drive connecté',busy:'🔵 Envoi des fichiers...',wait:'🟠 Drive lié · reconnexion au prochain toucher',off:'⚪ Drive non connecté (optionnel)'}[st]}</b><small class="mu">${dfOn()?'Tes fichiers sont aussi copiés dans TON Google Drive et disponibles sur tous tes appareils.':'Tes fichiers restent uniquement sur cet appareil.'}</small>${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Tes données (cours, horaires, notes...) sont sauvegardées par ton compte EduVault, pas par Drive.</small>`;
-  return `<b>${{ok:'🟢 Connecté · sauvegarde automatique active',busy:'🔵 Synchronisation en cours...',wait:'🟠 Lié à Drive · reconnexion automatique au prochain toucher',off:'🔴 Non connecté'}[st]}</b>${ts?`<small class="mu">Dernière synchronisation : ${new Date(ts).toLocaleString('fr-FR')}</small>`:''}${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Modules, horaires, devoirs, fiches, quiz, notes et fichiers locaux sont envoyés automatiquement.</small>`}
+  return `<b>${{ok:'🟢 Connecté · sauvegarde automatique active',busy:'🔵 Synchronisation en cours...',wait:'🟠 Lié à Drive · reconnexion automatique au prochain toucher',off:'🔴 Non connecté'}[st]}</b>${ts?`<small class="mu">Dernière synchronisation : ${new Date(ts).toLocaleString(LOC())}</small>`:''}${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Modules, horaires, devoirs, fiches, quiz, notes et fichiers locaux sont envoyés automatiquement.</small>`}
 
 function drvAuth(){
   return lib('https://accounts.google.com/gsi/client').then(()=>new Promise((ok,ko)=>{
@@ -893,6 +1029,7 @@ function mergeRemote(o){
   const nk=new Set(A.notes.map(n=>n.classId));(o.notes||[]).forEach(n=>{if(!nk.has(n.classId))A.notes.push(n)});
   A.settings.holidays=[...new Set([...A.settings.holidays,...((o.settings&&o.settings.holidays)||[])])];
   A.quizHist=[...A.quizHist,...(o.quizHist||[]).filter(h=>!A.quizHist.some(x=>x.d===h.d))].sort((a,b)=>a.d-b.d).slice(-60);
+  Object.entries(o.act||{}).forEach(([d,v])=>{const a=A.act[d]=A.act[d]||{};Object.entries(v||{}).forEach(([k,n])=>{a[k]=Math.max(a[k]||0,+n||0)})});
   A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){}render()}
 
 /* fichiers "locaux" : envoyes aussi sur Drive pour etre disponibles sur les autres appareils */
@@ -921,7 +1058,7 @@ async function drvSync(o={}){
     else if(o.force!=='down'&&f.modifiedTime===LS('eduVault_remoteMod')){if(dirty)await drvPut(f)}
     else{
       const rm=await drvGet(f),rts=rm.updatedAt||Date.parse(f.modifiedTime)||0;
-      if(o.force==='down'){if(confirm('Remplacer les données de cet appareil par la sauvegarde Drive du '+new Date(rts).toLocaleString('fr-FR')+' ?'))applyRemote(rm,rts,f)}
+      if(o.force==='down'){if(confirm('Remplacer les données de cet appareil par la sauvegarde Drive du '+new Date(rts).toLocaleString(LOC())+' ?'))applyRemote(rm,rts,f)}
       else if(rts>lastTs()){if(!dirty||!hasData())applyRemote(rm,rts,f);else{mergeRemote(rm);await drvPut(f);toast('Données fusionnées avec Drive ✔','ok')}}
       else{LS('eduVault_remoteMod',f.modifiedTime||'');if(dirty)await drvPut(f)}}
     await syncFiles();drvErr=''}
@@ -938,6 +1075,10 @@ function drvBoot(){
 
 /* ---------- Comptes EduVault (Firebase Auth + Firestore) ---------- */
 const FB_CFG={apiKey:"AIzaSyBD3n4Bg6XxTBoi4KL7iL5-NeBHpYWpsg8",authDomain:"eduvault-22224.firebaseapp.com",projectId:"eduvault-22224",storageBucket:"eduvault-22224.firebasestorage.app",messagingSenderId:"566849218980",appId:"1:566849218980:web:104b65763b02f8d6973931"};
+/* App Check (reCAPTCHA v3) : colle ici la clé de site reCAPTCHA v3 (voir LISEZ-MOI.md §3). Vide = App Check désactivé. */
+const APPCHECK_KEY='';
+let ENC=null,ENCST='off',encAsked='';
+const CH_ENC=250000;
 const FB_URL=n=>'https://www.gstatic.com/firebasejs/10.12.2/firebase-'+n+'-compat.js',CH_SZ=300000;
 let fb=null,fbUser=null,fbBusy=false,fbQ=false,fbErr='',fbUnsub=null,fbT=null,fbReady=null,wipeNext=null,intentional=false,acMode='in',acEmail='';
 const fbTsKey=()=>'eduVault_fbTs_'+UID,fbHKey=()=>'eduVault_fbH_'+UID;
@@ -946,7 +1087,7 @@ const fbMsg=e=>FBM[e&&e.code]||(e instanceof TypeError?'Pas de connexion interne
 const hash=str=>{let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)+str.length};
 const guestData=()=>{try{const o=JSON.parse(localStorage.getItem(GUEST_KEY)||'null');return o&&Array.isArray(o.modules)&&(o.modules.length||(o.timetable||[]).length)?o:null}catch(e){return null}};
 const closeOnboard=()=>{const d=$('dlg');if(d.open&&d.querySelector('[data-a=lvl]'))d.close()};
-const acctStatusTxt=()=>fbErr?'⚠️ '+fbErr:fbBusy?'Synchronisation...':(+LS('eduVault_fbLast')?'Synchronisé à '+new Date(+LS('eduVault_fbLast')).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'En attente de connexion...');
+const acctStatusTxt=()=>fbErr?'⚠️ '+fbErr:fbBusy?'Synchronisation...':(+LS('eduVault_fbLast')?'Synchronisé à '+new Date(+LS('eduVault_fbLast')).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'}):'En attente de connexion...');
 function paintAcct(){
   const l=$('acl'),d=$('ad'),b=$('ac');if(!l)return;const em=(acctInfo()||{}).email||'';
   if(UID){l.textContent=(em[0]||'?').toUpperCase();l.className='av';d.style.display='';d.style.color=fbErr?'#f59e0b':fbBusy?'#3b82f6':fbUser?'#10b981':'#f59e0b';b.title=em+' · '+acctStatusTxt()}
@@ -957,6 +1098,8 @@ function fbLoad(){
   fbReady=(async()=>{
     await lib(FB_URL('app'));await lib(FB_URL('auth'));await lib(FB_URL('firestore'));
     if(!firebase.apps.length)firebase.initializeApp(FB_CFG);
+    if(APPCHECK_KEY){try{if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname))self.FIREBASE_APPCHECK_DEBUG_TOKEN=true;
+      await lib(FB_URL('app-check'));firebase.appCheck().activate(APPCHECK_KEY,true)}catch(e){console.warn('App Check indisponible',e)}}
     fb={auth:firebase.auth(),db:firebase.firestore()};try{fb.db.settings({ignoreUndefinedProperties:true})}catch(e){}
     fb.auth.onAuthStateChanged(onAuth);return fb})().catch(e=>{fbReady=null;throw e});
   return fbReady}
@@ -966,7 +1109,7 @@ async function switchUser(uid,email){
   UID=uid;KEY=keyFor(uid);db=null;tok=null;clearTimeout(tokT);
   if(wiping){wipeLocal(leaving);wipeNext=null}
   if(uid)localStorage.setItem('eduVault_acct',JSON.stringify({uid,email}));else localStorage.removeItem('eduVault_acct');
-  fbErr='';resetA();load();paintDrive();if(linked())armReconnect();
+  fbErr='';ENC=null;ENCST='off';encAsked='';resetA();load();paintDrive();if(linked())armReconnect();
   if(!A.settings.level)onboard();else closeOnboard();
   render();paintAcct();
 }
@@ -975,7 +1118,7 @@ async function onAuth(user){
     fbUser=user;
     if(UID!==user.uid)await switchUser(user.uid,user.email);
     else localStorage.setItem('eduVault_acct',JSON.stringify({uid:user.uid,email:user.email}));
-    paintAcct();startRealtime();await fbSync({first:true});
+    paintAcct();startRealtime();await fbSync({first:true});setTimeout(()=>{typeof resumeJoin==='function'&&resumeJoin()},400);
   }else{
     fbUser=null;stopRealtime();
     const unexpected=!!UID&&!intentional;intentional=false;
@@ -992,18 +1135,27 @@ function stopRealtime(){if(fbUnsub){try{fbUnsub()}catch(e){}fbUnsub=null}}
 function fbSchedule(ms){clearTimeout(fbT);fbT=setTimeout(()=>fbSync(),ms==null?15000:ms)}
 async function fbPull(ref,m){
   const n=m.n||0,docs=await Promise.all(Array.from({length:n},(_,i)=>ref.collection('c').doc(String(i)).get()));
-  let str='';docs.forEach((d,i)=>{if(!d.exists)throw Error('Données cloud incomplètes ('+i+')');str+=d.data().t});
+  let str='';
+  for(let i=0;i<docs.length;i++){const d=docs[i];if(!d.exists)throw Error('Données cloud incomplètes ('+i+')');const t=d.data().t;
+    if(m.e){if(!ENC)throw Error('Données chiffrées : mot de passe de chiffrement requis');
+      try{str+=await decStr(ENC,t,'eduvault:chunk:'+i)}catch(e){throw Error('Déchiffrement impossible (mot de passe de chiffrement incorrect ou données corrompues)')}}
+    else str+=t}
   const o=JSON.parse(str);if(!o||!Array.isArray(o.modules))throw Error('Données cloud invalides');
   LS(fbHKey(),JSON.stringify(m.h||[]));return o}
 async function fbPush(ref,m){
   const ts=A.updatedAt||(A.updatedAt=Date.now()),str=JSON.stringify(A);
   if(str.length>9e6)throw Error('Données trop volumineuses : supprime quelques photos de notes');
-  const chunks=[];for(let i=0;i<str.length;i+=CH_SZ)chunks.push(str.slice(i,i+CH_SZ));
-  const hs=chunks.map(hash),prev=(m&&m.h)||[],batch=fb.db.batch();
+  const useEnc=!!ENC&&ENC.uid===fbUser.uid&&ENC.mode!=='disabling',sz=useEnc?CH_ENC:CH_SZ,raw=[];
+  for(let i=0;i<str.length;i+=sz)raw.push(str.slice(i,i+sz));
+  const chunks=useEnc?await Promise.all(raw.map((t,i)=>encStr(ENC,t,'eduvault:chunk:'+i))):raw;
+  const hs=chunks.map(hash);let prev=(m&&m.h)||[];
+  if(!!(m&&m.e)!==useEnc||(useEnc&&m&&m.s!==ENC.s))prev=[];
+  const prevN=Math.max(prev.length,(m&&m.n)||0),batch=fb.db.batch();
   chunks.forEach((t,i)=>{if(hs[i]!==prev[i])batch.set(ref.collection('c').doc(String(i)),{i,t,h:hs[i]})});
-  for(let i=chunks.length;i<prev.length;i++)batch.delete(ref.collection('c').doc(String(i)));
-  batch.set(ref,{updatedAt:ts,n:chunks.length,h:hs,v:1,email:fbUser.email||''});
-  await batch.commit();LS(fbTsKey(),String(ts));LS(fbHKey(),JSON.stringify(hs))}
+  for(let i=chunks.length;i<prevN;i++)batch.delete(ref.collection('c').doc(String(i)));
+  batch.set(ref,Object.assign({updatedAt:ts,n:chunks.length,h:hs,v:1,email:fbUser.email||''},useEnc?{e:1,s:ENC.s,it:ENC.it,kc:ENC.kc}:{}));
+  await batch.commit();LS(fbTsKey(),String(ts));LS(fbHKey(),JSON.stringify(hs));
+  if(ENC&&ENC.mode==='enabling')ENC.mode='on';else if(ENC&&ENC.mode==='disabling')ENC.mode='off'}
 function applyRemoteFb(o,ts){
   resetA();load(o);A.updatedAt=ts;try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){}
   LS(fbTsKey(),String(ts));closeOnboard();if(!A.settings.level)onboard();render();toast('Données synchronisées ✔','ok')}
@@ -1011,10 +1163,13 @@ async function fbSync(o={}){
   if(!fbUser||!fb)return;if(fbBusy){fbQ=true;return}
   fbBusy=true;paintAcct();
   try{
-    const ref=fbRef(),snap=await ref.get(),last=+LS(fbTsKey())||0,local=A.updatedAt||0,dirty=local>last;
+    const ref=fbRef(),snap=await ref.get(),last=+LS(fbTsKey())||0,local=A.updatedAt||0,dirty=local>last,m0=snap.exists?snap.data():null;
+    if(m0&&!m0.e&&ENC&&ENC.mode==='on'){ENC=null;try{kdel(fbUser.uid)}catch(e){}}
+    ENCST=m0&&m0.e?'on':'off';
+    if(m0&&m0.e&&!(await encEnsure(m0))){ENCST='locked';fbErr='Données chiffrées : déverrouille-les avec ton mot de passe de chiffrement';paintAcct();if(encAsked!==m0.s){encAsked=m0.s;setTimeout(()=>encUnlockDlg(m0),200)}return}
     if(!snap.exists){
       if(!hasData()){const g=guestData();if(g&&confirm('Importer les données de cet appareil (cours, horaires, fiches...) dans ton compte ?')){resetA();load(g);A.updatedAt=Date.now();flushSave();render()}}
-      if(hasData())await fbPush(ref,null);
+      if(hasData()||(ENC&&ENC.mode==='enabling'))await fbPush(ref,null);
     }else{
       const m=snap.data(),rts=m.updatedAt||0;
       if(o.force==='up')await fbPush(ref,m);
@@ -1027,7 +1182,7 @@ async function fbSync(o={}){
   }catch(e){fbErr=fbMsg(e)}
   finally{fbBusy=false;paintAcct();if(fbQ){fbQ=false;fbSchedule(1500)}}
 }
-function wipeLocal(uid){['eduVault_u_','eduVault_fbTs_','eduVault_fbH_'].forEach(p=>localStorage.removeItem(p+uid));try{indexedDB.deleteDatabase('EduVaultLocalFiles_'+uid)}catch(e){}}
+function wipeLocal(uid){try{kdel(uid)}catch(e){}['eduVault_u_','eduVault_fbTs_','eduVault_fbH_'].forEach(p=>localStorage.removeItem(p+uid));try{indexedDB.deleteDatabase('EduVaultLocalFiles_'+uid)}catch(e){}}
 async function fbDeleteCloud(){
   const ref=fbRef(),cs=await ref.collection('c').get(),b=fb.db.batch();cs.docs.forEach(d=>b.delete(d.ref));b.delete(ref);await b.commit()}
 function setDf(on){LS(DFK(),on?'1':'0');if(on&&tok)drvSync();else paintDrive();settings();toast(on?'Tes fichiers seront copiés dans ton Drive':'Tes fichiers resteront sur cet appareil','ok')}
@@ -1035,6 +1190,7 @@ function acctDlg(){
   const d=$('dlg');
   if(UID){
     d.innerHTML=`<h3>👤 Mon compte</h3><div class="rs" style="display:block;margin:8px 0"><b>${esc((acctInfo()||{}).email||'')}</b><small class="mu">${esc(acctStatusTxt())}</small></div>
+    ${typeof encSection==='function'?encSection():''}
     <div class="row" style="justify-content:flex-start"><button class="b p" data-a="acSync">Synchroniser maintenant</button><button class="b" data-a="acReset">Changer le mot de passe</button></div>
     <div class="row" style="justify-content:flex-start"><button class="b" data-a="acOut">Se déconnecter</button><button class="b" data-a="acWipe">Déconnecter et effacer cet appareil</button></div>
     <small class="mu" style="margin-top:8px">Sur un appareil partagé, utilise « effacer cet appareil » : tes données restent dans ton compte.</small>
@@ -1161,7 +1317,7 @@ $('fcf').onchange=e=>{const f=e.target.files[0],target=fcTarget;if(!f||!target)r
     if(!n)throw 0;upd();toast(n+' fiches importées','ok')}catch(x){toast('Fichier de fiches invalide','er')}};
   r.readAsText(f);e.target.value='';fcTarget=null};
 
-document.documentElement.lang=LANG();document.documentElement.dir=LANG()==='ar'?'rtl':'ltr';
+document.documentElement.lang=LANG()==='ary'?'ar':LANG();document.documentElement.dir=isRTL()?'rtl':'ltr';
 load();
 applyTheme();applyNavLang();
 drvBoot();acctBoot();go('da');
@@ -1175,7 +1331,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(swRefreshing||!hadCtrl)return;swRefreshing=true;location.reload()});
 }
 function showUpdateToast(reg){
-  const e=document.createElement('div');e.style.cssText='cursor:pointer;pointer-events:auto';e.textContent='🔄 '+(LANG()==='ar'?'تحديث جديد متوفر، اضغط للتحديث!':'Mise à jour disponible, touchez pour actualiser.');
+  const e=document.createElement('div');e.style.cssText='cursor:pointer;pointer-events:auto';e.textContent='🔄 '+(isRTL()?'تحديث جديد متوفر، اضغط للتحديث!':LANG()==='en'?'Update available, tap to refresh.':'Mise à jour disponible, touchez pour actualiser.');
   e.onclick=()=>{reg.waiting&&reg.waiting.postMessage({type:'SKIP_WAITING'})};$('ts').append(e);setTimeout(()=>e.remove(),20000);
 }
 if(!A.settings.level)onboard();
@@ -1188,5 +1344,302 @@ function chkCls(){
     if(st-nm>0&&st-nm<=mins&&!fired.has(key)){fired.add(key);notify(modName(c.moduleId)+' · dans '+(st-nm)+' min','📍 '+(c.room||'')+' · '+c.startTime)}})}
 setInterval(()=>{chk();chkCls();if(!document.hidden&&(tab==='da'||tab==='tt'))render()},6e4);chk();chkCls();
 </script>
+<script>
+/* =====================================================================
+   EduVault v9 : statistiques, partage par code/lien, chiffrement côté client,
+   accessibilité, visite guidée. (Tout ce qui est "const/let" du script principal est visible ici.)
+   ===================================================================== */
+
+/* ---------- 13. Statistiques ---------- */
+let stWk=0;
+const fmtDur=min=>{min=Math.round(min);return min>=60?Math.floor(min/60)+' h'+(min%60?' '+String(min%60).padStart(2,'0'):''):min+' min'};
+const actOf=d=>{const o=A.act[d]||{};return{f:+o.m||0,e:(+o.c||0)*.5+(+o.q||0)*.5}}; /* e = estimation : 30 s par fiche / question */
+const wdName=(d,w)=>d.toLocaleDateString(LOC(),{weekday:w||'short'});
+function rSt(){
+  const mon=monday(new Date());mon.setDate(mon.getDate()+7*stWk);
+  const days=[...Array(7)].map((_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return d}),vals=days.map(d=>actOf(iso(d)));
+  const tot=vals.reduce((s,v)=>s+v.f+v.e,0),mx=Math.max(60,...vals.map(v=>v.f+v.e)),todayIso=iso(new Date());
+  /* graphique : heures de révision de la semaine */
+  const W=320,H=190,base=156,bw=28,gap=(W-40-7*bw)/6;
+  let bars='';days.forEach((d,i)=>{const x=20+i*(bw+gap),v=vals[i],hf=Math.round(112*v.f/mx),he=Math.round(112*v.e/mx),tt=v.f+v.e,isT=iso(d)===todayIso;
+    bars+=`<g><title>${esc(wdName(d,'long'))} : ${fmtDur(v.f)} focus${v.e?' + ~'+fmtDur(v.e)+' fiches/quiz':''}</title>`+
+     (v.e?`<rect x="${x}" y="${base-hf-he}" width="${bw}" height="${he}" rx="5" style="fill:var(--br);opacity:.42"/>`:'')+
+     (v.f?`<rect x="${x}" y="${base-hf}" width="${bw}" height="${hf}" rx="5" style="fill:var(--br)"/>`:'')+
+     (!tt?`<rect x="${x}" y="${base-3}" width="${bw}" height="3" rx="1.5" style="fill:var(--ln)"/>`:'')+
+     (tt?`<text class="v" x="${x+bw/2}" y="${base-hf-he-5}" text-anchor="middle">${tt>=60?(tt/60).toFixed(1).replace(/\.0$/,'')+'h':Math.round(tt)+'m'}</text>`:'')+
+     `<text x="${x+bw/2}" y="${base+15}" text-anchor="middle" style="${isT?'fill:var(--br);font-weight:800':''}">${esc(wdName(d))}</text></g>`});
+  const wLabel=days[0].toLocaleDateString(LOC(),{day:'numeric',month:'short'})+' – '+days[6].toLocaleDateString(LOC(),{day:'numeric',month:'short'});
+  const chart=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(Lg('Heures de révision par jour de la semaine','Revision hours per weekday','ساعات المراجعة حسب أيام الأسبوع'))}"><line class="ln" x1="14" x2="${W-14}" y1="${base}" y2="${base}"/>${bars}</svg>`;
+  /* heatmap : 16 dernières semaines */
+  const WK=16,cs=15,cg=3,hm=monday(new Date());hm.setDate(hm.getDate()-7*(WK-1));let cells='';
+  for(let w=0;w<WK;w++)for(let r=0;r<7;r++){const d=new Date(hm);d.setDate(d.getDate()+w*7+r);const k=iso(d),fut=k>todayIso,a=actOf(k),t=a.f+a.e,lv=fut?0:t<=0?0:t<10?1:t<30?2:t<60?3:4;
+    cells+=`<rect x="${26+w*(cs+cg)}" y="${r*(cs+cg)}" width="${cs}" height="${cs}" rx="4" style="fill:${lv?`color-mix(in srgb,var(--br) ${[0,25,45,70,100][lv]}%,var(--in))`:'var(--in)'};${fut?'opacity:.35':''}"><title>${esc(d.toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'long'}))} : ${t?fmtDur(t):Lg('aucune activité','no activity','لا نشاط')}</title></rect>`}
+  const hmW=26+WK*(cs+cg),hmH=7*(cs+cg),wl=[0,2,4,6].map(r=>{const d=new Date(hm);d.setDate(d.getDate()+r);return`<text x="0" y="${r*(cs+cg)+cs-3}">${esc(wdName(d,'narrow'))}</text>`}).join('');
+  const heat=`<div class="gridwrap"><svg class="chart heat" viewBox="0 0 ${hmW} ${hmH}" width="100%" style="min-width:300px" role="img" aria-label="${esc(Lg('Carte de chaleur des jours de révision','Heatmap of revision days','خريطة حرارية لأيام المراجعة'))}">${wl}${cells}</svg></div>
+   <div class="legend">${tr('Moins')} ${[0,1,2,3,4].map(l=>`<i style="background:${l?`color-mix(in srgb,var(--br) ${[0,25,45,70,100][l]}%,var(--in))`:'var(--in)'}"></i>`).join('')} ${tr('Plus ')}</div>`;
+  /* moyenne par semestre */
+  const ss=visSems(),sv=ss.map(x=>({s:x,v:semAvgNum(x)})),SW=Math.max(280,ss.length*44+30),sb=130;
+  const sbars=sv.map((o,i)=>{const x=20+i*((SW-40)/ss.length)+4,bw2=(SW-40)/ss.length-8;if(o.v==null)return`<g><text x="${x+bw2/2}" y="${sb-6}" text-anchor="middle">–</text><text x="${x+bw2/2}" y="${sb+15}" text-anchor="middle">${o.s}</text></g>`;
+    const h=Math.round(100*Math.min(20,o.v)/20);return`<g><title>${o.s} : ${o.v.toFixed(2)}/20</title><rect x="${x}" y="${sb-h}" width="${bw2}" height="${h}" rx="6" style="fill:${o.v>=10?'var(--ok)':'var(--er)'}"/><text class="v" x="${x+bw2/2}" y="${sb-h-5}" text-anchor="middle">${o.v.toFixed(2)}</text><text x="${x+bw2/2}" y="${sb+15}" text-anchor="middle">${o.s}</text></g>`}).join('');
+  const avgChart=`<div class="gridwrap"><svg class="chart" viewBox="0 0 ${SW} ${sb+24}" width="100%" style="min-width:${SW}px" role="img" aria-label="${esc(tr('Moyenne par semestre'))}"><line class="ln" x1="14" x2="${SW-14}" y1="${sb}" y2="${sb}"/><line class="th" x1="14" x2="${SW-14}" y1="${sb-50}" y2="${sb-50}"/><text x="${SW-14}" y="${sb-54}" text-anchor="end">10/20</text>${sbars}</svg></div>`;
+  /* chiffres clés */
+  const now=new Date(),mk=iso(now).slice(0,7);let month=0,act30=0;Object.keys(A.act).forEach(k=>{const a=actOf(k),t=a.f+a.e;if(k.slice(0,7)===mk)month+=t});
+  for(let i=0;i<30;i++){const d=new Date();d.setDate(d.getDate()-i);const a=actOf(iso(d));if(a.f+a.e>0)act30++}
+  const any=Object.values(A.act).some(o=>o&&(o.m||o.c||o.q));
+  return `<div class="top"><div><h2>${tr('Statistiques')}</h2><small class="br">${Lg('Tes révisions et tes moyennes','Your revision and your averages','مراجعتك ومعدلاتك')}</small></div><div><button class="b" data-a="go" data-i="da">‹ ${tr('Retour')}</button></div></div>
+  <div class="st" style="margin-bottom:12px"><div><b>${fmtDur(tot)}</b><small class="mu">${tr('Cette semaine')}</small></div><div><b>${fmtDur(month)}</b><small class="mu">${tr('Total du mois')}</small></div><div><b>${act30}</b><small class="mu">${tr('Jours actifs (30 j)')}</small></div></div>
+  <div class="g">
+  <div class="c"><div class="top" style="margin:0 0 6px"><h4 style="margin:0">${tr('Heures de révision par semaine')}</h4><div style="display:flex;gap:4px;align-items:center"><button class="b" data-a="stWk" data-i="-1" aria-label="${Lg('Semaine précédente','Previous week','الأسبوع السابق')}">‹</button><button class="b" data-a="stWk" data-i="1" ${stWk>=0?'disabled':''} aria-label="${Lg('Semaine suivante','Next week','الأسبوع التالي')}">›</button></div></div><small class="mu" style="margin-bottom:4px">${esc(wLabel)}${stWk===0?' · '+tr('Cette semaine'):''}</small>${chart}
+   <div class="legend"><span><i style="background:var(--br)"></i>${Lg('Focus (Pomodoro)','Focus (Pomodoro)','تركيز (بومودورو)')}</span><span><i style="background:var(--br);opacity:.42"></i>${Lg('Fiches & quiz (estimation 30 s)','Cards & quiz (30 s estimate)','بطاقات واختبارات (تقدير 30 ث)')}</span></div>${any?'':`<p class="mu e" style="margin-top:10px">${tr('Pas encore de révision enregistrée')}</p>`}</div>
+  <div class="c"><h4>${tr('Activité des 16 dernières semaines')}</h4>${heat}</div>
+  <div class="c" style="grid-column:1/-1"><h4>${tr('Moyenne par semestre')}</h4>${sv.some(o=>o.v!=null)?avgChart:`<p class="mu e">${tr('Pas encore de notes')}</p>`}</div></div>`}
+R.st=rSt;
+
+/* ---------- 17. Accessibilité ---------- */
+function applyA11y(){
+  const R0=document.documentElement,hc=LS('eduVault_hc')==='1';R0.classList.toggle('big',LS('eduVault_big')==='1');R0.classList.toggle('hc',hc);
+  if(hc){const pal=PALS[R0.dataset.th]?R0.dataset.th:'blue',bg=isDarkUI()?'#0f1830':'#ffffff',to=isDarkUI()?'#ffffff':'#000000';let x=PALS[pal][1],n=0;while(crat(x,bg)<7&&n++<24)x=mixHex(x,to,.1);
+    R0.style.setProperty('--br',x);R0.style.setProperty('--onbr',crat(x,'#ffffff')>=crat(x,'#000000')?'#ffffff':'#000000')}
+  else{R0.style.removeProperty('--br');R0.style.removeProperty('--onbr')}}
+function setA11y(k,on){LS('eduVault_'+k,on?'1':'0');applyA11y();try{render()}catch(e){}settings()}
+function a11ySection(){
+  const bg=isDarkUI()?'#0f1830':'#ffffff',big=LS('eduVault_big')==='1',hc=LS('eduVault_hc')==='1';
+  const pal=Object.entries(PALS).map(([k,v])=>{const t=crat(v[1],bg),b=crat(v[1],'#ffffff'),ok=t>=4.5&&b>=4.5;
+    return`<span class="chip" title="${esc(Lg('texte sur fond / texte blanc sur bouton','text on background / white text on button','نص على الخلفية / نص أبيض على الزر'))}"><span class="sw" style="background:${v[1]};width:14px;height:14px;border-width:0;display:inline-block"></span>${esc(v[0])} ${t.toFixed(1)} · ${b.toFixed(1)} ${ok?'✓':'⚠'}</span>`}).join('');
+  const bad=A.modules.filter(m=>crat(normHex(m.color),mixHex(bg,normHex(m.color),.16))<4.5).length;
+  return `<label>${tr('Accessibilité')}</label>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${big?'checked':''} onchange="setA11y('big',this.checked)"> ${tr('Gros texte')}</label>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto;margin:0" ${hc?'checked':''} onchange="setA11y('hc',this.checked)"> ${tr('Contraste élevé')}</label>
+  <div class="rs" style="display:block;margin:0 0 6px"><b>${tr('Vérification des couleurs')}</b>
+   <small class="mu">${Lg('Rapport de contraste WCAG (minimum conseillé 4,5 : 1) pour chaque couleur de thème dans le mode actuel : texte coloré · texte blanc sur bouton.','WCAG contrast ratio (recommended minimum 4.5 : 1) for each theme color in the current mode: colored text · white text on button.','نسبة التباين WCAG (الحد الأدنى الموصى به 4.5 : 1) لكل لون في الوضع الحالي: نص ملون · نص أبيض على زر.')}</small>
+   <div class="kv">${pal}</div>
+   <small class="mu" style="margin-top:6px">${bad?Lg(bad+' module(s) ont une couleur trop claire/foncée : leur texte est corrigé automatiquement pour rester lisible.',bad+' module(s) use a color that is too light/dark: their text is automatically adjusted to stay readable.',bad+' مادة بألوان ضعيفة التباين: يتم تعديل نصها تلقائيا ليبقى مقروءا.'):Lg('Les couleurs de tes modules sont lisibles ✓ (le texte est ajusté automatiquement si besoin).','Your module colors are readable ✓ (text is adjusted automatically when needed).','ألوان موادك مقروءة ✓ (يُعدَّل النص تلقائيا عند الحاجة).')}</small></div>`}
+
+/* ---------- 15. Visite guidée ---------- */
+const TOUR=()=>[
+ ['📅',Lg('Ton emploi du temps','Your timetable','جدولك'),Lg("Importe-le avec l'IA, ou rejoins ta classe avec un code : un camarade l'a déjà importé pour tout le monde.",'Import it with AI, or join your class with a code: a classmate already imported it for everyone.','استورده بالذكاء الاصطناعي، أو انضم إلى قسمك برمز: زميل استورده من قبل للجميع.')],
+ ['📚',Lg('Cours, notes et moyennes','Courses, grades and averages','الدروس والنقط والمعدلات'),Lg('Ajoute tes modules, tes notes (CC, TP, examen) et tes documents. La moyenne du semestre se calcule toute seule.','Add your modules, grades (CC, TP, exam) and documents. Your semester average is computed for you.','أضف موادك ونقطك ومستنداتك. يُحسب معدل الفصل تلقائيا.')],
+ ['🃏',Lg('Fiches & quiz','Cards & quizzes','البطاقات والاختبارات'),Lg('Crée des fiches : elles reviennent au bon moment (révision espacée). Tu peux les partager avec un lien.','Create cards: they come back at the right time (spaced repetition). You can share them with a link.','أنشئ بطاقات: تعود في الوقت المناسب. يمكنك مشاركتها برابط.')],
+ ['📊',Lg('Statistiques','Statistics','الإحصائيات'),Lg('Lance un minuteur Focus : tes heures de révision, ta carte de chaleur et tes moyennes s\'affichent dans Statistiques.','Start a Focus timer: your revision hours, heatmap and averages show up in Statistics.','شغّل مؤقت التركيز: ستظهر ساعات مراجعتك وخريطتك الحرارية ومعدلاتك في الإحصائيات.')],
+ ['🔐',Lg('Compte & confidentialité','Account & privacy','الحساب والخصوصية'),Lg('Un compte gratuit synchronise tes appareils. Tu peux aussi chiffrer tes données : seul ton mot de passe de chiffrement les ouvre.','A free account syncs your devices. You can also encrypt your data: only your encryption password can open it.','حساب مجاني يزامن أجهزتك. ويمكنك أيضا تشفير بياناتك: لا يفتحها إلا كلمة مرور التشفير الخاصة بك.')]];
+let tourI=0;
+function tourStart(){tourI=0;tourDraw()}
+function tourDraw(){
+  const T0=TOUR(),s=T0[tourI],d=$('dlg'),last=tourI===T0.length-1;
+  d.innerHTML=`<div class="tour"><div class="big" aria-hidden="true">${s[0]}</div><h3 style="text-align:center">${esc(s[1])}</h3><p class="mu" style="text-align:center">${esc(s[2])}</p>
+  <div class="dots" aria-label="${tourI+1}/${T0.length}">${T0.map((_,i)=>`<i class="${i===tourI?'on':''}"></i>`).join('')}</div>
+  <div class="row"><button class="b" data-a="tourSkip">${tr('Passer')}</button><button class="b p" data-a="${last?'tourSkip':'tourNext'}">${last?tr("C'est parti !"):tr('Suivant')}</button></div></div>`;
+  d.oncancel=null;if(!d.open)d.showModal()}
+
+/* ---------- 11 & 14. Partage par code / lien (Firestore, collection "shares") ---------- */
+const SH_AL='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const shNew=()=>[...crypto.getRandomValues(new Uint8Array(8))].map(x=>SH_AL[x%32]).join('');
+const shOk=c=>/^[A-HJ-NP-Z2-9]{8}$/.test(c||'');
+const shParse=v=>{v=String(v||'');const m=v.match(/[#&?]j=([A-Za-z0-9-]+)/);return(m?m[1]:v).toUpperCase().replace(/[^A-Z0-9]/g,'')};
+const shFmt=c=>c.slice(0,4)+'-'+c.slice(4);
+const shLink=c=>location.href.split('#')[0]+'#j='+c;
+const sStr=(v,n)=>String(v==null?'':v).slice(0,n);
+const sTime=v=>{const m=String(v||'').match(/^(\d{1,2}):(\d{2})$/);return m&&+m[1]<24&&+m[2]<60?m[1].padStart(2,'0')+':'+m[2]:null};
+const sCol=v=>/^#[0-9a-fA-F]{6}$/.test(v||'')?v:null;
+const shErr=e=>e&&e.code==='permission-denied'?Lg('Accès refusé : publie les nouvelles règles Firestore (voir LISEZ-MOI.md §1)','Access denied: publish the new Firestore rules (see LISEZ-MOI.md §1)','مرفوض: انشر قواعد Firestore الجديدة (راجع LISEZ-MOI.md)'):fbMsg(e);
+async function needFb(){
+  if(!UID){toast(Lg('Crée un compte (gratuit) pour partager ou rejoindre une classe','Create a free account to share or join a class','أنشئ حسابا مجانيا للمشاركة أو الانضمام إلى قسم'),'er');acMode='up';acctDlg();return false}
+  try{await fbLoad()}catch(e){toast(fbMsg(e),'er');return false}
+  for(let i=0;i<40&&!fbUser;i++)await new Promise(r=>setTimeout(r,200));
+  if(!fbUser){toast(Lg('Connexion en cours… réessaie dans un instant','Signing in… try again in a moment','جاري تسجيل الدخول… أعد المحاولة بعد لحظة'),'er');return false}
+  return true}
+function ttPayload(){
+  const ids=new Set(mods().map(m=>m.id)),tt=A.timetable.filter(c=>ids.has(c.moduleId)),used=[...new Set(tt.map(c=>c.moduleId))].map(id=>A.modules.find(m=>m.id===id)).filter(Boolean);
+  return{lvl:A.settings.level||'',sem:A.activeSemester,m:used.map(m=>({n:m.name,p:m.prof||'',c:m.color,k:m.coeff||1})),t:tt.map(c=>({m:modName(c.moduleId),d:c.day,w:c.week||'all',s:c.startTime,e:c.endTime,r:c.room||''}))}}
+function fcPayload(ids){
+  const g=ids.map(id=>A.modules.find(m=>m.id===id)).filter(Boolean).map(m=>({n:m.name,c:m.color,cards:A.flashcards.filter(f=>f.moduleId===m.id).map(f=>({q:f.q,a:f.a})),quiz:A.quizQs.filter(x=>x.moduleId===m.id).map(x=>({q:x.q,o:x.opts,a:x.ans,e:x.exp||''}))})).filter(x=>x.cards.length||x.quiz.length);
+  return{g}}
+async function shPublish(k,name,payload,code){
+  const d=JSON.stringify(payload);if(d.length>280000)throw Error(Lg('Partage trop volumineux (max ~280 Ko)','Share too large (max ~280 KB)','المشاركة كبيرة جدا (الحد 280 ك.ب)'));
+  const c=code||shNew();await fb.db.collection('shares').doc(c).set({o:fbUser.uid,k,n:sStr(name,80),d,u:Date.now(),v:1});return c}
+function shRemember(r){const l=(A.settings.shares=A.settings.shares||[]).filter(x=>x.c!==r.c);l.push(r);A.settings.shares=l;save()}
+function shCodeDlg(c,ttl){
+  const d=$('dlg');
+  d.innerHTML=`<h3>${esc(ttl||Lg('Partage prêt','Share ready','المشاركة جاهزة'))}</h3><p class="mu">${Lg('Envoie ce code ou ce lien à ta classe. Ils devront créer un compte gratuit pour l\'ouvrir.','Send this code or link to your class. They need a free account to open it.','أرسل هذا الرمز أو الرابط إلى قسمك. سيحتاجون حسابا مجانيا لفتحه.')}</p>
+  <div class="code" id="shc">${shFmt(c)}</div><div class="row" style="justify-content:center"><button class="b p" data-a="shCopy" data-i="${c}|l">🔗 ${tr('Copier le lien')}</button><button class="b" data-a="shCopy" data-i="${c}|c">${tr('Copier le code')}</button>${navigator.share?`<button class="b" data-a="shNative" data-i="${c}">${tr('Partager')}…</button>`:''}</div>
+  <small class="mu" style="margin-top:10px">${Lg('⚠️ Toute personne qui a le code peut lire ce partage (emploi du temps ou fiches). Il ne contient ni tes notes, ni tes photos, ni tes fichiers.','⚠️ Anyone with the code can read this share (timetable or cards). It contains no grades, photos or files.','⚠️ كل من لديه الرمز يمكنه قراءة هذه المشاركة. لا تحتوي على نقطك أو صورك أو ملفاتك.')}</small>
+  <div class="row"><button class="b" data-a="shHub">${Lg('Mes partages','My shares','مشاركاتي')}</button><button class="b p" onclick="$('dlg').close()">${tr('Fermer')}</button></div>`;
+  d.oncancel=null;if(!d.open)d.showModal()}
+async function shareTT(){
+  if(!(await needFb()))return;
+  const p=ttPayload();if(!p.t.length)return toast(Lg('Aucune séance à partager dans ce semestre','No session to share in this semester','لا توجد حصص للمشاركة في هذا الفصل'),'er');
+  const ex=(A.settings.shares||[]).find(x=>x.k==='tt'&&x.sem===A.activeSemester),name=(A.settings.level||'')+' '+A.activeSemester;
+  try{const c=await shPublish('tt',name,p,ex&&ex.c);shRemember({c,k:'tt',n:Lg('Emploi du temps ','Timetable ','جدول ')+name,sem:A.activeSemester});shCodeDlg(c,Lg('Emploi du temps partagé ✔','Timetable shared ✔','تمت مشاركة الجدول ✔'))}
+  catch(e){toast(shErr(e),'er')}}
+function shareFc(){
+  if(needMod())return;
+  ask(Lg('Partager des fiches & quiz','Share cards & quizzes','مشاركة البطاقات والاختبارات'),[{k:'mid',l:Lg('Module à partager','Module to share','المادة المراد مشاركتها'),t:'select',o:[['*',Lg('Tous les modules du semestre','All modules of the semester','كل مواد الفصل')],...modOpts()],v:'*'}],async v=>{
+    if(!(await needFb()))return;const ids=v.mid==='*'?mods().map(m=>m.id):[v.mid],p=fcPayload(ids);
+    if(!p.g.length)return toast(Lg('Aucune fiche ni question à partager pour ce choix','No card or question to share for this choice','لا توجد بطاقات أو أسئلة للمشاركة'),'er');
+    try{const nm=v.mid==='*'?Lg('Fiches '+A.activeSemester,'Cards '+A.activeSemester,'بطاقات '+A.activeSemester):modName(v.mid),c=await shPublish('fc',nm,p);
+      shRemember({c,k:'fc',n:nm,ids,sem:A.activeSemester});shCodeDlg(c,Lg('Fiches partagées ✔','Cards shared ✔','تمت مشاركة البطاقات ✔'))}catch(e){toast(shErr(e),'er')}})}
+function joinAsk(pre){ask(tr('Rejoindre avec un code'),[{k:'code',l:Lg('Code de classe ou lien reçu','Class code or link you received','رمز القسم أو الرابط'),r:1,v:pre||'',a:' autocapitalize="characters" autocomplete="off" spellcheck="false"'}],v=>joinFlow(shParse(v.code)))}
+let joinCtx=null;
+async function joinFlow(code){
+  if(!shOk(code))return toast(Lg('Code invalide : il contient 8 lettres/chiffres','Invalid code: it has 8 letters/digits','رمز غير صالح: يتكون من 8 أحرف/أرقام'),'er');
+  if(!(await needFb()))return;
+  try{const s=await fb.db.collection('shares').doc(code).get();if(!s.exists)return toast(Lg('Code introuvable (vérifie les lettres)','Code not found (check the letters)','الرمز غير موجود'),'er');
+    const x=s.data();let p;try{p=JSON.parse(x.d)}catch(e){return toast(Lg('Partage illisible','Unreadable share','مشاركة غير مقروءة'),'er')}
+    joinCtx={code,x,p};joinPreview()}catch(e){toast(shErr(e),'er')}}
+function joinPreview(){
+  const{code,x,p}=joinCtx,d=$('dlg'),tt=x.k==='tt',nS=tt?(p.t||[]).length:0,nM=tt?(p.m||[]).length:0,nC=tt?0:(p.g||[]).reduce((s,g)=>s+(g.cards||[]).length,0),nQ=tt?0:(p.g||[]).reduce((s,g)=>s+(g.quiz||[]).length,0);
+  d.innerHTML=`<h3>${esc(sStr(x.n,80))}</h3><div class="rs" style="display:block"><b>${tt?Lg('Emploi du temps de classe','Class timetable','جدول القسم'):Lg('Fiches & quiz','Cards & quizzes','بطاقات واختبارات')}</b>
+  <small class="mu">${tt?Lg(nS+' séances · '+nM+' modules · import dans '+curSem(),nS+' sessions · '+nM+' modules · imported into '+curSem(),nS+' حصة · '+nM+' مادة · سيُستورد إلى '+curSem()):Lg(nC+' fiches · '+nQ+' questions','' +nC+' cards · '+nQ+' questions',nC+' بطاقة · '+nQ+' سؤال')}</small><small class="mu">${Lg('Code','Code','الرمز')} ${shFmt(code)}</small></div>
+  <p class="mu" style="margin-top:8px">${tt?Lg('Tes notes, tes modules existants et tes autres séances ne sont pas touchés. Si tu as déjà rejoint ce code, les séances importées sont mises à jour.','Your grades, existing modules and other sessions are untouched. If you already joined this code, imported sessions are updated.','نقطك ومواردك وحصصك الأخرى لا تتأثر. إذا انضممت من قبل فسيتم تحديث الحصص المستوردة.'):Lg('Les fiches déjà présentes (même question) ne sont pas dupliquées.','Cards you already have (same question) are not duplicated.','البطاقات الموجودة (نفس السؤال) لا تُكرَّر.')}</p>
+  <div class="row"><button class="b" onclick="$('dlg').close()">${tr('Annuler')}</button><button class="b p" data-a="joinGo">${tr('Importer')}</button></div>`;
+  d.oncancel=null;if(!d.open)d.showModal()}
+function findOrMakeMod(name,sem,ex){
+  let m=A.modules.find(x=>x.semester===sem&&x.name.toLowerCase()===name.toLowerCase());
+  if(!m){m={id:uid('m'),semester:sem,name,prof:sStr(ex&&ex.p,80),coeff:+(ex&&ex.k)||1,color:(ex&&sCol(ex.c))||nextModColor(),ccc:0,ctp:0,cex:1,ncc:null,ntp:null,nex:null,absences:0,pomo:0,resources:[]};A.modules.push(m)}return m}
+function importTT(p,code){
+  const sem=curSem(),meta={};(p.m||[]).forEach(m=>{meta[sStr(m&&m.n,80).toLowerCase()]=m});
+  const inSem=c=>{const m=A.modules.find(x=>x.id===c.moduleId);return!!m&&m.semester===sem},old=new Map(A.timetable.filter(c=>c.sh===code&&inSem(c)).map(c=>[c.moduleId+'|'+c.day+'|'+c.startTime+'|'+c.endTime,c])),keep=new Set();let add=0;
+  (p.t||[]).slice(0,250).forEach(r=>{if(!r)return;const day=DAYS.find(d=>d===r.d),st=sTime(r.s),en=sTime(r.e),name=sStr(r.m,80).trim();if(!day||!st||!en||en<=st||!name)return;
+    const m=findOrMakeMod(name,sem,meta[name.toLowerCase()]),key=m.id+'|'+day+'|'+st+'|'+en,wk=r.w==='A'||r.w==='B'?r.w:'all',room=sStr(r.r,60)||'Salle',ex=old.get(key);
+    if(ex){ex.week=wk;ex.room=room;keep.add(ex.id)}else{const c={id:uid('c'),moduleId:m.id,day,week:wk,startTime:st,endTime:en,room,sh:code};A.timetable.push(c);keep.add(c.id);add++}});
+  const gone=A.timetable.filter(c=>c.sh===code&&inSem(c)&&!keep.has(c.id));
+  if(gone.length){const g=new Set(gone.map(c=>c.id));A.timetable=A.timetable.filter(c=>!g.has(c.id));A.notes=A.notes.filter(n=>!g.has(n.classId))}
+  return{add,removed:gone.length}}
+function importFc(p){
+  const sem=curSem();let nc=0,nq=0;
+  (p.g||[]).slice(0,40).forEach(g=>{if(!g)return;const name=sStr(g.n,80).trim();if(!name)return;const m=findOrMakeMod(name,sem,{c:g.c});
+    (g.cards||[]).slice(0,500).forEach(c=>{const q=sStr(c&&c.q,1000).trim(),a=sStr(c&&c.a,2000).trim();if(q&&a&&!A.flashcards.some(f=>f.moduleId===m.id&&f.q===q)){A.flashcards.push(newCard({moduleId:m.id,q,a}));nc++}});
+    (g.quiz||[]).slice(0,300).forEach(x=>{if(!x||!Array.isArray(x.o))return;const q=sStr(x.q,1000).trim(),o=x.o.slice(0,6).map(v=>sStr(v,300)),a=+x.a;if(q&&o.length>=2&&a>=0&&a<o.length&&!A.quizQs.some(z=>z.moduleId===m.id&&z.q===q)){A.quizQs.push({id:uid('q'),moduleId:m.id,q,opts:o,ans:a,exp:sStr(x.e,500)});nq++}})});
+  return{nc,nq}}
+function joinRemember(code,x){const l=(A.settings.joined=A.settings.joined||[]).filter(j=>j.c!==code);l.push({c:code,k:x.k,n:sStr(x.n,80),at:Date.now()});A.settings.joined=l}
+function shHub(){
+  const mine=A.settings.shares||[],jn=A.settings.joined||[],d=$('dlg');
+  const row=(x,own)=>`<div class="rs" style="display:block;margin-top:6px"><b>${esc(x.n)}</b> <span class="chip">${shFmt(x.c)}</span><small class="mu">${x.k==='tt'?Lg('Emploi du temps','Timetable','جدول'):Lg('Fiches & quiz','Cards & quizzes','بطاقات واختبارات')}</small>
+   <div class="row" style="justify-content:flex-start;margin:6px 0 0">${own?`<button class="b" data-a="shShow" data-i="${x.c}">${Lg('Code & lien','Code & link','الرمز والرابط')}</button><button class="b" data-a="shUpd" data-i="${x.c}">${tr('Mettre à jour le partage')}</button><button class="b" style="color:var(--er)" data-a="shDel" data-i="${x.c}">${tr('Arrêter le partage')}</button>`
+   :`${x.k==='tt'?`<button class="b" data-a="shSync" data-i="${x.c}">${Lg('Mettre à jour','Update','تحديث')}</button>`:''}<button class="b" data-a="shLeave" data-i="${x.c}">${Lg('Retirer de la liste','Remove from list','إزالة من القائمة')}</button>`}</div></div>`;
+  d.innerHTML=`<h3>👥 ${Lg('Partage & code de classe','Sharing & class code','المشاركة ورمز القسم')}</h3>
+  <p class="mu">${Lg("Un seul élève de la filière importe l'emploi du temps (PDF + IA) puis le partage : les autres entrent le code et récupèrent les horaires, sans clé IA.","Only one student of the class imports the timetable (PDF + AI) and shares it: everyone else enters the code and gets the schedule, with no AI key.",'طالب واحد من الشعبة يستورد الجدول (PDF + ذكاء اصطناعي) ثم يشاركه: والبقية يدخلون الرمز ويحصلون على الحصص دون مفتاح ذكاء اصطناعي.')}</p>
+  <div class="row" style="justify-content:flex-start"><button class="b p" data-a="shTT">📅 ${tr('Partager mon emploi du temps')}</button><button class="b" data-a="shFc">🃏 ${Lg('Partager des fiches & quiz','Share cards & quizzes','مشاركة البطاقات والاختبارات')}</button><button class="b" data-a="shJoin">🔑 ${tr('Rejoindre avec un code')}</button></div>
+  ${mine.length?`<h4 style="margin-top:14px">${Lg('Mes partages','My shares','مشاركاتي')}</h4>`+mine.map(x=>row(x,1)).join(''):''}
+  ${jn.length?`<h4 style="margin-top:14px">${Lg('Rejoints','Joined','المنضم إليها')}</h4>`+jn.map(x=>row(x,0)).join(''):''}
+  <div class="row"><button class="b p" onclick="$('dlg').close()">${tr('Fermer')}</button></div>`;
+  d.oncancel=null;if(!d.open)d.showModal()}
+function hashJoin(){const m=location.hash.match(/[#&]j=([A-Za-z0-9-]+)/);if(!m)return;const c=shParse(m[1]);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(shOk(c)){sessionStorage.setItem('eduVault_join',c);setTimeout(resumeJoin,700)}}
+function resumeJoin(){
+  const c=sessionStorage.getItem('eduVault_join');if(!c)return;
+  if($('dlg').open){setTimeout(resumeJoin,1500);return}
+  if(!UID){toast(Lg('Connecte-toi pour ouvrir ce partage','Sign in to open this share','سجّل الدخول لفتح هذه المشاركة'));acMode='in';acctDlg();return}
+  if(!fbUser)return;sessionStorage.removeItem('eduVault_join');joinFlow(c)}
+
+/* ---------- 18. Chiffrement côté client (AES-GCM 256, clé dérivée par PBKDF2-SHA256 600 000 itérations) ---------- */
+const ENC_IT=600000,te=new TextEncoder(),td=new TextDecoder();
+const b64e=u=>{let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)};
+const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function encDerive(pass,saltB64,it){
+  const base=await crypto.subtle.importKey('raw',te.encode(String(pass).normalize('NFKC')),'PBKDF2',false,['deriveBits']),
+    bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:b64d(saltB64),iterations:it},base,512);
+  return{aes:await crypto.subtle.importKey('raw',bits.slice(0,32),'AES-GCM',false,['encrypt','decrypt']),mac:await crypto.subtle.importKey('raw',bits.slice(32),{name:'HMAC',hash:'SHA-256'},false,['sign'])}}
+/* IV synthétique (SIV) = HMAC(clé MAC, contexte|texte) : un bloc inchangé donne le même chiffré -> seuls les blocs modifiés sont réécrits dans Firestore */
+async function encStr(k,plain,ctx){
+  const data=te.encode(plain),c=te.encode(ctx+'|'),m=new Uint8Array(c.length+data.length);m.set(c);m.set(data,c.length);
+  const iv=new Uint8Array(await crypto.subtle.sign('HMAC',k.mac,m)).slice(0,12),ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:te.encode(ctx)},k.aes,data)),out=new Uint8Array(12+ct.length);
+  out.set(iv);out.set(ct,12);return b64e(out)}
+async function decStr(k,b,ctx){const u=b64d(b);return td.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12),additionalData:te.encode(ctx)},k.aes,u.slice(12)))}
+const kdb=()=>new Promise((ok,ko)=>{const r=indexedDB.open('EduVaultKeys',1);r.onupgradeneeded=()=>r.result.createObjectStore('k',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)});
+const kio=async(mode,fn)=>{const d=await kdb();return new Promise((ok,ko)=>{const t=d.transaction('k',mode),r=fn(t.objectStore('k'));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>ko(t.error)})};
+const kput=rec=>kio('readwrite',s=>s.put(rec)),kget=id=>kio('readonly',s=>s.get(id)),kdel=id=>kio('readwrite',s=>s.delete(id)).catch(()=>{});
+async function encEnsure(m){
+  if(!m||!m.e)return true;if(ENC&&ENC.uid===fbUser.uid&&(ENC.s===m.s||ENC.mode==='enabling'))return true;ENC=null;
+  try{const r=await kget(fbUser.uid);if(r&&r.s===m.s&&await decStr(r,m.kc,'eduvault:check')==='eduvault-ok'){ENC={uid:fbUser.uid,s:m.s,it:m.it||ENC_IT,kc:m.kc,aes:r.aes,mac:r.mac,mode:'on'};return true}}catch(e){}
+  return false}
+function encSection(){
+  const st=ENCST;
+  return `<div class="rs" style="display:block;margin:8px 0"><b>🔐 ${tr('Chiffrement')}</b><small class="mu">${st==='on'?Lg("Actif : tes données sont chiffrées sur ton appareil avant d'être envoyées. Sans ton mot de passe de chiffrement, personne (pas même l'administrateur du projet Firebase) ne peut les lire.",'Active: your data is encrypted on your device before upload. Without your encryption password nobody (not even the Firebase project admin) can read it.','مفعّل: تُشفَّر بياناتك على جهازك قبل إرسالها. بدون كلمة مرور التشفير لا يستطيع أحد قراءتها.'):st==='locked'?Lg('Tes données cloud sont chiffrées : saisis ton mot de passe de chiffrement pour les ouvrir sur cet appareil.','Your cloud data is encrypted: enter your encryption password to open it on this device.','بياناتك مشفرة: أدخل كلمة مرور التشفير لفتحها على هذا الجهاز.'):Lg("Désactivé : tes données sont stockées en clair dans Firebase (protégées uniquement par les règles d'accès).",'Off: your data is stored unencrypted in Firebase (protected only by access rules).','معطل: تُخزَّن بياناتك دون تشفير في Firebase (محمية بقواعد الوصول فقط).')}</small>
+  <div class="row" style="justify-content:flex-start;margin:6px 0 0">${st==='on'?`<button class="b" data-a="encOn" data-i="change">${Lg('Changer le mot de passe de chiffrement','Change encryption password','تغيير كلمة مرور التشفير')}</button><button class="b" data-a="encOff">${tr('Désactiver le chiffrement')}</button>`:st==='locked'?`<button class="b p" data-a="encUnlock">${tr('Déverrouiller')}</button><button class="b" data-a="encForgot">${Lg('Mot de passe oublié','Forgot password','نسيت كلمة المرور')}</button>`:`<button class="b p" data-a="encOn">${tr('Activer le chiffrement')}</button>`}</div></div>`}
+function encOnDlg(change){
+  const d=$('dlg');
+  d.innerHTML=`<h3>🔐 ${change?Lg('Nouveau mot de passe de chiffrement','New encryption password','كلمة مرور تشفير جديدة'):tr('Activer le chiffrement')}</h3>
+  <p class="mu">${Lg("Tes données seront chiffrées sur cet appareil (AES-256) avant d'être envoyées au cloud. Ce mot de passe est différent de celui de ton compte et n'est jamais envoyé.","Your data will be encrypted on this device (AES-256) before it is sent to the cloud. This password is different from your account password and is never sent.",'ستُشفَّر بياناتك على هذا الجهاز (AES-256) قبل إرسالها. كلمة المرور هذه تختلف عن كلمة مرور حسابك ولا تُرسل أبدا.')}</p>
+  <div class="warn">⚠️ ${Lg("Si tu l'oublies, tes données CLOUD sont perdues pour toujours : personne ne peut les récupérer (ni moi, ni Firebase). Les données déjà présentes sur tes appareils restent lisibles.","If you forget it, your CLOUD data is lost forever: nobody can recover it. Data already present on your devices stays readable.",'إذا نسيتها ستضيع بياناتك السحابية إلى الأبد ولا يمكن لأي أحد استرجاعها. البيانات الموجودة على أجهزتك تبقى مقروءة.')}</div>
+  <form id="enf" novalidate><label>${Lg('Mot de passe de chiffrement (10 caractères minimum)','Encryption password (10 characters minimum)','كلمة مرور التشفير (10 أحرف على الأقل)')}<input name="p1" type="password" autocomplete="new-password" required minlength="10"></label>
+  <label>${Lg('Confirmer','Confirm','تأكيد')}<input name="p2" type="password" autocomplete="new-password" required></label>
+  <label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" name="ok" style="width:auto;margin:3px 0 0"> ${Lg("J'ai compris : sans ce mot de passe, mes données cloud sont irrécupérables.",'I understand: without this password my cloud data cannot be recovered.','فهمت: بدون كلمة المرور لا يمكن استرجاع بياناتي السحابية.')}</label>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="rem" checked style="width:auto;margin:0"> ${Lg('Mémoriser sur cet appareil (clé non exportable)','Remember on this device (non-exportable key)','تذكر على هذا الجهاز (مفتاح غير قابل للتصدير)')}</label>
+  <p class="bad" id="ener" role="alert"></p><small class="mu">${Lg("Les fichiers (PDF…) et la copie locale sur cet appareil ne sont pas concernés ; les partages par code sont publics par nature.","Files (PDF…) and the local copy on this device are not covered; code shares are public by nature.",'الملفات والنسخة المحلية على هذا الجهاز غير مشمولة؛ والمشاركات بالرمز عامة بطبيعتها.')}</small>
+  <div class="row"><button type="button" class="b" onclick="$('dlg').close()">${tr('Annuler')}</button><button class="b p" name="go">${tr('Activer le chiffrement')}</button></div></form>`;
+  const f=$('enf');f.onsubmit=async e=>{e.preventDefault();const el=f.elements,er=$('ener');er.textContent='';
+    if(el.p1.value.length<10){er.textContent=Lg('10 caractères minimum','10 characters minimum','10 أحرف على الأقل');return}
+    if(el.p1.value!==el.p2.value){er.textContent=Lg('Les deux mots de passe sont différents','The two passwords differ','كلمتا المرور مختلفتان');return}
+    if(!el.ok.checked){er.textContent=Lg('Coche la case de confirmation','Tick the confirmation box','ضع علامة على مربع التأكيد');return}
+    el.go.disabled=true;el.go.textContent=Lg('Calcul de la clé…','Deriving key…','جاري حساب المفتاح…');
+    try{await encEnable(el.p1.value,el.rem.checked);$('dlg').close();toast(fbErr||Lg('Chiffrement activé ✔','Encryption enabled ✔','تم تفعيل التشفير ✔'),fbErr?'er':'ok')}
+    catch(x){er.textContent=x.message||String(x);el.go.disabled=false;el.go.textContent=tr('Activer le chiffrement')}};
+  d.oncancel=null;if(!d.open)d.showModal()}
+async function encEnable(pass,remember){
+  if(!fbUser||!fb)throw Error(Lg('Connecte-toi d\'abord','Sign in first','سجّل الدخول أولا'));
+  const prev=ENC,salt=b64e(crypto.getRandomValues(new Uint8Array(16))),k=await encDerive(pass,salt,ENC_IT),kc=await encStr(k,'eduvault-ok','eduvault:check');
+  ENC={uid:fbUser.uid,s:salt,it:ENC_IT,kc,aes:k.aes,mac:k.mac,mode:'enabling'};
+  for(let i=0;i<60&&fbBusy;i++)await new Promise(r=>setTimeout(r,200));
+  await fbSync({force:'up'});
+  if(fbErr||ENC.mode!=='on'){ENC=prev;throw Error(fbErr||Lg('Synchronisation impossible, réessaie','Sync failed, try again','تعذرت المزامنة، أعد المحاولة'))}
+  ENC.mode='on';ENCST='on';if(remember)await kput({id:fbUser.uid,s:salt,aes:k.aes,mac:k.mac}).catch(()=>{});else await kdel(fbUser.uid);paintAcct()}
+function encUnlockDlg(m){
+  if($('dlg').open&&!$('dlg').querySelector('#acf')&&!$('dlg').querySelector('[data-a=acSync]'))return;
+  const d=$('dlg');
+  d.innerHTML=`<h3>🔐 ${tr('Déverrouiller')}</h3><p class="mu">${Lg('Tes données cloud sont chiffrées. Saisis ton mot de passe de chiffrement (pas celui du compte).','Your cloud data is encrypted. Enter your encryption password (not your account password).','بياناتك السحابية مشفرة. أدخل كلمة مرور التشفير (وليس كلمة مرور الحساب).')}</p>
+  <form id="enu" novalidate><label>${Lg('Mot de passe de chiffrement','Encryption password','كلمة مرور التشفير')}<input name="p" type="password" autocomplete="current-password" required></label>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="rem" checked style="width:auto;margin:0"> ${Lg('Mémoriser sur cet appareil','Remember on this device','تذكر على هذا الجهاز')}</label><p class="bad" id="enuer" role="alert"></p>
+  <div class="row"><button type="button" class="b" data-a="encForgot">${Lg('Mot de passe oublié','Forgot password','نسيت كلمة المرور')}</button><button type="button" class="b" onclick="$('dlg').close()">${Lg('Plus tard','Later','لاحقا')}</button><button class="b p" name="go">${tr('Déverrouiller')}</button></div></form>`;
+  const f=$('enu');f.onsubmit=async e=>{e.preventDefault();const el=f.elements,er=$('enuer');er.textContent='';el.go.disabled=true;
+    try{const mm=(await fbRef().get()).data()||m,k=await encDerive(el.p.value,mm.s,mm.it||ENC_IT);
+      let ok=false;try{ok=(await decStr(k,mm.kc,'eduvault:check'))==='eduvault-ok'}catch(x){}
+      if(!ok){er.textContent=Lg('Mot de passe de chiffrement incorrect','Wrong encryption password','كلمة مرور التشفير غير صحيحة');el.go.disabled=false;return}
+      ENC={uid:fbUser.uid,s:mm.s,it:mm.it||ENC_IT,kc:mm.kc,aes:k.aes,mac:k.mac,mode:'on'};ENCST='on';fbErr='';
+      if(el.rem.checked)await kput({id:fbUser.uid,s:mm.s,aes:k.aes,mac:k.mac}).catch(()=>{});
+      $('dlg').close();toast(Lg('Données déverrouillées ✔','Data unlocked ✔','تم فتح البيانات ✔'),'ok');fbSync()}
+    catch(x){er.textContent=fbMsg(x);el.go.disabled=false}};
+  d.oncancel=null;if(!d.open)d.showModal()}
+
+/* ---------- actions ---------- */
+Object.assign(act,{
+  stats:()=>{$('dlg').open&&$('dlg').close();stWk=0;go('st')},
+  stWk:i=>{stWk=Math.min(0,stWk+(+i));render()},
+  tour:()=>tourStart(),
+  tourNext:()=>{tourI++;tourDraw()},
+  tourSkip:()=>{LS('eduVault_tour','1');$('dlg').close()},
+  shHub:()=>shHub(),shTT:()=>shareTT(),shFc:()=>{$('dlg').open&&$('dlg').close();shareFc()},shJoin:()=>{$('dlg').open&&$('dlg').close();setTimeout(()=>joinAsk(),50)},
+  shCopy:i=>{const[c,w]=i.split('|'),t=w==='l'?shLink(c):shFmt(c);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast(tr('Copié'),'ok')).catch(()=>{const r=document.createRange();r.selectNodeContents($('shc'));const sl=getSelection();sl.removeAllRanges();sl.addRange(r);toast(Lg('Sélectionné : copie-le manuellement','Selected: copy it manually','تم التحديد: انسخه يدويا'))})},
+  shNative:c=>{navigator.share({title:'EduVault',text:Lg('Rejoins ma classe sur EduVault avec le code '+shFmt(c),'Join my class on EduVault with code '+shFmt(c),'انضم إلى قسمي في EduVault بالرمز '+shFmt(c)),url:shLink(c)}).catch(()=>{})},
+  shShow:c=>shCodeDlg(c,Lg('Code & lien','Code & link','الرمز والرابط')),
+  shUpd:async c=>{const x=(A.settings.shares||[]).find(z=>z.c===c);if(!x||!(await needFb()))return;
+    try{let p;if(x.k==='tt'){if(x.sem!==A.activeSemester)return toast(Lg('Passe d\'abord sur le semestre '+x.sem+' (onglet Horaires)','Switch to semester '+x.sem+' first (Timetable tab)','انتقل أولا إلى الفصل '+x.sem),'er');p=ttPayload()}else p=fcPayload((x.ids||[]).filter(id=>A.modules.some(m=>m.id===id)));
+      if(x.k==='tt'?!p.t.length:!p.g.length)return toast(Lg('Rien à partager','Nothing to share','لا شيء للمشاركة'),'er');
+      await shPublish(x.k,x.n,p,c);toast(Lg('Partage mis à jour ✔','Share updated ✔','تم تحديث المشاركة ✔'),'ok')}catch(e){toast(shErr(e),'er')}},
+  shDel:async c=>{if(!confirm(Lg('Arrêter ce partage ? Le code ne fonctionnera plus pour les autres.','Stop this share? The code will stop working for others.','إيقاف هذه المشاركة؟ لن يعمل الرمز مع الآخرين.')))return;
+    try{if(await needFb())await fb.db.collection('shares').doc(c).delete();A.settings.shares=(A.settings.shares||[]).filter(x=>x.c!==c);save();shHub()}catch(e){toast(shErr(e),'er')}},
+  shSync:c=>{if(confirm(Lg('Mettre à jour les séances importées avec ce code ? (tes modifications sur ces séances seront remplacées)','Update sessions imported with this code? (your edits to those sessions will be replaced)','تحديث الحصص المستوردة بهذا الرمز؟ (ستُستبدل تعديلاتك عليها)')))joinFlow(c)},
+  shLeave:c=>{A.settings.joined=(A.settings.joined||[]).filter(x=>x.c!==c);save();shHub()},
+  joinGo:()=>{if(!joinCtx)return;const{code,x,p}=joinCtx;let msg;
+    try{if(x.k==='tt'){const r=importTT(p,code);msg=Lg(r.add+' séance(s) ajoutée(s)'+(r.removed?', '+r.removed+' retirée(s)':''),r.add+' session(s) added'+(r.removed?', '+r.removed+' removed':''),'أضيفت '+r.add+' حصة'+(r.removed?'، وحُذفت '+r.removed:''))}
+      else if(x.k==='fc'){const r=importFc(p);msg=Lg(r.nc+' fiche(s) et '+r.nq+' question(s) importées',r.nc+' card(s) and '+r.nq+' question(s) imported','استُوردت '+r.nc+' بطاقة و '+r.nq+' سؤال')}
+      else throw Error('?');
+      joinRemember(code,x);joinCtx=null;$('dlg').close();upd();toast(msg,'ok');if(x.k==='tt')go('tt')}catch(e){toast(Lg('Import impossible : partage invalide','Import failed: invalid share','فشل الاستيراد: مشاركة غير صالحة'),'er')}},
+  encOn:i=>encOnDlg(i==='change'),
+  encUnlock:async()=>{try{const m=(await fbRef().get()).data();if(m&&m.e)encUnlockDlg(m)}catch(e){toast(fbMsg(e),'er')}},
+  encOff:async()=>{if(!ENC||!confirm(Lg('Désactiver le chiffrement ? Tes données cloud seront de nouveau stockées en clair.','Disable encryption? Your cloud data will be stored unencrypted again.','تعطيل التشفير؟ ستُخزَّن بياناتك السحابية دون تشفير من جديد.')))return;
+    for(let i=0;i<60&&fbBusy;i++)await new Promise(r=>setTimeout(r,200));
+    ENC.mode='disabling';await fbSync({force:'up'});if(fbErr||ENC.mode!=='off'){ENC.mode='on';return toast(fbErr||'Erreur','er')}
+    ENC=null;ENCST='off';await kdel(fbUser.uid);toast(Lg('Chiffrement désactivé','Encryption disabled','تم تعطيل التشفير'),'ok');acctDlg()},
+  encForgot:async()=>{if(!fbUser)return;
+    if(!confirm(Lg("Mot de passe oublié : les données CLOUD chiffrées seront effacées définitivement. Les données encore présentes sur cet appareil seront renvoyées sans chiffrement. Continuer ?","Forgot password: the encrypted CLOUD data will be permanently erased. Data still present on this device will be re-uploaded unencrypted. Continue?",'نسيت كلمة المرور: ستُمحى البيانات السحابية المشفرة نهائيا. والبيانات الموجودة على هذا الجهاز ستُرسل من جديد دون تشفير. متابعة؟')))return;
+    try{await fbDeleteCloud();ENC=null;ENCST='off';encAsked='';fbErr='';await kdel(fbUser.uid);LS(fbTsKey(),'0');$('dlg').close();await fbSync();toast(Lg('Chiffrement réinitialisé','Encryption reset','تمت إعادة ضبط التشفير'),'ok')}catch(e){toast(fbMsg(e),'er')}}
+});
+/* suppression du compte : supprime aussi les partages de l'utilisateur */
+{const _del=fbDeleteCloud;fbDeleteCloud=async function(){try{const q=await fb.db.collection('shares').where('o','==',fbUser.uid).get();const b=fb.db.batch();q.docs.forEach(d=>b.delete(d.ref));if(q.size)await b.commit()}catch(e){}return _del()}}
+
+/* ---------- démarrage ---------- */
+applyA11y();hashJoin();trDom(document.body);render();
+</script>
+
 </body>
 </html>
