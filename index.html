@@ -187,6 +187,50 @@ html.hc .c,html.hc .cl,html.hc .rs{border-width:2px}html.hc small.mu,html.hc .mu
 html.hc .b.p{background:var(--br);box-shadow:none}html.hc .b.p,html.hc nav .on,html.hc .sbadge b,html.hc .av,html.hc h1 .ic{color:var(--onbr,#fff)}
 html.hc nav .on{background:var(--br)}html.hc :focus-visible{outline:4px solid var(--tx);outline-offset:3px}
 @media(forced-colors:active){.b,.c,.cl{border:1px solid CanvasText}.b.p{forced-color-adjust:none;background:Highlight;color:HighlightText}}
+
+/* ===== Réglages v11 : hub de tuiles + pages par section ===== */
+dialog:has(.setw){padding:0;width:min(540px,96vw);overflow:hidden}
+.setw{max-height:88vh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.sethd{position:sticky;top:0;z-index:3;padding:14px 16px 16px;color:#fff;background:linear-gradient(135deg,var(--br),color-mix(in srgb,var(--br) 50%,#a855f7));border-radius:0 0 26px 26px;box-shadow:0 14px 30px -20px #000c}
+html.hc .sethd{color:var(--onbr,#fff)}
+.seth1{display:flex;align-items:center;gap:10px}.seth1 h3{flex:1;margin:0;color:inherit;font-size:19px;letter-spacing:-.01em}
+.setx{all:unset;box-sizing:border-box;cursor:pointer;width:40px;height:40px;border-radius:14px;display:grid;place-items:center;background:#ffffff26;color:inherit;font-size:18px;font-weight:800;-webkit-tap-highlight-color:transparent}
+.setx:hover{background:#ffffff40}.setx:focus-visible,.tile:focus-visible,.nr:focus-visible{outline:3px solid var(--br);outline-offset:2px}.sethd .setx:focus-visible{outline-color:#fff}
+.prof{display:flex;gap:12px;align-items:center;margin-top:14px}
+.pav{flex:none;width:56px;height:56px;border-radius:20px;background:#ffffff2e;border:1px solid #ffffff55;display:grid;place-items:center;font:800 24px system-ui,sans-serif;text-transform:uppercase}
+.pn{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.prof small{display:block;opacity:.9;font-size:11.5px;color:inherit}
+.xpbar{height:7px;border-radius:99px;background:#ffffff33;margin:6px 0 3px}.xpbar i{display:block;height:100%;border-radius:99px;background:#fff}
+.pbtn{margin-top:12px;width:100%;background:#fff!important;color:#111827!important;border:0!important;box-shadow:0 8px 20px -10px #0008!important}
+.setbody{padding:14px 14px 20px;animation:setin .22s ease-out}@keyframes setin{from{opacity:0;transform:translateX(12px)}}
+html[dir=rtl] .setbody{animation-name:setinr}@keyframes setinr{from{opacity:0;transform:translateX(-12px)}}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:14px;min-height:120px;border-radius:22px;background:var(--in);border:1px solid var(--ln);transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden}
+.tile::before{content:"";position:absolute;inset-inline-end:-26px;top:-26px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c1) 22%,transparent),transparent 70%)}
+.tile:active{transform:scale(.97)}.tile:hover{box-shadow:0 14px 28px -18px var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--ln))}
+.tile b{font-size:14.5px;display:block}.tile small{display:block;color:var(--mu);font-size:11.5px;line-height:1.35;margin-top:2px}
+.ti{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;font-size:22px;color:#fff;flex:none;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 10px 18px -10px var(--c1)}
+.ti .ic{width:24px;height:24px;color:#fff}
+.tile.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center}
+.sh{margin:18px 4px 6px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);font-weight:800}
+.sg{background:var(--in);border:1px solid var(--ln);border-radius:20px;overflow:hidden}
+.sg>label,.sg .sr{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:12px 14px;font-weight:700;font-size:13.5px;border-bottom:1px solid var(--ln)}
+.sg>label:last-child,.sg>.sr:last-child{border-bottom:0}
+.sg>label select,.sg .sr select{width:auto;max-width:56%;min-width:110px;margin:0}
+.sg .sr.col{flex-direction:column;align-items:stretch;gap:10px}
+.sg label>input[type=checkbox]{margin-inline-start:auto!important;order:2;flex:none}
+.sg input[type=checkbox]{-webkit-appearance:none;appearance:none;width:46px!important;height:28px!important;border-radius:99px;background:var(--ln);position:relative;cursor:pointer;transition:background .2s;border:0;padding:0;min-height:0!important}
+.sg input[type=checkbox]::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px #0004;transition:inset-inline-start .2s}
+.sg input[type=checkbox]:checked{background:var(--br)}.sg input[type=checkbox]:checked::after{inset-inline-start:21px}.sg input[type=checkbox]:disabled{opacity:.45}
+.sg.pad{padding:12px 14px}.sg.pad>*+*{margin-top:10px}.sg.pad>label{padding:0;border:0;justify-content:space-between;color:var(--tx)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}.seg button{all:unset;box-sizing:border-box;cursor:pointer;padding:9px 14px;border-radius:99px;background:var(--card);border:1px solid var(--ln);font-weight:700;font-size:13px;min-height:40px;display:inline-flex;align-items:center}
+.seg button.on{background:var(--br);color:var(--onbr,#fff);border-color:transparent}.seg button:focus-visible{outline:3px solid var(--br);outline-offset:2px}
+.swr{display:flex;gap:10px;flex-wrap:wrap}
+.nr{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;border-bottom:1px solid var(--ln);-webkit-tap-highlight-color:transparent}
+.nr:last-child{border-bottom:0}.nr:hover{background:color-mix(in srgb,var(--br) 7%,transparent)}.nr:active{background:color-mix(in srgb,var(--br) 14%,transparent)}
+.nr .ti{width:36px;height:36px;border-radius:12px;font-size:18px}.nr>span:nth-child(2){flex:1;min-width:0}.nr b{display:block;font-size:14px}.nr small{display:block;color:var(--mu);font-size:11.5px}
+.chev{width:9px;height:9px;border-top:2.5px solid var(--mu);border-inline-end:2.5px solid var(--mu);transform:rotate(45deg);flex:none;opacity:.7;margin-inline-end:4px}html[dir=rtl] .chev{transform:rotate(-135deg)}
+.sg>label,.sg .sr b,.sg.pad>label{color:var(--tx)}.sg label small{font-weight:500}
+.setver{text-align:center;color:var(--mu);font-size:11px;margin-top:16px}
 </style>
 </head>
 <body>
@@ -1980,6 +2024,93 @@ async function postLogin(){if(!fbUser||postFor===fbUser.uid)return;postFor=fbUse
 {const _del2=fbDeleteCloud;fbDeleteCloud=async function(){try{const ref=fbRef(),v=await ref.collection('v').get();for(const d of v.docs){const cs=await d.ref.collection('c').get(),b=fb.db.batch();cs.docs.forEach(c=>b.delete(c.ref));b.delete(d.ref);await b.commit()}}catch(e){}
   try{await fb.db.collection('lb').doc(fbUser.uid).delete()}catch(e){}try{await fb.db.collection('tokens').doc(fbUser.uid).delete()}catch(e){}return _del2()}}
 trDom(document.body);render();
+</script>
+
+<script>
+/* =====================================================================
+   Réglages v11 : un "hub" de tuiles colorées + une page par section (remplace l'ancienne longue fenêtre)
+   ===================================================================== */
+let setSec='';
+const SETC={look:['#8b5cf6','#ec4899'],study:['#3b82f6','#06b6d4'],data:['#10b981','#14b8a6'],social:['#f59e0b','#ef4444'],acct:['#6366f1','#8b5cf6'],help:['#64748b','#0ea5e9'],admin:['#0f172a','#475569'],stat:['#ec4899','#f97316'],bell:['#eab308','#f97316'],hist:['#0ea5e9','#6366f1']};
+const sIco=(k,e)=>`<span class="ti" style="--c1:${SETC[k][0]};--c2:${SETC[k][1]}" aria-hidden="true">${e}</span>`;
+const nrow=(ic,k,ti,sub,a,i)=>`<button class="nr" data-a="${a}"${i!=null?` data-i="${i}"`:''}>${sIco(k,ic)}<span><b>${ti}</b>${sub?`<small>${sub}</small>`:''}</span><i class="chev"></i></button>`;
+const tile=(k,ic,ti,sub,a,i,wide)=>`<button class="tile${wide?' wide':''}" style="--c1:${SETC[k][0]};--c2:${SETC[k][1]}" data-a="${a}"${i!=null?` data-i="${i}"`:''}>${sIco(k,ic)}<span><b>${ti}</b><small>${sub}</small></span></button>`;
+const langName=()=>({fr:'Français',en:'English',ar:'العربية',ary:'الدارجة'}[LANG()]);
+const swCheck=(on,js,dis)=>`<input type="checkbox" ${on?'checked':''} ${dis?'disabled':''} onchange="${js}">`;
+
+function secLook(){
+  const pal=localStorage.getItem('eduPal')||'blue';
+  return `<div class="sg">
+   <div class="sr col"><b>${tr('Langue')}</b><div class="seg">${[['fr','Français'],['en','English'],['ar','العربية'],['ary','الدارجة']].map(([k,n])=>`<button class="${LANG()===k?'on':''}" data-a="setLang" data-i="${k}">${n}</button>`).join('')}</div></div>
+   <div class="sr col"><b>${tr('Couleur du thème')}</b><div class="swr">${Object.entries(PALS).map(([k,v])=>`<button class="sw${pal===k?' sel':''}" data-a="pal" data-i="${k}" style="background:${v[1]}" aria-label="${v[0]}" title="${v[0]}"></button>`).join('')}</div></div>
+   <label>${tr('Apparence')}<select onchange="setMode(this.value)">${[['auto','Auto (comme le téléphone)'],['light','Clair'],['dark','Sombre']].map(o=>`<option value="${o[0]}"${getMode()===o[0]?' selected':''}>${tr(o[1])}</option>`).join('')}</select></label></div>
+  <h5 class="sh">${tr('Accessibilité')}</h5><div class="sg pad">${a11ySection().replace(`<label>${tr('Accessibilité')}</label>`,'')}</div>`}
+function secStudy(){
+  const s=A.settings;
+  return `<div class="sg">
+   <label>${tr('Niveau actuel')}<select onchange="chgLvl(this.value)">${Object.keys(LV).map(l=>`<option${l===s.level?' selected':''}>${l}</option>`).join('')}</select></label>
+   <label>${tr('Semestre en cours')}<select onchange="chgSem(this.value)">${sems().map(x=>`<option${x===curSem()?' selected':''}>${x}</option>`).join('')}</select></label>
+   <label>${tr('Afficher aussi les anciens semestres (archives)')}${swCheck(s.showAll,'chgAll(this.checked)')}</label>
+   <label>${tr("Semaine actuelle (l'alternance A/B est automatique)")}<select onchange="chgWk(this.value)"><option value="A"${curWeek()==='A'?' selected':''}>${tr('Semaine A')}</option><option value="B"${curWeek()==='B'?' selected':''}>${tr('Semaine B')}</option></select></label></div>
+  <h5 class="sh">${Lg('Rappels','Reminders','التذكيرات')}</h5><div class="sg">
+   <label>${tr('Rappel avant les cours')}<select onchange="localStorage.setItem('eduVault_clsRem',this.value)">${[0,5,10,15,30].map(v=>`<option value="${v}"${(+(localStorage.getItem('eduVault_clsRem')||10))===v?' selected':''}>${v?v+' min':tr('Désactivé')}</option>`).join('')}</select></label>
+   <label>${tr('🔔 Son des alertes')}${swCheck(localStorage.getItem('eduVault_sound')!=='0',"localStorage.setItem('eduVault_sound',this.checked?'1':'0')")}</label></div>
+  <h5 class="sh">${tr('Vacances & jours chômés (du / au)')}</h5><div class="sg pad"><div class="row" style="margin:0"><input type="date" id="h1" aria-label="Du"><input type="date" id="h2" aria-label="Au"><button class="b p" data-a="addHol" aria-label="${Lg('Ajouter','Add','إضافة')}">+</button></div>
+   <div>${ranges().map(r=>`<span class="chip">${r[0]===r[1]?r[0]:r[0]+' → '+r[1]}<button class="x-btn" data-a="delHol" data-i="${r[0]}|${r[1]}" aria-label="Supprimer">✕</button></span>`).join('')||`<small class="mu">${Lg('Aucune période ajoutée','No period added','لا توجد فترات')}</small>`}</div></div>`}
+function secData(){
+  return `<div class="sg pad"><b>${UID?'☁️ Google Drive ('+Lg('optionnel','optional','اختياري')+')':tr('☁️ Sauvegarde Google Drive')}</b><div class="rs" style="margin:0">${driveStatusHTML()}</div>
+   ${UID?`<label>${tr('Copier mes fichiers dans mon Google Drive')}${swCheck(dfOn(),'setDf(this.checked)',!linked())}</label>${linked()?'':`<small class="mu">${Lg("Connecte d'abord ton Drive (bouton ci-dessous).","Connect your Drive first (button below).",'اربط Drive أولا (الزر أدناه).')}</small>`}`:''}
+   <div class="row" style="margin:0;justify-content:flex-start"><button class="b p" data-a="drive">${linked()?Lg('Déconnecter Drive','Disconnect Drive','فصل Drive'):(UID?Lg('Connecter mon Drive','Connect my Drive','ربط Drive'):Lg('Activer la sauvegarde auto','Enable auto backup','تفعيل النسخ التلقائي'))}</button>${linked()&&!UID?`<button class="b" data-a="dsave">⬆ ${Lg('Envoyer','Upload','إرسال')}</button><button class="b" data-a="dload">⬇ ${Lg('Restaurer','Restore','استعادة')}</button>`:''}<button class="b" data-a="setCid" title="Client ID Google" aria-label="Client ID Google">🔑</button></div></div>
+  <h5 class="sh">${Lg('Sauvegarde & export','Backup & export','النسخ والتصدير')}</h5><div class="sg">
+   ${nrow('⬇','data',tr('⬇ Exporter').replace(/^⬇\s*/,''),Lg('Fichier .json de toutes tes données','.json file with all your data','ملف .json بكل بياناتك'),'exp')}
+   ${nrow('⬆','data',tr('⬆ Importer').replace(/^⬆\s*/,''),Lg('Restaurer depuis un fichier .json','Restore from a .json file','استعادة من ملف .json'),'imp')}
+   ${nrow('📅','data',tr('📅 Export .ics').replace(/^📅\s*/,''),Lg('Cours et échéances vers ton calendrier','Classes and deadlines to your calendar','الحصص والمواعيد إلى تقويمك'),'expics')}
+   ${UID?nrow('🕘','hist',Lg('Historique des versions','Version history','سجل النسخ'),Lg('5 dernières sauvegardes cloud','Last 5 cloud backups','آخر 5 نسخ سحابية'),'verHist'):''}
+   ${UID?nrow('🔐','acct',tr('Chiffrement'),ENCST==='on'?Lg('Actif','Active','مفعّل'):Lg('Protège tes données cloud','Protect your cloud data','احمِ بياناتك السحابية'),'acct'):''}</div>`}
+function secSocial(){
+  const n=(A.settings.shares||[]).length+(A.settings.joined||[]).length;
+  return `<div class="sg">
+   ${nrow('👥','social',Lg('Partage & code de classe','Sharing & class code','المشاركة ورمز القسم'),n?Lg(n+' partage(s) / classe(s)',n+' share(s) / class(es)',n+' مشاركة'):Lg('Importe un emploi du temps avec un code','Import a timetable with a code','استورد جدولا برمز'),'shHub')}
+   ${nrow('📚','social',Lg('Ressources de classe','Class resources','موارد القسم'),Lg('Liens validés par l\'admin','Links approved by the admin','روابط يعتمدها المشرف'),'resHub')}
+   ${nrow('🏆','stat',Lg('Niveau & classement','Level & ranking','المستوى والترتيب'),Lg('Niv. '+lvlOf(A.xp||0)+' · '+(A.xp||0)+' XP','Lvl '+lvlOf(A.xp||0)+' · '+(A.xp||0)+' XP','م '+lvlOf(A.xp||0)+' · '+(A.xp||0)+' XP'),'lbSet')}
+   ${nrow('📊','stat',tr('Statistiques'),Lg('Heures de révision, heatmap, moyennes','Revision hours, heatmap, averages','ساعات المراجعة والمعدلات'),'stats')}
+   ${UID?nrow('🔔','bell',Lg('Annonces','Announcements','الإعلانات'),LS('eduVault_push')==='1'?Lg('Notifications activées','Notifications on','الإشعارات مفعلة'):Lg('Reçois les infos importantes','Get important news','استقبل الأخبار المهمة'),'pushSet'):''}</div>`}
+function secHelp(){
+  return `<div class="sg">
+   ${nrow('🧭','help',tr('Revoir la visite guidée'),Lg('Un tour rapide de l\'appli','A quick tour of the app','جولة سريعة في التطبيق'),'tour')}
+   ${nrow('💡','bell',Lg('Signaler / Idée','Report / Idea','إبلاغ / فكرة'),Lg('Dis-nous ce qui manque ou bugue','Tell us what is missing or broken','أخبرنا بما ينقص أو يتعطل'),'feedback')}</div>
+  <h5 class="sh">${tr('ℹ️ À propos')}</h5><div class="sg pad about"><div style="display:flex;flex-wrap:wrap;gap:8px"><a class="b" href="https://discord.gg/FzEymZsTGq" target="_blank" rel="noopener">💬 Discord</a><a class="b" href="https://www.linkedin.com/in/zakariae-rezine" target="_blank" rel="noopener">🌐 LinkedIn</a></div><small class="mu">EduVault — ${Lg('fait avec ❤ pour les étudiants. Bugs et suggestions : Discord.','made with ❤ for students. Bugs and suggestions: Discord.','صُنع بـ ❤ للطلبة. للأخطاء والاقتراحات: Discord.')}</small></div>
+  <div class="setver">EduVault ${APP_V}</div>`}
+const SEC={look:['🎨',()=>Lg('Apparence & langue','Appearance & language','المظهر واللغة'),secLook],study:['🎓',()=>Lg('Études','Studies','الدراسة'),secStudy],data:['☁️',()=>Lg('Données & sauvegarde','Data & backup','البيانات والنسخ'),secData],social:['👥',()=>Lg('Classe & partage','Class & sharing','القسم والمشاركة'),secSocial],help:['💬',()=>Lg('Aide & infos','Help & info','المساعدة'),secHelp]};
+function settings(){
+  const d=$('dlg'),prevSc=d.querySelector('.setw');if(!d.open||!prevSc)setSec='';
+  const sc=prevSc&&d.open?prevSc.scrollTop:0,sec=SEC[setSec]?setSec:'';
+  const info=acctInfo()||{},em=UID?(info.email||''):'',name=UID?(em.split('@')[0]||Lg('Mon compte','My account','حسابي')):Lg('Mode invité','Guest mode','وضع الضيف'),
+    xp=A.xp||0,l=lvlOf(xp),a0=lvlBase(l),b0=lvlBase(l+1),pc=Math.max(0,Math.min(100,Math.round(100*(xp-a0)/(b0-a0)))),st=streakDays();
+  const closeX=`<button class="setx" onclick="$('dlg').close()" aria-label="${tr('Fermer')}">✕</button>`;
+  let head,body;
+  if(sec){const S=SEC[sec];head=`<div class="sethd"><div class="seth1"><button class="setx" data-a="setSec" data-i="" aria-label="${Lg('Retour','Back','رجوع')}">${isRTL()?'›':'‹'}</button><h3>${S[1]()}</h3>${closeX}</div></div>`;body=S[2]()}
+  else{
+    head=`<div class="sethd"><div class="seth1"><h3>${tr('⚙️ Réglages')}</h3>${closeX}</div>
+     <div class="prof"><div class="pav" aria-hidden="true">${UID?esc((name[0]||'?')):'🎓'}</div><div style="flex:1;min-width:0"><b class="pn">${esc(name)}</b><small>${UID?esc(em):Lg('Tes données restent sur cet appareil','Your data stays on this device','تبقى بياناتك على هذا الجهاز')}</small>
+      <div class="xpbar" role="progressbar" aria-valuenow="${pc}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pc}%"></i></div><small>${Lg('Niv.','Lvl','م')} ${l} · ${xp} XP${st?' · 🔥 '+st:''}</small></div></div>
+     <button class="b pbtn" data-a="acct">${UID?Lg('Gérer mon compte','Manage my account','إدارة حسابي'):tr('Se connecter / Créer un compte')}</button></div>`;
+    const pal=(PALS[localStorage.getItem('eduPal')||'blue']||PALS.blue)[0],n=(A.settings.shares||[]).length+(A.settings.joined||[]).length;
+    body=`<div class="tiles">
+      ${tile('look','🎨',Lg('Apparence','Appearance','المظهر'),langName()+' · '+pal+(LS('eduVault_big')==='1'?' · Aa':''),'setSec','look')}
+      ${tile('study','🎓',Lg('Études','Studies','الدراسة'),(A.settings.level||'–')+' · '+curSem()+' · '+Lg('Sem.','Wk','أ')+' '+curWeek(),'setSec','study')}
+      ${tile('data','☁️',Lg('Données','Data','البيانات'),linked()?Lg('Drive connecté','Drive connected','Drive متصل'):Lg('Export, Drive, historique','Export, Drive, history','تصدير، Drive، سجل'),'setSec','data')}
+      ${tile('social','👥',Lg('Classe & partage','Class & sharing','القسم والمشاركة'),n?n+' '+Lg('actif(s)','active','نشط'):Lg('Code, ressources, classement','Code, resources, ranking','رمز، موارد، ترتيب'),'setSec','social')}
+      ${tile('acct','🔐',Lg('Compte & sécurité','Account & security','الحساب والأمان'),UID?(ENCST==='on'?Lg('Chiffrement actif','Encryption on','التشفير مفعّل'):Lg('Synchronisation active','Sync on','المزامنة مفعلة')):Lg('Sauvegarde cloud','Cloud backup','نسخ سحابي'),'acct')}
+      ${tile('help','💬',Lg('Aide & infos','Help & info','المساعدة'),Lg('Visite, signaler, à propos','Tour, report, about','جولة، إبلاغ، حول'),'setSec','help')}
+      ${ADMIN?tile('admin','🛠','Admin',Lg('Comptes, feedback, liens','Accounts, feedback, links','حسابات، ملاحظات، روابط'),'admin',null,1):''}</div>
+     <div class="setver">EduVault ${APP_V}</div>`}
+  d.innerHTML=`<div class="setw">${head}<div class="setbody">${body}</div></div><input type="file" id="jf" accept=".json,application/json" hidden>`;
+  $('jf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||!Array.isArray(o.modules))throw 0;if(!confirm('Remplacer toutes vos données par cette sauvegarde ?'))return;load(o);upd();$('dlg').close();toast('Sauvegarde restaurée','ok')}catch(x){toast('Format JSON invalide','er')}};r.readAsText(f)};
+  d.oncancel=null;if(!d.open)d.showModal();
+  const w=d.querySelector('.setw');if(w&&sc)w.scrollTop=sc;trDom(d)}
+act.setSec=i=>{setSec=i||'';settings();const w=$('dlg').querySelector('.setw');if(w)w.scrollTop=0};
+settings.__v11=1;
 </script>
 
 </body>
