@@ -266,6 +266,7 @@ const I18N_ROWS=[
 ['🔐 Chiffrement','🔐 Encryption','🔐 التشفير',''],['Activer le chiffrement','Enable encryption','تفعيل التشفير',''],['Déverrouiller','Unlock','فتح القفل',''],['Désactiver le chiffrement','Disable encryption','تعطيل التشفير',''],
 ['Commence par ajouter un module','Start by adding a module','ابدأ بإضافة مادة',''],['Aucun module','No module','لا توجد مواد',''],['Aucune fiche','No card','لا توجد بطاقات',''],['Aucun emploi du temps','No timetable','لا يوجد جدول',''],['Aucune échéance pour le moment','No deadline for now','لا مواعيد حاليا',''],
 ['Importer avec l\'IA','Import with AI','استيراد بالذكاء الاصطناعي',''],['Ajouter une séance','Add a session','إضافة حصة',''],['Ajouter un module','Add a module','إضافة مادة',''],['Créer une fiche','Create a card','إنشاء بطاقة',''],['Ajouter une échéance ','Add a deadline','إضافة موعد',''],
+['Révisions','Revision','مراجعات',''],['Plan','Plan','خطة',''],
 ['Crée un compte gratuit pour sauvegarder tes données et les retrouver sur tous tes appareils.','Create a free account to back up your data and find it on all your devices.','أنشئ حسابا مجانيا لحفظ بياناتك واسترجاعها على كل أجهزتك.',''],
 ['Tes données restent sur cet appareil. Crée un compte pour les sauvegarder et les retrouver sur tous tes appareils.','Your data stays on this device. Create an account to back it up and find it on all your devices.','تبقى بياناتك على هذا الجهاز. أنشئ حسابا لحفظها واسترجاعها على كل أجهزتك.',''],
 ['Créer','Create','إنشاء',''],['🔴 Non connecté','🔴 Not signed in','🔴 غير متصل',''],['Modules, horaires, devoirs, fiches, quiz, notes et fichiers locaux sont envoyés automatiquement.','Modules, timetable, homework, cards, quizzes, notes and local files are uploaded automatically.','تُرسل المواد والجداول والواجبات والبطاقات والاختبارات والملاحظات والملفات المحلية تلقائيا.',''],
@@ -350,7 +351,7 @@ function applyNavLang(){
   const sq=$('sq');if(sq)sq.placeholder=tr('Rechercher...');
 }
 function setLang(l){localStorage.setItem(LANGK,l);document.documentElement.lang=l==='ary'?'ar':l;document.documentElement.dir=isRTL()?'rtl':'ltr';applyNavLang();render();settings()}
-const defaultA=()=>({activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[],quizQs:[],quizHist:[],act:{}});
+const defaultA=()=>({activeSemester:'S1',settings:{level:null,currentWeek:'A',weekRef:'',holidays:[]},modules:[],tasks:[],flashcards:[],timetable:[],notes:[],quizQs:[],quizHist:[],act:{},xp:0,tot:{}});
 let A=defaultA();
 const resetA=()=>{Object.keys(A).forEach(k=>delete A[k]);Object.assign(A,defaultA())};
 const emptyBox=(ic,ti,tx,btns)=>`<div class="emp" style="grid-column:1/-1"><div class="emp-i" aria-hidden="true">${ic}</div><b>${ti}</b><p class="mu">${tx}</p><div class="row" style="justify-content:center;margin:12px 0 0">${(btns||[]).map(b=>`<button class="b${b[2]?' p':''}" data-a="${b[1]}">${b[0]}</button>`).join('')}</div></div>`;
@@ -388,13 +389,14 @@ function dlBlob(n,b){const a=document.createElement('a');a.href=URL.createObject
 function shrink(f,max=800,qa=.6){return new Promise((ok,ko)=>{const r=new FileReader();r.onerror=ko;r.onload=()=>{const im=new Image();im.onerror=ko;im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',qa))};im.src=r.result};r.readAsDataURL(f)})}
 
 /* ---------- journal d'activité (statistiques) : A.act['YYYY-MM-DD']={m:min de focus, c:fiches révisées, q:questions de quiz} ---------- */
-function logAct(k,v){const d=iso(new Date()),o=A.act[d]||(A.act[d]={});o[k]=Math.round(((o[k]||0)+v)*10)/10;
+function logAct(k,v){const d=iso(new Date()),o=A.act[d]||(A.act[d]={});o[k]=Math.round(((o[k]||0)+v)*10)/10;A.tot[k]=Math.round(((A.tot[k]||0)+v)*10)/10;A.xp=(A.xp||0)+Math.round(v*({m:1,c:2,q:1}[k]||0));
   const lim=iso(new Date(Date.now()-400*864e5));Object.keys(A.act).forEach(x=>{if(x<lim)delete A.act[x]})}
 /* ---------- data ---------- */
 function load(o){
   try{Object.assign(A,o||JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
   for(const k of ['modules','tasks','flashcards','timetable','notes','quizQs','quizHist'])if(!Array.isArray(A[k]))A[k]=[];
   if(!A.act||typeof A.act!=='object'||Array.isArray(A.act))A.act={};
+  if(!A.tot||typeof A.tot!=='object'||Array.isArray(A.tot))A.tot={};A.xp=+A.xp||0;
   A.settings=Object.assign({level:null,currentWeek:'A',weekRef:'',holidays:[]},A.settings);
   if(!Array.isArray(A.settings.holidays))A.settings.holidays=[];
   A.modules.forEach(m=>{
@@ -433,7 +435,7 @@ function ask(title,fields,ok){
 /* ---------- views ---------- */
 const semBadge=()=>`<div class="sbadge"><span>Semestre en cours</span><b>${curSem()}</b><small>${A.settings.level||''} · modifiable dans Réglages</small></div>`;
 const pills=()=>`<div class="pills">${visSems().map(s=>`<button class="b${s===A.activeSemester?' p':''}${s===curSem()?' cur':''}" data-a="sem" data-i="${s}">${s}</button>`).join('')}</div>`;
-function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&new Date(t.dueDate)>n).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];if(!t)return'';const h=Math.floor((new Date(t.dueDate)-n)/36e5),d=Math.floor(h/24);return`<div class="up" data-a="goAg">⏰ ${t.type==='exam'?'Examen':'Devoir'} : ${esc(t.title)} (${d>0?'dans '+d+' j':h>0?'dans '+h+' h':'très bientôt'})</div>`}
+function banner(){const n=new Date(),t=A.tasks.filter(t=>!t.completed&&t.type!=='review'&&new Date(t.dueDate)>n).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];if(!t)return'';const h=Math.floor((new Date(t.dueDate)-n)/36e5),d=Math.floor(h/24);return`<div class="up" data-a="goAg">⏰ ${t.type==='exam'?'Examen':'Devoir'} : ${esc(t.title)} (${d>0?'dans '+d+' j':h>0?'dans '+h+' h':'très bientôt'})</div>`}
 const modCol=id=>A.modules.find(m=>m.id===id)?.color||'var(--br)';
 const MPAL=['#2563eb','#059669','#7c3aed','#e11d48','#ea580c','#0d9488','#d97706','#4f46e5','#db2777','#0891b2','#65a30d','#9333ea'];
 const nextModColor=()=>MPAL[A.modules.length%MPAL.length];
@@ -468,7 +470,7 @@ const fmtMin=m=>m>=60?Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0
 function rDa(){
   const t=Date.now(),n=new Date(),hol=isHol(iso(n)),nm=n.getHours()*60+n.getMinutes(),tm=x=>{const[h,m]=x.split(':');return+h*60+ +m};
   const cls=hol?[]:A.timetable.filter(c=>curIds().has(c.moduleId)&&c.day===TOD()&&(c.week==='all'||c.week===curWeek())).sort((a,b)=>a.startTime.localeCompare(b.startTime));
-  const due=A.tasks.filter(x=>curIds().has(x.moduleId)&&!x.completed&&new Date(x.dueDate).getTime()<t+7*864e5).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  const due=A.tasks.filter(x=>curIds().has(x.moduleId)&&!x.completed&&x.type!=='review'&&new Date(x.dueDate).getTime()<t+7*864e5).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
   const nFc=A.flashcards.filter(f=>curIds().has(f.moduleId)&&(!f.nextRev||f.nextRev<=t)).length,nx=cls.find(c=>tm(c.endTime)>nm);
   const hist=A.quizHist,avgQ=hist.length?Math.round(hist.reduce((s,x)=>s+x.sc/x.n,0)/hist.length*100):null,focus=Math.round(A.modules.reduce((s,m)=>s+(m.pomo||0),0)/60);
   const gr=n.getHours()<12?'Bonjour':n.getHours()<18?'Bon après-midi':'Bonsoir';
@@ -482,7 +484,7 @@ function rDa(){
 function rTT(){
   const nowD=new Date(),nowM=nowD.getHours()*60+nowD.getMinutes(),tmin=x=>{const[h,m]=x.split(':');return+h*60+ +m},wk=curWeek(),ids=mods().map(m=>m.id),tt=A.timetable.filter(c=>ids.includes(c.moduleId)&&(c.week==='all'||c.week===wk));
   const days=DAYS.filter((d,i)=>i<6||tt.some(c=>c.day===d));
-  const head=semBadge()+`<div class="top"><div><h2>${tr('Emploi du temps')}</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ttView">${ttView==='grid'?'📋 '+tr('Cartes'):'🗓 '+tr('Grille horaire')}</button><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">${tr('+ Séance')}</button></div></div>`;
+  const head=semBadge()+`<div class="top"><div><h2>${tr('Emploi du temps')}</h2><small class="br">Semaine ${wk}${isHol(iso(new Date()))?' · Vacances aujourd\'hui 🌴':''}</small></div><div><button class="b" data-a="ttView">${ttView==='grid'?'📋 '+tr('Cartes'):'🗓 '+tr('Grille horaire')}</button><button class="b" data-a="ttExp" title="${Lg('Exporter / imprimer','Export / print','تصدير / طباعة')}">🖨</button><button class="b" data-a="ai">✨ IA</button><button class="b p" data-a="addCls">${tr('+ Séance')}</button></div></div>`;
   if(!tt.length)return head+`<div class="g">${emptyBox('📅',Lg('Aucun emploi du temps','No timetable yet','لا يوجد جدول بعد'),Lg("Importe ton emploi du temps avec l'IA, rejoins ta classe avec un code, ou ajoute une séance à la main.",'Import your timetable with AI, join your class with a code, or add a session by hand.','استورد جدولك بالذكاء الاصطناعي، أو انضم إلى قسمك برمز، أو أضف حصة يدويا.'),[['✨ '+Lg('Importer avec l\'IA','Import with AI','استيراد بالذكاء الاصطناعي'),'ai',1],['👥 '+Lg('Rejoindre avec un code','Join with a code','الانضمام برمز'),'shJoin'],['+ '+Lg('Ajouter une séance','Add a session','إضافة حصة'),'addCls']])}</div>`;
   if(ttView==='grid')return head+rTTGrid(tt,days,nowD,nowM,tmin);
   return head+`<div class="g">`+
@@ -513,10 +515,10 @@ function rTTGrid(tt,days,nowD,nowM,tmin){
 }
 function rAg(){
   const ids=mods().map(m=>m.id),l=A.tasks.filter(x=>ids.includes(x.moduleId)&&(filt==='all'||x.type===filt)).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
-  const head=semBadge()+`<div class="top"><h2>${tr('Examens & Devoirs')}</h2><div><button class="b" data-a="agView">${agView==='cal'?tr('📋 Liste'):tr('📅 Calendrier')}</button><button class="b p" data-a="addTask">${tr('+ Ajouter')}</button></div></div>`;
+  const head=semBadge()+`<div class="top"><h2>${tr('Examens & Devoirs')}</h2><div><button class="b" data-a="agView">${agView==='cal'?tr('📋 Liste'):tr('📅 Calendrier')}</button><button class="b" data-a="plan" title="${Lg('Plan de révision automatique','Automatic revision plan','خطة مراجعة تلقائية')}">📅 ${Lg('Plan','Plan','خطة')}</button><button class="b p" data-a="addTask">${tr('+ Ajouter')}</button></div></div>`;
   if(agView==='cal')return head+rCal();
-  return head+`<div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${tr(f[1])}</button>`).join('')}</div>`+
-  (l.length?l.map(x=>`<div class="c t${x.type==='exam'?' x':''}${x.completed?' d':''}"><input type="checkbox" ${x.completed?'checked':''} data-a="done" data-i="${x.id}" aria-label="Terminé"><div><b>${x.type==='exam'?'🚨 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))} • ${new Date(x.dueDate).toLocaleString(LOC())}</small></div><button class="x-btn" data-a="editTask" data-i="${x.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${x.id}" aria-label="Supprimer">🗑</button></div>`).join(''):(filt==='all'?`<div class="g">${emptyBox('⏰',Lg('Aucune échéance pour le moment','No deadline for now','لا مواعيد حاليا'),Lg('Ajoute tes examens et devoirs : tu seras prévenu avant la date.','Add your exams and homework: you will be reminded before the date.','أضف امتحاناتك وواجباتك وسنذكّرك قبل الموعد.'),[['+ '+Lg('Ajouter une échéance','Add a deadline','إضافة موعد'),'addTask',1]])}</div>`:`<p class="mu e">${tr('Aucune échéance')}</p>`));
+  return head+`<div class="pills">${[['all','Tous'],['exam','Examens'],['homework','Devoirs'],['review','Révisions']].map(f=>`<button class="b${filt===f[0]?' p':''}" data-a="flt" data-i="${f[0]}">${tr(f[1])}</button>`).join('')}</div>`+
+  (l.length?l.map(x=>`<div class="c t${x.type==='exam'?' x':''}${x.completed?' d':''}"><input type="checkbox" ${x.completed?'checked':''} data-a="done" data-i="${x.id}" aria-label="Terminé"><div><b>${x.type==='exam'?'🚨 ':x.type==='review'?'📖 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))} • ${new Date(x.dueDate).toLocaleString(LOC())}</small></div><button class="x-btn" data-a="editTask" data-i="${x.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delTask" data-i="${x.id}" aria-label="Supprimer">🗑</button></div>`).join(''):(filt==='all'?`<div class="g">${emptyBox('⏰',Lg('Aucune échéance pour le moment','No deadline for now','لا مواعيد حاليا'),Lg('Ajoute tes examens et devoirs : tu seras prévenu avant la date.','Add your exams and homework: you will be reminded before the date.','أضف امتحاناتك وواجباتك وسنذكّرك قبل الموعد.'),[['+ '+Lg('Ajouter une échéance','Add a deadline','إضافة موعد'),'addTask',1]])}</div>`:`<p class="mu e">${tr('Aucune échéance')}</p>`));
 }
 function rCal(){
   const ids=mods().map(m=>m.id),m0=new Date(calMonth.getFullYear(),calMonth.getMonth(),1),today=iso(new Date());
@@ -529,7 +531,7 @@ function rCal(){
     cells+=`<div class="cd${ds===today?' today':''}${tx.length?' has':''}" title="${esc(tx.map(x=>x.title).join(', '))}" data-a="calDay" data-i="${ds}">${d}</div>`}
   cells+='</div>';
   const sel=byDay[lastCalDay]||[];
-  return cells+(lastCalDay?`<h4 style="margin-top:14px">${new Date(lastCalDay+'T00:00').toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'long'})}</h4>`+(sel.length?sel.map(x=>`<div class="c t${x.type==='exam'?' x':''}"><div><b>${x.type==='exam'?'🚨 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div></div>`).join(''):`<p class="mu e">${tr('Aucune échéance')}</p>`):'');
+  return cells+(lastCalDay?`<h4 style="margin-top:14px">${new Date(lastCalDay+'T00:00').toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'long'})}</h4>`+(sel.length?sel.map(x=>`<div class="c t${x.type==='exam'?' x':''}"><div><b>${x.type==='exam'?'🚨 ':x.type==='review'?'📖 ':'📝 '}${esc(x.title)}</b><small class="mu">${esc(modName(x.moduleId))}</small></div></div>`).join(''):`<p class="mu e">${tr('Aucune échéance')}</p>`):'');
 }
 let lastCalDay=null;
 function mgrid(){
@@ -545,12 +547,12 @@ function mgrid(){
     CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>`<div>${x.isLocal?`<button class="l" data-a="openRes" data-i="${esc(x.localFileId)}">📄 ${esc(x.title)}</button>`:`<a href="${esc(x.url)}" target="_blank" rel="noopener">🔗 ${esc(x.title)}</a>`}<button class="x-btn" data-a="delRes" data-i="${m.id}|${x.id}" aria-label="Supprimer">✕</button></div>`).join('')}</div>`}).join('')+'</div>'
   }).join(''):(q?`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`:emptyBox('📚',Lg('Aucun module en '+A.activeSemester,'No module in '+A.activeSemester,'لا توجد مواد في '+A.activeSemester),Lg('Ajoute tes matières pour suivre tes notes, tes cours et tes fiches.','Add your subjects to track grades, courses and cards.','أضف موادك لتتبع النقط والدروس والبطاقات.'),[['+ '+Lg('Ajouter un module','Add a module','إضافة مادة'),'addMod',1]]));
 }
-function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="recolor" title="${tr('🎨 Varier les couleurs')}">🎨</button><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
+function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="recolor" title="${tr('🎨 Varier les couleurs')}">🎨</button><button class="b" data-a="sim" title="${Lg('Simulateur de notes','Grade simulator','محاكي النقط')}">🎯</button><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
 function rFc(){
   const t=Date.now(),ms=mods(),ids=ms.map(m=>m.id);
   const all=A.flashcards.filter(f=>ids.includes(f.moduleId)&&(cardMod==='all'||f.moduleId===cardMod));
   const l=fcAll?all:all.filter(f=>!f.nextRev||f.nextRev<=t);
-  return pills()+`<div class="top"><div><h2>${tr('Active Recall')}</h2><small class="br">${all.filter(f=>!f.nextRev||f.nextRev<=t).length} à réviser · ${all.length} au total</small></div><div><button class="b${fcAll?' p':''}" data-a="fcAll">${fcAll?'Toutes':'À réviser'}</button><button class="b p" data-a="addFc">${tr('+ Créer')}</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
+  return pills()+`<div class="top"><div><h2>${tr('Active Recall')}</h2><small class="br">${all.filter(f=>!f.nextRev||f.nextRev<=t).length} à réviser · ${all.length} au total</small></div><div><button class="b${fcAll?' p':''}" data-a="fcAll">${fcAll?'Toutes':'À réviser'}</button><button class="b" data-a="pdfc" title="${Lg('PDF → fiches / quiz','PDF → cards / quiz','PDF ← بطاقات / اختبار')}">📄</button><button class="b p" data-a="addFc">${tr('+ Créer')}</button></div></div><select onchange="cardMod=this.value;render()" style="margin:0 0 12px"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${cardMod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select><div class="g">`+
   (l.length?l.map(f=>`<div class="fc" data-a="flip"><div class="fi"><div class="fa"><div><div class="top" style="margin:0"><small class="mu" style="color:${readable(modCol(f.moduleId))}">● ${esc(modName(f.moduleId))}</small><span><button class="x-btn" data-a="editFc" data-i="${f.id}" aria-label="Modifier">✏️</button><button class="x-btn" data-a="delFc" data-i="${f.id}" aria-label="Supprimer">🗑</button></span></div><b>${esc(f.q)}</b></div><small class="br">↻ Touchez pour la réponse</small></div><div class="fb"><div><small class="br">RÉPONSE</small>${esc(f.a)}</div><div class="row" style="justify-content:center;margin:0"><button class="b" style="background:#fecaca;color:#991b1b" data-a="sm2" data-i="${f.id}|1">Difficile</button><button class="b" style="background:#bbf7d0;color:#166534" data-a="sm2" data-i="${f.id}|2">Correct</button><button class="b p" data-a="sm2" data-i="${f.id}|3">Facile</button></div></div></div></div>`).join(''):(all.length?'<p class="mu e" style="grid-column:1/-1">Rien à réviser aujourd\'hui. Bravo !</p>':emptyBox('🃏',Lg('Aucune fiche pour ce semestre','No cards for this semester','لا توجد بطاقات لهذا الفصل'),Lg('Crée des fiches question/réponse : l\'appli te les représente au bon moment (révision espacée).','Create question/answer cards: the app shows them again at the right time (spaced repetition).','أنشئ بطاقات سؤال/جواب وسيعرضها التطبيق عليك في الوقت المناسب.'),[['+ '+Lg('Créer une fiche','Create a card','إنشاء بطاقة'),'addFc',1],['🔗 '+Lg('Rejoindre avec un code','Join with a code','الانضمام برمز'),'shJoin']])))+'</div>';
 }
 
@@ -598,7 +600,7 @@ const act={
   delMod:i=>{if(!confirm('Supprimer ce module, ses séances, devoirs et fiches ?'))return;
     (A.modules.find(m=>m.id===i)?.resources||[]).forEach(r=>r.isLocal&&fst('delete',r.localFileId).catch(()=>{}));
     A.modules=A.modules.filter(x=>x.id!==i);for(const k of ['timetable','tasks','flashcards','quizQs'])A[k]=A[k].filter(x=>x.moduleId!==i);upd()},
-  addTask:()=>{if(needMod())return;ask('Ajouter une échéance',[{k:'title',l:'Titre',r:1},{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'type',l:'Type',t:'select',o:[['exam','🚨 Examen'],['homework','📝 Devoir']]},{k:'dueDate',l:'Date et heure',t:'datetime-local',r:1}],v=>{A.tasks.push({id:uid('t'),...v,title:v.title.trim(),completed:false});upd();toast('Échéance ajoutée','ok')})},
+  addTask:()=>{if(needMod())return;ask('Ajouter une échéance',[{k:'title',l:'Titre',r:1},{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'type',l:'Type',t:'select',o:[['exam','🚨 Examen'],['homework','📝 Devoir'],['review','📖 Révision']]},{k:'dueDate',l:'Date et heure',t:'datetime-local',r:1}],v=>{A.tasks.push({id:uid('t'),...v,title:v.title.trim(),completed:false});upd();toast('Échéance ajoutée','ok')})},
   done:i=>{const t=A.tasks.find(x=>x.id===i);if(t){t.completed=!t.completed;upd()}},
   delTask:i=>{A.tasks=A.tasks.filter(x=>x.id!==i);upd()},
   addFc:()=>{if(needMod())return;ask('Nouvelle fiche',[{k:'moduleId',l:'Module',t:'select',o:modOpts()},{k:'q',l:'Question (recto)',t:'textarea',r:1},{k:'a',l:'Réponse (verso)',t:'textarea',r:1}],v=>{A.flashcards.push({id:uid('f'),moduleId:v.moduleId,q:v.q.trim(),a:v.a.trim()});upd();toast('Fiche créée','ok')})},
@@ -653,7 +655,7 @@ const act={
 };
 function clsForm(c){ask(c?'Modifier la séance':'Séance',[{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:c?.moduleId},{k:'day',l:'Jour',t:'select',o:DAYS.map(d=>[d,d]),v:c?.day},{k:'week',l:'Semaine',t:'select',o:[['all','Toutes les semaines'],['A','Semaine A'],['B','Semaine B']],v:c?.week},{k:'startTime',l:'Début',t:'time',r:1,v:c?.startTime},{k:'endTime',l:'Fin',t:'time',r:1,v:c?.endTime},{k:'room',l:'Salle ou amphi',r:1,v:c?.room}],v=>{
   if(v.endTime<=v.startTime)return toast("L'heure de fin doit être après le début",'er');c?Object.assign(c,v):A.timetable.push({id:uid('c'),...v});upd();toast('Séance enregistrée','ok')})}
-function taskForm(t){ask(t?"Modifier l'échéance":'Ajouter une échéance',[{k:'title',l:'Titre',r:1,v:t?.title},{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:t?.moduleId},{k:'type',l:'Type',t:'select',o:[['exam','🚨 Examen'],['homework','📝 Devoir']],v:t?.type},{k:'dueDate',l:'Date et heure',t:'datetime-local',r:1,v:t?.dueDate}],v=>{
+function taskForm(t){ask(t?"Modifier l'échéance":'Ajouter une échéance',[{k:'title',l:'Titre',r:1,v:t?.title},{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:t?.moduleId},{k:'type',l:'Type',t:'select',o:[['exam','🚨 Examen'],['homework','📝 Devoir'],['review','📖 Révision']],v:t?.type},{k:'dueDate',l:'Date et heure',t:'datetime-local',r:1,v:t?.dueDate}],v=>{
   v.title=v.title.trim();if(t){Object.assign(t,v);fired.delete(t.id+'h');fired.delete(t.id+'d')}else A.tasks.push({id:uid('t'),...v,completed:false});upd();toast('Échéance enregistrée','ok')})}
 function fcForm(f){ask(f?'Modifier la fiche':'Nouvelle fiche',[{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:f?.moduleId},{k:'q',l:'Question (recto)',t:'textarea',r:1,v:f?.q},{k:'a',l:'Réponse (verso)',t:'textarea',r:1,v:f?.a}],v=>{
   v.q=v.q.trim();v.a=v.a.trim();f?Object.assign(f,v):A.flashcards.push(newCard(v));upd();toast('Fiche enregistrée','ok')})}
@@ -714,7 +716,7 @@ function rQz(){
 function qHome(){
   const ms=mods(),bank=A.quizQs.filter(x=>ms.some(m=>m.id===x.moduleId)).length,nCards=A.flashcards.filter(f=>ms.some(m=>m.id===f.moduleId)).length;
   const h=A.quizHist,avgQ=h.length?Math.round(h.reduce((s,x)=>s+x.sc/x.n,0)/h.length*100):null,best=h.length?Math.round(Math.max(...h.map(x=>x.sc/x.n))*100):null;
-  return pills()+`<div class="top"><div><h2>Quiz</h2><small class="br">${nCards} fiches · ${bank} questions IA (${A.activeSemester})</small></div><div><button class="b" data-a="qgen">✨ Quiz IA</button></div></div>
+  return pills()+`<div class="top"><div><h2>Quiz</h2><small class="br">${nCards} fiches · ${bank} questions IA (${A.activeSemester})</small></div><div><button class="b" data-a="pdfc" title="${Lg('PDF → fiches / quiz','PDF → cards / quiz','PDF ← بطاقات / اختبار')}">📄</button><button class="b" data-a="qgen">✨ Quiz IA</button></div></div>
   <div class="st" style="margin-bottom:12px"><div><b>${qStreak()}🔥</b><small class="mu">série (jours)</small></div><div><b>${avgQ==null?'-':avgQ+'%'}</b><small class="mu">moyenne</small></div><div><b>${best==null?'-':best+'%'}</b><small class="mu">meilleur</small></div></div>
   <div class="c"><h4>Nouveau quiz</h4>
   <label>Module<select onchange="qcfg.mod=this.value"><option value="all">Tous les modules</option>${ms.map(m=>`<option value="${m.id}"${qcfg.mod===m.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select></label>
@@ -871,6 +873,7 @@ function settings(){
   ${typeof a11ySection==='function'?a11ySection():''}
   <label>${Lg('👥 Partage','👥 Sharing','👥 المشاركة')}</label>
   <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="shHub">${Lg('Partage & code de classe','Sharing & class code','المشاركة ورمز القسم')}</button><button class="b" data-a="stats">${tr('📊 Statistiques')}</button><button class="b" data-a="tour">${tr('Revoir la visite guidée')}</button></div>
+  <div class="row" style="margin:0 0 6px;justify-content:flex-start"><button class="b" data-a="resHub">📚 ${Lg('Ressources de classe','Class resources','موارد القسم')}</button><button class="b" data-a="lbSet">🏆 ${Lg('Niveau & classement','Level & ranking','المستوى والترتيب')}</button><button class="b" data-a="feedback">💡 ${Lg('Signaler / Idée','Report / Idea','إبلاغ / فكرة')}</button>${UID?`<button class="b" data-a="verHist">🕘 ${Lg('Historique','History','السجل')}</button><button class="b" data-a="pushSet">🔔 ${Lg('Annonces','Announcements','الإعلانات')}</button>`:''}${ADMIN?'<button class="b" data-a="admin">🛠 Admin</button>':''}</div>
   <label>${tr('ℹ️ À propos')}</label>
   <div class="rs about" style="margin:0 0 6px">
     <div style="display:flex;flex-wrap:wrap">
@@ -1029,6 +1032,7 @@ function mergeRemote(o){
   const nk=new Set(A.notes.map(n=>n.classId));(o.notes||[]).forEach(n=>{if(!nk.has(n.classId))A.notes.push(n)});
   A.settings.holidays=[...new Set([...A.settings.holidays,...((o.settings&&o.settings.holidays)||[])])];
   A.quizHist=[...A.quizHist,...(o.quizHist||[]).filter(h=>!A.quizHist.some(x=>x.d===h.d))].sort((a,b)=>a.d-b.d).slice(-60);
+  A.xp=Math.max(A.xp||0,+o.xp||0);Object.entries(o.tot||{}).forEach(([k,n])=>{A.tot[k]=Math.max(A.tot[k]||0,+n||0)});
   Object.entries(o.act||{}).forEach(([d,v])=>{const a=A.act[d]=A.act[d]||{};Object.entries(v||{}).forEach(([k,n])=>{a[k]=Math.max(a[k]||0,+n||0)})});
   A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){}render()}
 
@@ -1077,7 +1081,7 @@ function drvBoot(){
 const FB_CFG={apiKey:"AIzaSyBD3n4Bg6XxTBoi4KL7iL5-NeBHpYWpsg8",authDomain:"eduvault-22224.firebaseapp.com",projectId:"eduvault-22224",storageBucket:"eduvault-22224.firebasestorage.app",messagingSenderId:"566849218980",appId:"1:566849218980:web:104b65763b02f8d6973931"};
 /* App Check (reCAPTCHA v3) : colle ici la clé de site reCAPTCHA v3 (voir LISEZ-MOI.md §3). Vide = App Check désactivé. */
 const APPCHECK_KEY='';
-let ENC=null,ENCST='off',encAsked='';
+let ENC=null,ENCST='off',encAsked='',ADMIN=false;
 const CH_ENC=250000;
 const FB_URL=n=>'https://www.gstatic.com/firebasejs/10.12.2/firebase-'+n+'-compat.js',CH_SZ=300000;
 let fb=null,fbUser=null,fbBusy=false,fbQ=false,fbErr='',fbUnsub=null,fbT=null,fbReady=null,wipeNext=null,intentional=false,acMode='in',acEmail='';
@@ -1143,6 +1147,7 @@ async function fbPull(ref,m){
   const o=JSON.parse(str);if(!o||!Array.isArray(o.modules))throw Error('Données cloud invalides');
   LS(fbHKey(),JSON.stringify(m.h||[]));return o}
 async function fbPush(ref,m){
+  if(m&&m.n&&typeof fbSnapPrev==='function')await fbSnapPrev(ref,m);
   const ts=A.updatedAt||(A.updatedAt=Date.now()),str=JSON.stringify(A);
   if(str.length>9e6)throw Error('Données trop volumineuses : supprime quelques photos de notes');
   const useEnc=!!ENC&&ENC.uid===fbUser.uid&&ENC.mode!=='disabling',sz=useEnc?CH_ENC:CH_SZ,raw=[];
@@ -1639,6 +1644,342 @@ Object.assign(act,{
 
 /* ---------- démarrage ---------- */
 applyA11y();hashJoin();trDom(document.body);render();
+</script>
+
+<script>
+/* =====================================================================
+   EduVault v10 : Undo, simulateur de notes, PDF -> fiches/quiz, export emploi du temps,
+   plan de révision, historique de versions, feedback/erreurs, niveaux & classement,
+   annonces + push, ressources (liens) et page admin.
+   ===================================================================== */
+const APP_V='v12';
+/* Notifications push (FCM) : clé VAPID = Firebase console > Paramètres du projet > Cloud Messaging > Web Push certificates. Vide = désactivé. */
+const FCM_VAPID_KEY='';
+const dlgShow=h=>{const d=$('dlg');d.innerHTML=h;d.oncancel=null;if(!d.open)d.showModal();return d};
+const fmtD=ts=>new Date(ts).toLocaleString(LOC(),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const closeBtn=()=>`<div class="row"><button class="b p" onclick="$('dlg').close()">${tr('Fermer')}</button></div>`;
+const tmin=x=>{const[h,m]=String(x).split(':');return+h*60+ +m};
+const hhmm=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
+const jsonArr=raw=>{raw=String(raw).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```(?:json)?/g,'');const a=raw.indexOf('['),b=raw.lastIndexOf(']');if(a<0||b<a)throw Error(Lg("l'IA n'a pas renvoyé de JSON valide","the AI did not return valid JSON",'لم يُرجع الذكاء الاصطناعي JSON صالحا'));return JSON.parse(raw.slice(a,b+1))};
+
+/* ---------- Undo : "Supprimé · Annuler" pendant 5 s ---------- */
+function toastUndo(msg,fn){
+  const e=document.createElement('div');e.style.pointerEvents='auto';e.append(document.createTextNode(T(msg)+' '));
+  const b=document.createElement('button');b.textContent=Lg('Annuler','Undo','تراجع');b.style.cssText='margin-inline-start:8px;background:#fff;color:#111827;border:0;border-radius:99px;padding:4px 12px;font-weight:800;font-size:12px;cursor:pointer;min-height:28px';
+  let done=0;const t=setTimeout(()=>e.remove(),5000);b.onclick=()=>{if(done)return;done=1;clearTimeout(t);e.remove();fn()};e.append(b);$('ts').append(e)}
+function delUndo(keys,label,mut,extra){const old={};keys.forEach(k=>old[k]=A[k].slice());mut();upd();toastUndo(label,()=>{keys.forEach(k=>A[k]=old[k]);upd();toast(Lg('Rétabli ✔','Restored ✔','تمت الاستعادة ✔'),'ok')})}
+Object.assign(act,{
+  delMod:i=>{const m=A.modules.find(x=>x.id===i);if(!m)return;const keys=['modules','timetable','tasks','flashcards','quizQs','notes'],old={};keys.forEach(k=>old[k]=A[k].slice());
+    const cls=new Set(A.timetable.filter(c=>c.moduleId===i).map(c=>c.id));
+    A.modules=A.modules.filter(x=>x.id!==i);for(const k of['timetable','tasks','flashcards','quizQs'])A[k]=A[k].filter(x=>x.moduleId!==i);A.notes=A.notes.filter(n=>!cls.has(n.classId));upd();
+    let undone=false;toastUndo(Lg('Module supprimé','Module deleted','تم حذف المادة'),()=>{undone=true;keys.forEach(k=>A[k]=old[k]);upd()});
+    /* les fichiers locaux ne sont effacés qu'après le délai d'annulation */
+    setTimeout(()=>{if(!undone)(m.resources||[]).forEach(r=>r.isLocal&&fst('delete',r.localFileId).catch(()=>{}))},6000)},
+  delTask:i=>{if(!A.tasks.some(x=>x.id===i))return;delUndo(['tasks'],Lg('Échéance supprimée','Deadline deleted','تم حذف الموعد'),()=>{A.tasks=A.tasks.filter(x=>x.id!==i)})},
+  delFc:i=>{if(!A.flashcards.some(x=>x.id===i))return;delUndo(['flashcards'],Lg('Fiche supprimée','Card deleted','تم حذف البطاقة'),()=>{A.flashcards=A.flashcards.filter(x=>x.id!==i)})},
+  delCls:i=>{if(!A.timetable.some(x=>x.id===i))return;$('dlg').open&&$('dlg').close();delUndo(['timetable','notes'],Lg('Séance supprimée','Session deleted','تم حذف الحصة'),()=>{A.timetable=A.timetable.filter(x=>x.id!==i);A.notes=A.notes.filter(x=>x.classId!==i)})}
+});
+
+/* ---------- Simulateur de notes ---------- */
+const simParts=()=>[['ncc','ccc','CC'],['ntp','ctp','TP'],['nex','cex',Lg('Examen','Exam','الامتحان')]];
+function simModel(sem){return A.modules.filter(m=>m.semester===sem).map(m=>{let kn=0,kc=0,mc=0;const miss=[],known=[];
+  simParts().forEach(([n,c,l])=>{const w=+m[c]||0;if(w<=0)return;if(m[n]!=null&&m[n]!==''){kn+=m[n]*w;kc+=w;known.push(l+' '+(+m[n]).toFixed(1).replace(/\.0$/,''))}else{mc+=w;miss.push({n,l,w})}});
+  return{m,kn,kc,mc,tot:kc+mc,miss,known,coeff:+m.coeff||1}}).filter(r=>r.tot>0)}
+let simVals={},simTarget=10;
+function simDlg(){
+  const sem=A.activeSemester,rows=simModel(sem);
+  if(!rows.length)return toast(Lg('Ajoute des modules avec des coefficients CC / TP / Examen pour simuler','Add modules with CC / TP / Exam weights to simulate','أضف مواد بمعاملات CC / TP / امتحان للمحاكاة'),'er');
+  simVals={};
+  dlgShow(`<h3>🎯 ${Lg('Simulateur de notes','Grade simulator','محاكي النقط')} · ${sem}</h3>
+  <p class="mu">${Lg("Saisis les notes que tu espères : la moyenne du semestre se met à jour. Les champs vides sont ignorés, comme dans le calcul de l'appli.","Enter the grades you hope for: the semester average updates. Empty fields are ignored, like in the app's calculation.",'أدخل النقط التي تتوقعها وسيتحدث معدل الفصل. الحقول الفارغة تُتجاهل مثل حساب التطبيق.')}</p>
+  ${rows.map(r=>`<div class="rs" style="display:block;margin-top:6px"><b>${esc(r.m.name)}</b> <small class="mu">coef ${r.coeff}${r.known.length?' · '+esc(r.known.join(' · ')):''}</small>
+   ${r.miss.length?`<div class="row" style="justify-content:flex-start;margin:6px 0 0;flex-wrap:wrap">${r.miss.map(p=>`<label style="margin:0;flex:1;min-width:90px">${esc(p.l)} <small class="mu">(×${p.w})</small><input type="number" inputmode="decimal" min="0" max="20" step="0.25" data-sim="${esc(r.m.id)}|${p.n}" placeholder="/20" oninput="simIn(this)"></label>`).join('')}</div>`:`<small class="mu">${Lg('Toutes les notes sont saisies','All grades entered','كل النقط مدخلة')}</small>`}</div>`).join('')}
+  <div class="rs" id="simres" style="display:block;margin-top:10px"></div>
+  <h4 style="margin-top:12px">${Lg("Objectif : que me faut-il ?","Goal: what do I need?",'الهدف: ماذا أحتاج؟')}</h4>
+  <label>${Lg('Moyenne visée','Target average','المعدل المطلوب')}<input type="number" min="1" max="20" step="0.25" value="${simTarget}" oninput="simTarget=+this.value||10;simUpd()"></label>
+  <div class="rs" id="simobj" style="display:block"></div>${closeBtn()}`);
+  simUpd()}
+function simIn(el){const v=el.value;if(v===''||isNaN(+v))delete simVals[el.dataset.sim];else simVals[el.dataset.sim]=Math.max(0,Math.min(20,+v));simUpd()}
+function simCalc(rows,get){let t=0,c=0;rows.forEach(r=>{let kn=r.kn,kc=r.kc;r.miss.forEach(p=>{const v=get(r,p);if(v!=null){kn+=v*p.w;kc+=p.w}});if(kc>0){t+=kn/kc*r.coeff;c+=r.coeff}});return c?t/c:null}
+function simUpd(){
+  const rows=simModel(A.activeSemester),cur=simCalc(rows,()=>null),hyp=simCalc(rows,(r,p)=>simVals[r.m.id+'|'+p.n]??null),box=$('simres'),ob=$('simobj');if(!box)return;
+  const ok=v=>v>=10?'var(--ok)':'var(--er)',fm=v=>v==null?'–':v.toFixed(2);
+  box.innerHTML=`<div class="row" style="justify-content:space-around;margin:0"><div style="text-align:center"><small class="mu">${Lg('Actuelle','Current','الحالية')}</small><br><b style="font-size:22px">${fm(cur)}</b></div><div style="text-align:center"><small class="mu">${Lg('Simulée','Simulated','المحاكاة')}</small><br><b style="font-size:26px;color:${hyp==null?'inherit':ok(hyp)}">${fm(hyp)}</b> ${hyp==null?'':hyp>=10?'✅':'❌'}</div></div>`;
+  /* objectif : même note x sur toutes les notes manquantes */
+  let a=0,b=0,Z=0;rows.forEach(r=>{a+=r.coeff*r.kn/r.tot;b+=r.coeff*r.mc/r.tot;Z+=r.coeff});
+  const T0=simTarget||10;let h='';
+  if(b<=0)h=`<small>${Lg('Il ne reste aucune note à saisir.','No grade left to enter.','لا توجد نقط متبقية.')}</small>`;
+  else{const x=(T0*Z-a)/b;
+    h=`<small><b>${x<=0?Lg('Déjà acquis ✅ : même avec 0 partout tu atteins '+T0,'Already secured ✅: even with 0 everywhere you reach '+T0,'محقق ✅ حتى بصفر في كل مكان تبلغ '+T0):x>20?Lg('Impossible ❌ : il faudrait '+x.toFixed(1)+'/20 partout','Impossible ❌: you would need '+x.toFixed(1)+'/20 everywhere','مستحيل ❌ ستحتاج '+x.toFixed(1)+'/20 في كل مكان'):Lg('Pour '+T0+' de moyenne : '+x.toFixed(2)+'/20 en moyenne sur toutes les notes manquantes','For an average of '+T0+': '+x.toFixed(2)+'/20 on average on all missing grades','للحصول على معدل '+T0+': '+x.toFixed(2)+'/20 في كل النقط المتبقية')}</b></small>`;
+    h+=`<div style="margin-top:8px"><small class="mu">${Lg('Pour valider chaque module (≥ 10) il faut, sur ses notes manquantes :','To pass each module (≥ 10) you need, on its missing grades:','لاجتياز كل مادة (≥ 10) تحتاج في نقطها المتبقية:')}</small>`+
+      rows.filter(r=>r.mc>0).map(r=>{const x2=(10*r.tot-r.kn)/r.mc;return`<div class="row" style="justify-content:space-between;margin:2px 0"><span>${esc(r.m.name)} <small class="mu">(${r.miss.map(p=>esc(p.l)).join(' + ')})</small></span><b style="color:${x2>20?'var(--er)':x2<=0?'var(--ok)':'inherit'}">${x2<=0?'✅ 0':x2>20?'❌ '+x2.toFixed(1):x2.toFixed(2)}</b></div>`}).join('')+'</div>'}
+  ob.innerHTML=h}
+
+/* ---------- PDF -> fiches / quiz ---------- */
+async function pdfText(f){
+  await lib(PDFJS+'min.js');await lib(PDFJS+'worker.min.js').catch(()=>{});pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'worker.min.js';
+  const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let out='';
+  for(let i=1;i<=Math.min(pdf.numPages,80)&&out.length<36000;i++){const tc=await(await pdf.getPage(i)).getTextContent();out+=tc.items.map(x=>x.str).join(' ')+'\n\n'}
+  return out.replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim()}
+function pdfcDlg(){
+  if(needMod())return;
+  ask(Lg('PDF → fiches / quiz','PDF → cards / quiz','PDF ← بطاقات / اختبار'),[{k:'moduleId',l:Lg('Module','Module','المادة'),t:'select',o:modOpts()},{k:'file',l:Lg('Cours (PDF)','Course (PDF)','الدرس (PDF)'),t:'file',r:1,a:' accept="application/pdf,.pdf"'},
+    {k:'what',l:Lg('Générer','Generate','توليد'),t:'select',o:[['both',Lg('Fiches + quiz','Cards + quiz','بطاقات + اختبار')],['cards',Lg('Fiches seulement','Cards only','بطاقات فقط')],['quiz',Lg('Quiz seulement','Quiz only','اختبار فقط')]],v:'both'},
+    {k:'n',l:Lg('Nombre (de chaque)','Amount (of each)','العدد (لكل نوع)'),t:'select',o:[['6','6'],['10','10'],['15','15']],v:'10'}],pdfcRun)}
+async function pdfcRun(v,fd){
+  const f=fd.get('file');if(!f||!f.size)return toast(Lg('Choisis un PDF','Choose a PDF','اختر ملف PDF'),'er');
+  const prov=localStorage.getItem('eduVault_aiProv')||'gemini',key=aiKey(prov);
+  if(!key)return toast(Lg("Configure d'abord l'IA : bouton ✨ IA dans Horaires","Set up the AI first: ✨ AI button in Timetable",'اضبط الذكاء الاصطناعي أولا: زر ✨ في الجدول'),'er');
+  const n=+v.n||10,model=aiModel(prov);let nc=0,nq=0;
+  try{
+    toast(Lg('Lecture du PDF…','Reading the PDF…','جاري قراءة PDF…'));
+    const txt=await pdfText(f),chunks=[];let imgs=null;
+    if(txt.length<300){imgs=await toImages(f);toast(Lg('PDF scanné : lecture des 3 premières pages en image','Scanned PDF: reading the first 3 pages as images','PDF ممسوح: قراءة أول 3 صفحات كصور'))}
+    else for(let i=0;i<txt.length&&chunks.length<3;i+=12000)chunks.push(txt.slice(i,i+12000));
+    const parts=imgs?[null]:chunks,per=Math.max(3,Math.ceil(n/parts.length));
+    for(let pi=0;pi<parts.length;pi++){
+      const body=imgs?'':'\n\nCours :\n'+parts[pi];
+      toast(Lg('IA : partie '+(pi+1)+'/'+parts.length+'…','AI: part '+(pi+1)+'/'+parts.length+'…','الذكاء الاصطناعي: الجزء '+(pi+1)+'/'+parts.length));
+      if(v.what!=='quiz'){
+        const cs=jsonArr(await aiCall(prov,key,model,imgs||[],'Crée '+per+' fiches de révision en français à partir de ce cours : question courte, réponse concise. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"q":"Question","a":"Réponse"}].'+body));
+        cs.forEach(c=>{const q=String(c&&c.q||'').trim(),a=String(c&&c.a||'').trim();if(q&&a&&!A.flashcards.some(x=>x.moduleId===v.moduleId&&x.q===q)){A.flashcards.push(newCard({moduleId:v.moduleId,q:q.slice(0,1000),a:a.slice(0,2000)}));nc++}})}
+      if(v.what!=='cards'){
+        const qs=jsonArr(await aiCall(prov,key,model,imgs||[],'Crée '+per+' questions QCM en français à partir de ce cours. Réponds STRICTEMENT avec un tableau JSON valide, sans markdown : [{"q":"Question","opts":["A","B","C","D"],"ans":0,"exp":"Courte explication"}] où ans est l\'index (0 à 3) de la bonne proposition et opts contient exactement 4 propositions plausibles.'+body));
+        qs.filter(x=>x&&x.q&&Array.isArray(x.opts)&&x.opts.length===4&&Number.isInteger(+x.ans)&&+x.ans>=0&&+x.ans<4&&!A.quizQs.some(z=>z.moduleId===v.moduleId&&z.q===String(x.q))).forEach(x=>{A.quizQs.push({id:uid('q'),moduleId:v.moduleId,q:String(x.q),opts:x.opts.map(String),ans:+x.ans,exp:String(x.exp||'')});nq++})}
+      upd()}
+    toast(Lg(nc+' fiches et '+nq+' questions ajoutées',nc+' cards and '+nq+' questions added','أضيفت '+nc+' بطاقة و '+nq+' سؤال'),'ok')
+  }catch(e){upd();toast(e instanceof TypeError?Lg('Connexion impossible (internet, Brave Shields, VPN)','Connection failed (internet, Brave Shields, VPN)','تعذر الاتصال'):Lg('Erreur IA : ','AI error: ','خطأ الذكاء الاصطناعي: ')+e.message,'er')}}
+
+/* ---------- Export / impression de l'emploi du temps ---------- */
+function wrapText(ctx,txt,maxW,maxLines){const words=String(txt).split(/\s+/),lines=[];let cur='';words.forEach(w=>{const t=cur?cur+' '+w:w;if(ctx.measureText(t).width<=maxW||!cur)cur=t;else{lines.push(cur);cur=w}});if(cur)lines.push(cur);if(lines.length>maxLines){lines.length=maxLines;lines[maxLines-1]=lines[maxLines-1].replace(/.{0,2}$/,'…')}return lines}
+function ttCanvas(wk,scale){
+  scale=scale||2;const ids=new Set(mods().map(m=>m.id)),tt=A.timetable.filter(c=>ids.has(c.moduleId)&&(wk==='both'||c.week==='all'||c.week===wk));
+  const days=DAYS.filter((d,i)=>i<5||tt.some(c=>c.day===d));
+  const t0=Math.floor(Math.min(480,...tt.map(c=>tmin(c.startTime)))/60)*60,t1=Math.ceil(Math.max(1020,...tt.map(c=>tmin(c.endTime)))/60)*60,PPM=1.15,lab=62,top=118,W=1100,colW=(W-lab-20)/days.length,H=top+(t1-t0)*PPM+46;
+  const cv=document.createElement('canvas');cv.width=W*scale;cv.height=H*scale;const x=cv.getContext('2d');x.scale(scale,scale);
+  const FONT='system-ui,-apple-system,Segoe UI,Roboto,sans-serif',acc=PALS[document.documentElement.dataset.th]?PALS[document.documentElement.dataset.th][1]:'#2563eb',brand=normHex(acc);
+  x.fillStyle='#ffffff';x.fillRect(0,0,W,H);
+  x.fillStyle='#0f172a';x.font='800 30px '+FONT;x.fillText(Lg('Emploi du temps','Timetable','جدول الحصص'),20,46);
+  x.fillStyle='#64748b';x.font='600 17px '+FONT;x.fillText([A.settings.level,A.activeSemester,wk==='both'?'':Lg('Semaine ','Week ','الأسبوع ')+wk].filter(Boolean).join(' · '),20,74);
+  days.forEach((d,i)=>{const cx=lab+i*colW;x.fillStyle=brand;x.beginPath();x.roundRect(cx+3,84,colW-6,28,10);x.fill();x.fillStyle='#fff';x.font='800 16px '+FONT;x.textAlign='center';x.fillText(({Lundi:Lg('Lundi','Monday','الإثنين'),Mardi:Lg('Mardi','Tuesday','الثلاثاء'),Mercredi:Lg('Mercredi','Wednesday','الأربعاء'),Jeudi:Lg('Jeudi','Thursday','الخميس'),Vendredi:Lg('Vendredi','Friday','الجمعة'),Samedi:Lg('Samedi','Saturday','السبت'),Dimanche:Lg('Dimanche','Sunday','الأحد')})[d],cx+colW/2,104);x.textAlign='left'});
+  x.font='600 13px '+FONT;for(let m=t0;m<=t1;m+=60){const y=top+(m-t0)*PPM;x.strokeStyle='#e2e8f0';x.lineWidth=1;x.beginPath();x.moveTo(lab-6,y);x.lineTo(W-14,y);x.stroke();x.fillStyle='#64748b';x.fillText(hhmm(m),8,y+4)}
+  days.forEach((d,di)=>{
+    const ev=tt.filter(c=>c.day===d).map(c=>({c,s:tmin(c.startTime),e:tmin(c.endTime)})).sort((a,b)=>a.s-b.s||b.e-a.e),groups=[];
+    ev.forEach(o=>{const g=groups[groups.length-1];if(g&&o.s<g.end){g.items.push(o);g.end=Math.max(g.end,o.e)}else groups.push({items:[o],end:o.e})});
+    groups.forEach(g=>{const laneEnd=[];g.items.forEach(o=>{let l=laneEnd.findIndex(e=>e<=o.s);if(l<0){l=laneEnd.length;laneEnd.push(0)}laneEnd[l]=o.e;o.l=l});const nl=laneEnd.length;
+      g.items.forEach(o=>{const m=A.modules.find(z=>z.id===o.c.moduleId),col=normHex(m?m.color:'#2563eb'),bw=(colW-10)/nl,bx=lab+di*colW+5+o.l*bw,by=top+(o.s-t0)*PPM+1,bh=(o.e-o.s)*PPM-2;
+        const bg=mixHex('#ffffff',col,.2);let tx=col,n=0;while(crat(tx,bg)<4.5&&n++<24)tx=mixHex(tx,'#000000',.1);
+        x.fillStyle=bg;x.beginPath();x.roundRect(bx,by,bw-3,bh,9);x.fill();x.fillStyle=col;x.beginPath();x.roundRect(bx,by,6,bh,3);x.fill();
+        x.save();x.beginPath();x.rect(bx+10,by,bw-16,bh);x.clip();x.fillStyle=tx;x.font='800 15px '+FONT;const ln=wrapText(x,m?m.name:'?',bw-22,Math.max(1,Math.min(3,Math.floor((bh-30)/18))));let yy=by+20;ln.forEach(t=>{x.fillText(t,bx+12,yy);yy+=18});
+        x.font=(bw<140?'600 11px ':'600 13px ')+FONT;x.fillStyle='#334155';if(yy<by+bh-4){x.fillText(o.c.startTime+'–'+o.c.endTime,bx+12,yy);yy+=16}if(yy<by+bh-2&&o.c.room)x.fillText(o.c.room,bx+12,yy);x.restore()})})});
+  x.fillStyle='#94a3b8';x.font='600 12px '+FONT;x.fillText('EduVault',20,H-16);
+  return cv}
+function ttExpDlg(){
+  const cw=curWeek();
+  dlgShow(`<h3>🖨 ${Lg('Exporter l\'emploi du temps','Export the timetable','تصدير جدول الحصص')}</h3>
+  <label>${Lg('Semaine','Week','الأسبوع')}<select id="exwk"><option value="A"${cw==='A'?' selected':''}>${Lg('Semaine A','Week A','الأسبوع A')}</option><option value="B"${cw==='B'?' selected':''}>${Lg('Semaine B','Week B','الأسبوع B')}</option><option value="both">${Lg('A et B ensemble','A and B together','A و B معا')}</option></select></label>
+  <div class="row" style="justify-content:flex-start"><button class="b p" data-a="ttImg">🖼 ${Lg('Image (WhatsApp)','Image (WhatsApp)','صورة (واتساب)')}</button><button class="b" data-a="ttPdf">📄 ${Lg('PDF / Imprimer','PDF / Print','PDF / طباعة')}</button></div>
+  <small class="mu">${Lg("« PDF / Imprimer » ouvre la fenêtre d'impression : choisis « Enregistrer au format PDF ».","“PDF / Print” opens the print dialog: choose “Save as PDF”.",'يفتح «PDF / طباعة» نافذة الطباعة: اختر «حفظ بصيغة PDF».')}</small>${closeBtn()}`)}
+async function ttImg(){const wk=$('exwk').value;if(!A.timetable.length)return toast(Lg('Aucune séance à exporter','No session to export','لا توجد حصص'),'er');
+  ttCanvas(wk).toBlob(async b=>{const f=new File([b],'EduVault_emploi_du_temps_'+A.activeSemester+'.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'EduVault'});return}catch(e){if(e&&e.name==='AbortError')return}}
+    dlBlob(f.name,b);toast(Lg('Image enregistrée ✔','Image saved ✔','تم حفظ الصورة ✔'),'ok')},'image/png')}
+function ttPdf(){const wk=$('exwk').value;if(!A.timetable.length)return toast(Lg('Aucune séance à exporter','No session to export','لا توجد حصص'),'er');
+  const url=ttCanvas(wk,2).toDataURL('image/png'),fr=document.createElement('iframe');fr.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.append(fr);
+  const d=fr.contentDocument;d.open();d.write('<!doctype html><html><head><title>EduVault</title><style>@page{size:A4 landscape;margin:8mm}html,body{margin:0}img{width:100%;display:block}</style></head><body><img src="'+url+'"></body></html>');d.close();
+  fr.contentWindow.onafterprint=()=>fr.remove();const go2=()=>{fr.contentWindow.focus();fr.contentWindow.print()};const im=d.querySelector('img');im.complete?go2():im.onload=go2;setTimeout(()=>fr.remove(),120000)}
+
+/* ---------- Plan de révision automatique ---------- */
+const weekOfDate=d=>{const s=A.settings,c=s.currentWeek||'A';if(!s.weekRef)return c;const k=Math.round((monday(d)-monday(new Date(s.weekRef+'T00:00')))/6048e5);return Math.abs(k)%2===0?c:(c==='A'?'B':'A')};
+let planCtx=null;
+const PLAN_PREF={matin:[480,750,570],apres:[810,1080,900],soir:[1050,1320,1140],jour:[480,1320,1080]};
+function planDlg(){
+  if(needMod())return;const now=Date.now(),ids=new Set(mods().map(m=>m.id)),ex=A.tasks.filter(t=>t.type==='exam'&&!t.completed&&ids.has(t.moduleId)&&new Date(t.dueDate)>now).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  if(!ex.length)return toast(Lg("Ajoute d'abord un examen dans l'agenda (avec sa date)",'Add an exam with its date in the agenda first','أضف أولا امتحانا بتاريخه في المهام'),'er');
+  ask(Lg('Plan de révision automatique','Automatic revision plan','خطة مراجعة تلقائية'),[
+    {k:'examId',l:Lg('Examen','Exam','الامتحان'),t:'select',o:ex.map(t=>[t.id,t.title+' · '+modName(t.moduleId)+' · '+new Date(t.dueDate).toLocaleDateString(LOC())])},
+    {k:'n',l:Lg('Nombre de séances','Number of sessions','عدد الحصص'),t:'select',o:[3,4,5,6,8,10,12].map(x=>[String(x),String(x)]),v:'6'},
+    {k:'len',l:Lg('Durée d\'une séance','Session length','مدة الحصة'),t:'select',o:[['45','45 min'],['60','1 h'],['90','1 h 30'],['120','2 h']],v:'90'},
+    {k:'pref',l:Lg('Moment préféré','Preferred time','الوقت المفضل'),t:'select',o:[['jour',Lg('Toute la journée','Any time','طوال اليوم')],['matin',Lg('Matin','Morning','صباحا')],['apres',Lg('Après-midi','Afternoon','بعد الظهر')],['soir',Lg('Soir','Evening','مساء')]],v:'soir'},
+    {k:'we',l:Lg('Week-ends','Weekends','عطلة نهاية الأسبوع'),t:'select',o:[['1',Lg('Oui, inclure','Yes, include','نعم')],['0',Lg('Non','No','لا')]],v:'1'}],planCompute)}
+function planCompute(v){
+  const exam=A.tasks.find(t=>t.id===v.examId);if(!exam)return;const n=+v.n,len=+v.len,[from,to,pref]=PLAN_PREF[v.pref]||PLAN_PREF.jour,we=v.we==='1',now=new Date(),exd=new Date(exam.dueDate),ids=new Set(mods().map(m=>m.id));
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()),lastDay=new Date(exd.getFullYear(),exd.getMonth(),exd.getDate()),days=[];
+  for(let d=new Date(today);d<lastDay;d.setDate(d.getDate()+1)){const wd=(d.getDay()+6)%7;if(!we&&wd>=5)continue;days.push(new Date(d))}
+  if(!days.length)return toast(Lg("L'examen est trop proche pour planifier (il faut au moins un jour avant)","The exam is too close to plan (at least one day before is needed)",'الامتحان قريب جدا للتخطيط'),'er');
+  const placed={},busyOf=d=>{const k=iso(d),wd=DAYS[(d.getDay()+6)%7],w=weekOfDate(d),out=[];
+    A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===wd&&(c.week==='all'||c.week===w)).forEach(c=>out.push([tmin(c.startTime)-15,tmin(c.endTime)+15]));
+    A.tasks.filter(t=>t.id!==exam.id&&t.plan!==exam.id&&!t.completed&&iso(t.dueDate)===k).forEach(t=>{const s=new Date(t.dueDate),m=s.getHours()*60+s.getMinutes();out.push([m-15,m+(+t.dur||60)+15])});
+    (placed[k]||[]).forEach(p=>out.push([p[0]-15,p[0]+len+15]));return out.sort((a,b)=>a[0]-b[0])};
+  const slotOf=d=>{let f=from;if(iso(d)===iso(now))f=Math.max(f,Math.ceil((now.getHours()*60+now.getMinutes()+30)/15)*15);let cur=f;const fr=[];busyOf(d).forEach(([s,e])=>{if(s>cur&&Math.min(s,to)-cur>=len)fr.push([cur,Math.min(s,to)]);cur=Math.max(cur,e)});if(to-cur>=len)fr.push([cur,to]);
+    if(!fr.length)return null;let best=null;fr.forEach(([a,b])=>{let st=Math.round(Math.max(a,Math.min(pref,b-len))/15)*15;if(st<a)st=a;if(st+len>b)st=b-len;const dist=Math.abs(st-pref);if(!best||dist<best.dist)best={st,dist}});return best&&best.st};
+  const out=[],N=Math.min(n,days.length*3),order=[];for(let k=0;k<N;k++)order.push(Math.min(days.length-1,Math.floor((k+.5)*days.length/N)));
+  order.forEach(di=>{for(let off=0;off<days.length;off++){const dd=days[(di+off)%days.length],st=slotOf(dd);if(st!=null){const k=iso(dd);(placed[k]=placed[k]||[]).push([st]);out.push({day:k,st});return}}});
+  if(!out.length)return toast(Lg('Aucun créneau libre trouvé : élargis le moment préféré ou réduis la durée','No free slot found: widen the preferred time or shorten the session','لم يتم العثور على وقت فارغ'),'er');
+  out.sort((a,b)=>a.day<b.day?-1:a.day>b.day?1:a.st-b.st);planCtx={exam,out,len};
+  const old=A.tasks.filter(t=>t.plan===exam.id).length;
+  dlgShow(`<h3>📅 ${Lg('Aperçu du plan','Plan preview','معاينة الخطة')}</h3><p class="mu">${esc(exam.title)} · ${esc(modName(exam.moduleId))} · ${new Date(exam.dueDate).toLocaleDateString(LOC())}</p>
+  ${out.map(o=>`<div class="rs" style="margin-top:4px"><b>${esc(new Date(o.day+'T00:00').toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'short'}))}</b><small>${hhmm(o.st)} → ${hhmm(o.st+len)}</small></div>`).join('')}
+  ${out.length<n?`<p class="warn">${Lg(out.length+' séance(s) sur '+n+' : pas assez de créneaux libres.',out.length+' of '+n+' sessions: not enough free slots.',out.length+' من '+n+' حصة: لا توجد أوقات كافية.')}</p>`:''}
+  ${old?`<small class="mu">${Lg('Remplace le plan existant ('+old+' blocs).','Replaces the existing plan ('+old+' blocks).','يستبدل الخطة الحالية ('+old+' حصة).')}</small>`:''}
+  <div class="row"><button class="b" onclick="$('dlg').close()">${tr('Annuler')}</button><button class="b p" data-a="planGo">${Lg('Ajouter à l\'agenda','Add to agenda','أضف إلى المهام')}</button></div>`)}
+act.planGo=()=>{if(!planCtx)return;const{exam,out,len}=planCtx;A.tasks=A.tasks.filter(t=>t.plan!==exam.id);
+  out.forEach(o=>A.tasks.push({id:uid('t'),moduleId:exam.moduleId,type:'review',title:Lg('Réviser ','Revise ','مراجعة ')+modName(exam.moduleId)+' · '+len+' min',dueDate:o.day+'T'+hhmm(o.st),dur:len,plan:exam.id,completed:false}));
+  planCtx=null;$('dlg').close();upd();toast(Lg(out.length+' blocs ajoutés à l\'agenda',out.length+' blocks added to the agenda','أضيفت '+out.length+' حصص إلى المهام'),'ok')};
+act.plan=()=>planDlg();act.sim=()=>simDlg();act.pdfc=()=>pdfcDlg();act.ttExp=()=>ttExpDlg();act.ttImg=()=>ttImg();act.ttPdf=()=>ttPdf();
+
+/* ---------- Historique de versions (5 dernières, Firestore) ---------- */
+const VER_KEEP=5;
+async function fbSnapPrev(ref,m){
+  const k='eduVault_vday_'+fbUser.uid,today=iso(new Date());if(LS(k)===today)return;LS(k,today); /* un seul essai par jour, même en cas d'échec */
+  try{const vid=iso(new Date(m.updatedAt||Date.now())),vref=ref.collection('v').doc(vid),docs=await Promise.all(Array.from({length:m.n||0},(_,i)=>ref.collection('c').doc(String(i)).get()));
+    if(!docs.length||docs.some(d=>!d.exists))return;
+    const b=fb.db.batch();docs.forEach((d,i)=>b.set(vref.collection('c').doc(String(i)),d.data()));b.set(vref,m);await b.commit();
+    const ids=(await ref.collection('v').get()).docs.map(d=>d.id).sort().reverse();
+    for(const id of ids.slice(VER_KEEP)){const cs=await ref.collection('v').doc(id).collection('c').get(),bb=fb.db.batch();cs.docs.forEach(c=>bb.delete(c.ref));bb.delete(ref.collection('v').doc(id));await bb.commit()}
+  }catch(e){console.warn('Historique indisponible (règles Firestore à jour ?)',e)}}
+async function verHist(){
+  if(!(await needFb()))return;dlgShow(`<h3>🕘 ${Lg('Historique','History','السجل')}</h3><p class="mu">…</p>`);
+  try{const l=(await fbRef().collection('v').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.id<b.id?1:-1);
+    dlgShow(`<h3>🕘 ${Lg('Historique des versions','Version history','سجل النسخ')}</h3><p class="mu">${Lg("Les 5 dernières sauvegardes cloud, une par jour de modification. Restaurer remplace tes données actuelles (tu peux annuler 5 s).","The last 5 cloud backups, one per day of changes. Restoring replaces your current data (you can undo for 5 s).",'آخر 5 نسخ سحابية، واحدة لكل يوم تعديل. الاستعادة تستبدل بياناتك الحالية (يمكنك التراجع خلال 5 ثوان).')}</p>
+    ${l.length?l.map(v=>`<div class="rs" style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><div><b>${esc(new Date(v.id+'T12:00').toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'long'}))}</b><small class="mu">${v.e?'🔐 ':''}${Math.round((v.n||1)*(v.e?190:300))} Ko max · ${fmtD(v.updatedAt)}</small></div><button class="b" data-a="verRestore" data-i="${v.id}">${Lg('Restaurer','Restore','استعادة')}</button></div>`).join(''):`<p class="mu e">${Lg("Pas encore de version : la première est créée à la prochaine synchronisation d'un nouveau jour.","No version yet: the first one is created at the next sync of a new day.",'لا توجد نسخ بعد.')}</p>`}${closeBtn()}`)
+  }catch(e){dlgShow(`<h3>🕘 ${Lg('Historique','History','السجل')}</h3><p class="bad">${esc(shErr(e))}</p>${closeBtn()}`)}}
+async function verRestore(day){
+  if(!confirm(Lg('Restaurer la version du '+day+' ? Tes données actuelles seront remplacées.','Restore the version of '+day+'? Your current data will be replaced.','استعادة نسخة '+day+'؟ ستُستبدل بياناتك الحالية.')))return;
+  try{const vref=fbRef().collection('v').doc(day),m=(await vref.get()).data();if(!m)throw Error('?');let key=ENC&&ENC.uid===fbUser.uid&&ENC.s===m.s?ENC:null;
+    if(m.e&&!key){const pw=prompt(Lg('Mot de passe de chiffrement de cette version :','Encryption password of this version:','كلمة مرور تشفير هذه النسخة:'));if(!pw)return;const k=await encDerive(pw,m.s,m.it||ENC_IT);let ok=false;try{ok=(await decStr(k,m.kc,'eduvault:check'))==='eduvault-ok'}catch(e){}if(!ok)return toast(Lg('Mot de passe de chiffrement incorrect','Wrong encryption password','كلمة مرور التشفير غير صحيحة'),'er');key=k}
+    const docs=await Promise.all(Array.from({length:m.n||0},(_,i)=>vref.collection('c').doc(String(i)).get()));let str='';
+    for(let i=0;i<docs.length;i++){if(!docs[i].exists)throw Error(Lg('Version incomplète','Incomplete version','نسخة غير مكتملة'));const t=docs[i].data().t;str+=m.e?await decStr(key,t,'eduvault:chunk:'+i):t}
+    const o=JSON.parse(str);if(!o||!Array.isArray(o.modules))throw Error(Lg('Version invalide','Invalid version','نسخة غير صالحة'));
+    const snap=JSON.stringify(A);resetA();load(o);A.updatedAt=Date.now();flushSave();$('dlg').open&&$('dlg').close();render();await fbSync({force:'up'});
+    toastUndo(Lg('Version restaurée','Version restored','تمت استعادة النسخة'),async()=>{resetA();load(JSON.parse(snap));A.updatedAt=Date.now();flushSave();render();await fbSync({force:'up'})})
+  }catch(e){toast(e.message||String(e),'er')}}
+Object.assign(act,{verHist:()=>verHist(),verRestore:d=>verRestore(d)});
+
+/* ---------- Signaler un problème / idée + journal d'erreurs anonyme ---------- */
+const errOn=()=>LS('eduVault_errlog')!=='0';
+function feedbackDlg(){
+  dlgShow(`<form id="fbk"><h3>💡 ${Lg('Signaler un problème / Idée','Report a problem / Idea','إبلاغ عن مشكلة / فكرة')}</h3>
+  <label>${Lg('Type','Type','النوع')}<select name="t"><option value="bug">🐞 ${Lg('Problème','Problem','مشكلة')}</option><option value="idea">💡 ${Lg('Idée','Idea','فكرة')}</option></select></label>
+  <label>${Lg('Ton message','Your message','رسالتك')}<textarea name="m" rows="5" maxlength="1500" required></textarea></label>
+  <small class="mu">${Lg("Envoyé avec : version de l'appli et type d'appareil. Pas tes données.","Sent with: app version and device type. Not your data.",'يُرسل مع: إصدار التطبيق ونوع الجهاز. وليس بياناتك.')}</small>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="er" style="width:auto;margin:0" ${errOn()?'checked':''}> ${Lg("Envoyer automatiquement les erreurs techniques (anonymes)","Automatically send technical errors (anonymous)",'إرسال الأخطاء التقنية تلقائيا (مجهولة)')}</label>
+  <div class="row"><button type="button" class="b" onclick="$('dlg').close()">${tr('Annuler')}</button><button class="b p" name="go">${Lg('Envoyer','Send','إرسال')}</button></div></form>`);
+  const f=$('fbk');f.onsubmit=async e=>{e.preventDefault();LS('eduVault_errlog',f.elements.er.checked?'1':'0');if(!(await needFb()))return;f.elements.go.disabled=true;
+    try{await fb.db.collection('feedback').add({u:fbUser.uid,t:f.elements.t.value,m:f.elements.m.value.slice(0,1500),ts:Date.now(),v:APP_V,ua:(navigator.userAgent||'').slice(0,120)});$('dlg').close();toast(Lg('Merci ! Message envoyé ✔','Thanks! Message sent ✔','شكرا! تم إرسال الرسالة ✔'),'ok')}catch(x){toast(shErr(x),'er');f.elements.go.disabled=false}}}
+let errCount=0;
+function errLog(msg,stack){if(errCount>=5||!errOn()||!UID||typeof fbUser==='undefined'||!fbUser||!fb)return;errCount++;
+  try{fb.db.collection('errors').add({u:fbUser.uid,m:String(msg).slice(0,300),s:String(stack||'').split('\n').slice(0,4).join('\n').slice(0,600),ts:Date.now(),v:APP_V,ua:(navigator.userAgent||'').slice(0,120)}).catch(()=>{})}catch(e){}}
+window.addEventListener('error',e=>errLog(e.message,e.error&&e.error.stack));
+window.addEventListener('unhandledrejection',e=>errLog(e.reason&&e.reason.message||e.reason,e.reason&&e.reason.stack));
+act.feedback=()=>feedbackDlg();
+
+/* ---------- Niveaux, badges, série, classement (optionnel) ---------- */
+const lvlOf=xp=>Math.floor(Math.sqrt((xp||0)/40))+1;
+const lvlBase=l=>40*(l-1)*(l-1);
+function streakDays(){let n=0;const d=new Date(),has=x=>{const o=A.act[iso(x)];return o&&(o.m||o.c||o.q)};if(!has(d))d.setDate(d.getDate()-1);while(has(d)){n++;d.setDate(d.getDate()-1)}return n}
+function badges(){const t=A.tot||{},st=streakDays(),sem=Math.max(-1,...visSems().map(s=>semAvgNum(s)==null?-1:semAvgNum(s)));
+  return[['🌱',Lg('Premier pas','First step','الخطوة الأولى'),(t.m||0)+(t.c||0)+(t.q||0)>0],['🔥3',Lg('Série de 3 jours','3-day streak','سلسلة 3 أيام'),st>=3],['🔥7',Lg('Série de 7 jours','7-day streak','سلسلة 7 أيام'),st>=7],['🔥30',Lg('Série de 30 jours','30-day streak','سلسلة 30 يوما'),st>=30],
+    ['🃏',Lg('100 fiches révisées','100 cards reviewed','100 بطاقة'),(t.c||0)>=100],['🃏🃏',Lg('500 fiches révisées','500 cards reviewed','500 بطاقة'),(t.c||0)>=500],['⏱',Lg('10 h de focus','10 h of focus','10 ساعات تركيز'),(t.m||0)>=600],['⏱⏱',Lg('50 h de focus','50 h of focus','50 ساعة تركيز'),(t.m||0)>=3000],
+    ['🧠',Lg('100 questions de quiz','100 quiz questions','100 سؤال'),(t.q||0)>=100],['🎓',Lg('Semestre validé (≥ 10)','Semester passed (≥ 10)','فصل ناجح (≥ 10)'),sem>=10]]}
+function gamCard(){const xp=A.xp||0,l=lvlOf(xp),a=lvlBase(l),b=lvlBase(l+1),pc=Math.round(100*(xp-a)/(b-a)),st=streakDays(),bd=badges();
+  return `<div class="c" style="margin-bottom:12px"><div class="top" style="margin:0"><div><h4 style="margin:0">${Lg('Niveau','Level','المستوى')} ${l}</h4><small class="mu">${xp} XP · ${Lg('prochain niveau à','next level at','المستوى التالي عند')} ${b} XP</small></div><div style="text-align:center"><b style="font-size:22px">🔥 ${st}</b><br><small class="mu">${Lg('jours de suite','days in a row','أيام متتالية')}</small></div></div>
+  <div style="height:10px;border-radius:99px;background:var(--in);margin:10px 0"><div style="height:100%;width:${pc}%;border-radius:99px;background:var(--br)"></div></div>
+  <div class="kv">${bd.map(x=>`<span class="chip" style="${x[2]?'':'opacity:.4;filter:grayscale(1)'}" title="${esc(x[1])}">${x[0]} ${esc(x[1])}</span>`).join('')}</div>
+  <small class="mu" style="display:block;margin-top:6px">${Lg('XP : 1 par minute de focus, 2 par fiche révisée, 1 par question de quiz.','XP: 1 per focus minute, 2 per reviewed card, 1 per quiz question.','النقاط: 1 لكل دقيقة تركيز، 2 لكل بطاقة، 1 لكل سؤال.')}</small></div>`}
+{const _st=R.st;R.st=()=>_st().replace('<div class="g">',gamCard()+'<div class="g">')}
+const myGroups=()=>{const m=new Map();[...(A.settings.shares||[]),...(A.settings.joined||[])].filter(x=>x.k==='tt').forEach(x=>m.set(x.c,x.n));return[...m.entries()]};
+const lbOn=()=>LS('eduVault_lb_'+(UID||''))==='1';
+async function lbPush(force){if(!lbOn()||!UID||!fbUser||!fb)return;const x=A.xp||0,key='eduVault_lbx_'+fbUser.uid;if(!force&&LS(key)===String(x))return;
+  try{await fb.db.collection('lb').doc(fbUser.uid).set({p:sStr(LS('eduVault_lbp_'+UID)||'Anonyme',20),x,g:LS('eduVault_lbg_'+UID)||'',l:lvlOf(x),t:Date.now()});LS(key,String(x))}catch(e){console.warn('lb',e)}}
+setInterval(()=>lbPush(),300000);
+function lbSetDlg(){
+  const xp=A.xp||0,l=lvlOf(xp),gs=myGroups(),on=lbOn(),g=LS('eduVault_lbg_'+(UID||''))||'';
+  dlgShow(`<h3>🏆 ${Lg('Niveau & classement','Level & ranking','المستوى والترتيب')}</h3>${gamCard()}
+  ${UID?`<div class="rs" style="display:block"><b>${Lg('Classement de classe (optionnel)','Class ranking (optional)','ترتيب القسم (اختياري)')}</b>
+   <small class="mu">${Lg("Si tu l'actives, ton pseudo, ton niveau et ton XP sont visibles par les membres connectés qui partagent le même code de classe. Pas ton nom ni ton email. Les scores sont déclaratifs.","If you enable it, your nickname, level and XP are visible to signed-in members of the same class code. Not your name or email. Scores are self-reported.",'عند التفعيل يظهر لقبك ومستواك ونقاطك للأعضاء المتصلين بنفس رمز القسم. دون اسمك أو بريدك. النتائج تصريحية.')}</small>
+   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="lbon" style="width:auto;margin:0" ${on?'checked':''}> ${Lg('Participer','Take part','المشاركة')}</label>
+   <label>${Lg('Pseudo (20 car. max)','Nickname (20 chars max)','اللقب (20 حرفا)')}<input id="lbp" maxlength="20" value="${esc(LS('eduVault_lbp_'+UID)||'')}"></label>
+   <label>${Lg('Classe','Class','القسم')}<select id="lbg"><option value="">${gs.length?'—':Lg('Rejoins une classe avec un code d\'abord','Join a class with a code first','انضم إلى قسم برمز أولا')}</option>${gs.map(([c,n])=>`<option value="${c}"${c===g?' selected':''}>${esc(n)} (${shFmt(c)})</option>`).join('')}</select></label>
+   <div class="row" style="justify-content:flex-start"><button class="b p" data-a="lbSave">${Lg('Enregistrer','Save','حفظ')}</button><button class="b" data-a="lbTop">${Lg('Voir le top 10','See the top 10','عرض أفضل 10')}</button></div><div id="lbtop"></div></div>`:`<small class="mu">${Lg('Crée un compte pour participer au classement.','Create an account to join the ranking.','أنشئ حسابا للمشاركة في الترتيب.')}</small>`}${closeBtn()}`)}
+Object.assign(act,{lbSet:()=>lbSetDlg(),
+  lbSave:async()=>{if(!(await needFb()))return;const on=$('lbon').checked,p=$('lbp').value.trim().slice(0,20),g=$('lbg').value;
+    if(on&&(!p||!g))return toast(Lg('Choisis un pseudo et une classe','Choose a nickname and a class','اختر لقبا وقسما'),'er');
+    LS('eduVault_lb_'+UID,on?'1':'0');LS('eduVault_lbp_'+UID,p);LS('eduVault_lbg_'+UID,g);
+    try{if(on)await lbPush(true);else await fb.db.collection('lb').doc(fbUser.uid).delete();toast(Lg('Enregistré ✔','Saved ✔','تم الحفظ ✔'),'ok')}catch(e){toast(shErr(e),'er')}},
+  lbTop:async()=>{const g=$('lbg').value;if(!g)return toast(Lg('Choisis une classe','Choose a class','اختر قسما'),'er');if(!(await needFb()))return;
+    try{const l=(await fb.db.collection('lb').where('g','==',g).limit(100).get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.x-a.x).slice(0,10);
+      $('lbtop').innerHTML=l.length?l.map((r,i)=>`<div class="row" style="justify-content:space-between;margin:3px 0${r.id===fbUser.uid?';font-weight:800':''}"><span>${['🥇','🥈','🥉'][i]||(i+1)+'.'} ${esc(r.p)} <small class="mu">${Lg('niv.','lvl','م')} ${r.l}</small></span><b>${r.x} XP</b></div>`).join(''):`<small class="mu">${Lg('Personne pour le moment','Nobody yet','لا أحد حاليا')}</small>`}catch(e){toast(shErr(e),'er')}}});
+
+/* ---------- Annonces (Firestore) + notifications push (FCM) ---------- */
+async function pushEnable(){
+  if(!FCM_VAPID_KEY)return toast(Lg('Notifications non configurées (voir LISEZ-MOI §6)','Notifications not configured (see LISEZ-MOI §6)','الإشعارات غير مهيأة'),'er');
+  if(!('Notification' in window)||!('serviceWorker' in navigator))return toast(Lg("Ce navigateur ne gère pas les notifications. Sur iPhone : ajoute d'abord l'appli à l'écran d'accueil.","This browser does not support notifications. On iPhone: add the app to the home screen first.",'هذا المتصفح لا يدعم الإشعارات.'),'er');
+  if(!(await needFb()))return;
+  try{const perm=await Notification.requestPermission();if(perm!=='granted')return toast(Lg('Permission refusée','Permission denied','تم رفض الإذن'),'er');
+    await lib(FB_URL('messaging'));const reg=await navigator.serviceWorker.ready,tok=await firebase.messaging().getToken({vapidKey:FCM_VAPID_KEY,serviceWorkerRegistration:reg});
+    await fb.db.collection('tokens').doc(fbUser.uid).set({t:tok,ts:Date.now(),ua:(navigator.userAgent||'').slice(0,120)});LS('eduVault_push','1');toast(Lg('Annonces activées ✔','Announcements enabled ✔','تم تفعيل الإعلانات ✔'),'ok');pushDlg()}
+  catch(e){toast(shErr(e),'er')}}
+async function pushOff(){try{if(fb&&fbUser)await fb.db.collection('tokens').doc(fbUser.uid).delete()}catch(e){}LS('eduVault_push','0');pushDlg()}
+function pushDlg(){const on=LS('eduVault_push')==='1',perm=('Notification' in window)?Notification.permission:'unsupported';
+  dlgShow(`<h3>🔔 ${Lg('Annonces','Announcements','الإعلانات')}</h3><p class="mu">${Lg("Reçois les annonces importantes (examen reporté, salle changée…) même quand l'appli est fermée. Sur iPhone, l'appli doit être ajoutée à l'écran d'accueil.","Receive important announcements (exam postponed, room changed…) even when the app is closed. On iPhone the app must be added to the home screen.",'استقبل الإعلانات المهمة حتى عندما يكون التطبيق مغلقا. على آيفون يجب إضافة التطبيق إلى الشاشة الرئيسية.')}</p>
+  <small class="mu">${Lg('État','Status','الحالة')} : ${on&&perm==='granted'?'✅ '+Lg('activées','enabled','مفعّلة'):perm==='denied'?'⛔ '+Lg('bloquées dans le navigateur','blocked in the browser','محظورة في المتصفح'):'⚪ '+Lg('désactivées','disabled','معطلة')}</small>
+  <div class="row"><button class="b p" data-a="pushOn">${Lg('Activer','Enable','تفعيل')}</button><button class="b" data-a="pushOff">${Lg('Désactiver','Disable','تعطيل')}</button></div>${closeBtn()}`)}
+Object.assign(act,{pushSet:()=>pushDlg(),pushOn:()=>pushEnable(),pushOff:()=>pushOff()});
+async function annCheck(){try{const s=await fb.db.collection('announcements').doc('latest').get();if(!s.exists)return;const a=s.data(),k='eduVault_ann';if(+LS(k)>=a.ts)return;
+  dlgShow(`<h3>🔔 ${esc(a.t||'EduVault')}</h3><p style="white-space:pre-wrap">${esc(a.m||'')}</p><small class="mu">${fmtD(a.ts)}</small>${closeBtn()}`);LS(k,String(a.ts))}catch(e){}}
+
+/* ---------- Ressources de classe (liens, avec modération) ---------- */
+let resG='';
+async function resHub(g){
+  const gs=myGroups();if(!gs.length)return dlgShow(`<h3>📚 ${Lg('Ressources de classe','Class resources','موارد القسم')}</h3><p class="mu">${Lg("Rejoins d'abord une classe avec un code (Partage & code de classe) : les ressources sont partagées par classe.","Join a class with a code first: resources are shared per class.",'انضم أولا إلى قسم برمز: الموارد مشتركة لكل قسم.')}</p><div class="row"><button class="b" data-a="shJoin">${tr('Rejoindre avec un code')}</button></div>${closeBtn()}`);
+  if(!(await needFb()))return;resG=g&&shOk(g)?g:(resG&&gs.some(x=>x[0]===resG)?resG:gs[0][0]);
+  dlgShow(`<h3>📚 ${Lg('Ressources de classe','Class resources','موارد القسم')}</h3><p class="mu">…</p>`);
+  try{const col=fb.db.collection('res'),[ap,mine]=await Promise.all([col.where('g','==',resG).where('ok','==',true).limit(100).get(),col.where('o','==',fbUser.uid).limit(50).get()]);
+    const items=ap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts),pend=mine.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!x.ok&&x.g===resG),kinds={epreuve:'📝 '+Lg('Épreuve','Past exam','امتحان سابق'),td:'✍️ TD',cours:'📘 '+Lg('Cours','Course','درس'),autre:'📎'};
+    const row=(x,p)=>`<div class="rs" style="display:block;margin-top:6px"><b>${kinds[x.k]||'📎'} ${esc(x.n)}</b><small class="mu">${esc(x.m||'')}${p?' · ⏳ '+Lg('en attente de validation','pending approval','في انتظار الموافقة'):''}</small><div class="row" style="justify-content:flex-start;margin:6px 0 0"><a class="b" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer">${Lg('Ouvrir','Open','فتح')} ↗</a>${x.o===fbUser.uid?`<button class="b" style="color:var(--er)" data-a="resDel" data-i="${x.id}">${tr('Supprimer')}</button>`:`<button class="b" data-a="resRep" data-i="${x.id}">🚩 ${Lg('Signaler','Report','إبلاغ')}</button>`}</div></div>`;
+    dlgShow(`<h3>📚 ${Lg('Ressources de classe','Class resources','موارد القسم')}</h3>
+    <label>${Lg('Classe','Class','القسم')}<select onchange="resHub(this.value)">${gs.map(([c,n])=>`<option value="${c}"${c===resG?' selected':''}>${esc(n)} (${shFmt(c)})</option>`).join('')}</select></label>
+    <div class="warn">⚖️ ${Lg("Ne partage que des liens vers des documents que tu as le droit de diffuser (tes propres résumés, épreuves publiques). Chaque lien est vérifié avant d'apparaître. Les contenus illicites sont supprimés.","Only share links to documents you may distribute (your own summaries, public exams). Every link is reviewed before it appears. Unlawful content is removed.",'شارك فقط روابط لمستندات يحق لك نشرها. تتم مراجعة كل رابط قبل ظهوره. يُحذف المحتوى غير المشروع.')}</div>
+    <div class="row" style="justify-content:flex-start"><button class="b p" data-a="resAdd">+ ${Lg('Ajouter un lien','Add a link','إضافة رابط')}</button></div>
+    ${pend.map(x=>row(x,1)).join('')}${items.length?items.map(x=>row(x,0)).join(''):`<p class="mu e">${Lg('Aucune ressource validée pour le moment','No approved resource yet','لا توجد موارد معتمدة بعد')}</p>`}${closeBtn()}`)
+  }catch(e){dlgShow(`<h3>📚 ${Lg('Ressources de classe','Class resources','موارد القسم')}</h3><p class="bad">${esc(shErr(e))}</p>${closeBtn()}`)}}
+Object.assign(act,{resHub:()=>resHub(),
+  resAdd:()=>{ask(Lg('Ajouter un lien','Add a link','إضافة رابط'),[{k:'n',l:Lg('Titre','Title','العنوان'),r:1,a:' maxlength="80"'},{k:'m',l:Lg('Module','Module','المادة'),a:' maxlength="60"'},{k:'k',l:Lg('Type','Type','النوع'),t:'select',o:[['epreuve',Lg('Épreuve','Past exam','امتحان سابق')],['td','TD'],['cours',Lg('Cours','Course','درس')],['autre',Lg('Autre','Other','أخرى')]]},{k:'u',l:Lg('Lien https://','https:// link','رابط https://'),t:'url',r:1,a:' maxlength="280" placeholder="https://"'}],async v=>{
+      let u;try{u=new URL(v.u.trim())}catch(e){return toast(Lg('Lien invalide','Invalid link','رابط غير صالح'),'er')}if(u.protocol!=='https:')return toast(Lg('Le lien doit commencer par https://','The link must start with https://','يجب أن يبدأ الرابط بـ https://'),'er');
+      try{await fb.db.collection('res').add({g:resG,n:sStr(v.n.trim(),80),m:sStr(v.m,60),k:v.k,u:u.href.slice(0,280),o:fbUser.uid,ts:Date.now(),ok:false});toast(Lg('Envoyé : visible après validation','Sent: visible after approval','أُرسل: سيظهر بعد الموافقة'),'ok');resHub(resG)}catch(e){toast(shErr(e),'er')}})},
+  resDel:async i=>{if(!confirm(Lg('Supprimer ce lien ?','Delete this link?','حذف هذا الرابط؟')))return;try{await fb.db.collection('res').doc(i).delete();resHub(resG)}catch(e){toast(shErr(e),'er')}},
+  resRep:async i=>{try{await fb.db.collection('feedback').add({u:fbUser.uid,t:'bug',m:'[SIGNALEMENT ressource '+i+']',ts:Date.now(),v:APP_V,ua:''});toast(Lg('Signalé, merci','Reported, thanks','تم الإبلاغ، شكرا'),'ok')}catch(e){toast(shErr(e),'er')}}});
+
+/* ---------- Page admin (comptes déclarés dans la collection "admins") ---------- */
+async function adminDlg(){
+  if(!ADMIN)return;dlgShow(`<h3>🛠 Admin</h3><p class="mu">…</p>`);
+  const C=n=>fb.db.collection(n);let users='?',fbs=[],errs=[],pend=[],ann=null;
+  try{try{const c=await C('users').count().get();users=c.data().count}catch(e){users=(await C('users').limit(1000).get()).size+'+'}
+    [fbs,errs,pend]=await Promise.all([C('feedback').orderBy('ts','desc').limit(30).get(),C('errors').orderBy('ts','desc').limit(30).get(),C('res').where('ok','==',false).limit(50).get()].map(p=>p.then(s=>s.docs.map(d=>({id:d.id,...d.data()})))))}
+  catch(e){return dlgShow(`<h3>🛠 Admin</h3><p class="bad">${esc(shErr(e))}</p>${closeBtn()}`)}
+  const list=(a,fn)=>a.length?a.map(fn).join(''):'<small class="mu">—</small>';
+  dlgShow(`<h3>🛠 Admin</h3><div class="st"><div><b>${users}</b><small class="mu">${Lg('comptes','accounts','حسابات')}</small></div><div><b>${fbs.length}</b><small class="mu">feedback</small></div><div><b>${errs.length}</b><small class="mu">${Lg('erreurs','errors','أخطاء')}</small></div></div>
+  <h4>📣 ${Lg('Annonce','Announcement','إعلان')}</h4><label>${Lg('Titre','Title','العنوان')}<input id="antt" maxlength="80"></label><label>${Lg('Message','Message','الرسالة')}<textarea id="anmm" rows="3" maxlength="500"></textarea></label><div class="row" style="justify-content:flex-start"><button class="b p" data-a="annPub">${Lg('Publier','Publish','نشر')}</button></div>
+  <h4>📚 ${Lg('Liens à valider','Links to approve','روابط للموافقة')} (${pend.length})</h4>${list(pend,x=>`<div class="rs" style="display:block;margin-top:4px"><b>${esc(x.n)}</b> <small class="mu">${shFmt(x.g)} · ${esc(x.m||'')}</small><small style="word-break:break-all"><a href="${esc(x.u)}" target="_blank" rel="noopener noreferrer">${esc(x.u)}</a></small><div class="row" style="justify-content:flex-start;margin:4px 0 0"><button class="b p" data-a="resOk" data-i="${x.id}">✅</button><button class="b" data-a="resNo" data-i="${x.id}">🗑</button></div></div>`)}
+  <h4>💡 Feedback</h4>${list(fbs,x=>`<div class="rs" style="display:block;margin-top:4px"><small class="mu">${x.t==='idea'?'💡':'🐞'} ${fmtD(x.ts)} · ${esc(x.v||'')}</small><div style="white-space:pre-wrap">${esc(x.m)}</div><button class="b" data-a="admDel" data-i="feedback|${x.id}">🗑</button></div>`)}
+  <h4>🐞 ${Lg('Erreurs','Errors','أخطاء')}</h4>${list(errs,x=>`<div class="rs" style="display:block;margin-top:4px"><small class="mu">${fmtD(x.ts)} · ${esc(x.v||'')} · ${esc((x.ua||'').slice(0,50))}</small><div><b>${esc(x.m)}</b></div><small class="mu" style="white-space:pre-wrap">${esc(x.s||'')}</small><button class="b" data-a="admDel" data-i="errors|${x.id}">🗑</button></div>`)}${closeBtn()}`)}
+Object.assign(act,{admin:()=>adminDlg(),
+  annPub:async()=>{const t=$('antt').value.trim(),m=$('anmm').value.trim();if(!t||!m)return toast('…','er');try{await fb.db.collection('announcements').doc('latest').set({t,m,ts:Date.now()});toast(Lg('Annonce publiée ✔','Announcement published ✔','تم نشر الإعلان ✔'),'ok')}catch(e){toast(shErr(e),'er')}},
+  resOk:async i=>{try{await fb.db.collection('res').doc(i).update({ok:true});adminDlg()}catch(e){toast(shErr(e),'er')}},
+  resNo:async i=>{try{await fb.db.collection('res').doc(i).delete();adminDlg()}catch(e){toast(shErr(e),'er')}},
+  admDel:async i=>{const[c,id]=i.split('|');try{await fb.db.collection(c).doc(id).delete();adminDlg()}catch(e){toast(shErr(e),'er')}}});
+
+/* ---------- après connexion : admin ? annonce ? ---------- */
+let postFor='';
+async function postLogin(){if(!fbUser||postFor===fbUser.uid)return;postFor=fbUser.uid;
+  try{ADMIN=(await fb.db.collection('admins').doc(fbUser.uid).get()).exists}catch(e){ADMIN=false}
+  setTimeout(()=>{if(!$('dlg').open)annCheck()},1500);lbPush()}
+{const _rj=resumeJoin;resumeJoin=function(){_rj();postLogin()}}
+/* suppression du compte : supprime aussi versions, classement, jeton push */
+{const _del2=fbDeleteCloud;fbDeleteCloud=async function(){try{const ref=fbRef(),v=await ref.collection('v').get();for(const d of v.docs){const cs=await d.ref.collection('c').get(),b=fb.db.batch();cs.docs.forEach(c=>b.delete(c.ref));b.delete(d.ref);await b.commit()}}catch(e){}
+  try{await fb.db.collection('lb').doc(fbUser.uid).delete()}catch(e){}try{await fb.db.collection('tokens').doc(fbUser.uid).delete()}catch(e){}return _del2()}}
+trDom(document.body);render();
 </script>
 
 </body>
