@@ -1,10 +1,10 @@
 /* EduVault : fonctionne hors-ligne + notifie quand une nouvelle version est prete. */
-const C = 'eduvault-v24';
+const C = 'eduvault-v26';
 const CDN = ['cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 const PRE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'icon-shortcut-quiz.png', 'icon-shortcut-focus.png', 'icon-shortcut-cards.png', 'icon-shortcut-agenda.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(C).then(c => c.addAll(PRE).catch(() => {})));
+  e.waitUntil(caches.open(C).then(c => Promise.all(PRE.map(u => fetch(new Request(u, { cache: 'reload' })).then(r => r.ok && c.put(u, r)).catch(() => {})))));
   /* pas de self.skipWaiting() ici : on laisse la nouvelle version "attendre"
      pour pouvoir prevenir la personne avant de l'activer (voir index.html) */
 });
@@ -43,6 +43,18 @@ self.addEventListener('fetch', e => {
     return;
   }
   if (u.origin !== location.origin) return;
+  /* page, icônes, manifeste : on affiche tout de suite la copie en cache, et on la met à jour en arrière-plan (ouverture instantanée) */
+  if (r.mode === 'navigate' || /\.(html|png|svg|ico|webmanifest|woff2?)$/i.test(u.pathname) || u.pathname.endsWith('/')) {
+    e.respondWith(caches.match(r, { ignoreSearch: true }).then(m => {
+      const net = fetch(r, r.mode === 'navigate' ? { cache: 'no-cache' } : undefined).then(res => {
+        if (res && res.ok && res.type === 'basic') { const cp = res.clone(); caches.open(C).then(c => c.put(r, cp)); }
+        return res;
+      });
+      if (m) { net.catch(() => {}); return m; }
+      return net.catch(() => caches.match('index.html'));
+    }));
+    return;
+  }
   e.respondWith(
     fetch(r).then(res => { if (res.ok) { const cp = res.clone(); caches.open(C).then(c => c.put(r, cp)); } return res; })
       .catch(() => caches.match(r, { ignoreSearch: true }).then(m => m || caches.match('index.html')))
