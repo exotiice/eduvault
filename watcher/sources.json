@@ -1,0 +1,11 @@
+{
+ "pages": [
+  "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+  "https://eniad.ump.ma/fr/emploi-du-temps",
+  "https://eniad.ump.ma/fr/calendrier-des-examens",
+  "https://eniad.ump.ma/fr/actualite",
+  "https://eniad.ump.ma/fr/notes",
+  "https://eniad.ump.ma/fr/resultats"
+ ],
+ "_aide": "Pages du site ENIAD à surveiller (annonces, notes, examens, résultats, emplois du temps). Chaque nouveau lien/PDF apparaît dans l'appli sous « Nouveautés ENIAD » et déclenche une notification. Ajoute d'autres pages ici ; la première lecture d'une page n'envoie aucune notification (elle sert de référence)."
+}

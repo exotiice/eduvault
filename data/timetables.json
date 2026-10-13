@@ -1,0 +1,120 @@
+{
+ "v": 1,
+ "baseline": true,
+ "checked": "",
+ "docs": [],
+ "news": [],
+ "status": {
+  "ok": 0,
+  "err": []
+ },
+ "tables": {
+  "ROC1": {
+   "sem": "Année Universitaire 2026-2027 - Session Automne",
+   "hash": "3360205fe03cc1df",
+   "src": "initial",
+   "sessions": [
+    {
+     "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
+     "p": "Mohamed BADIY",
+     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "t": "COURS",
+     "d": "LUNDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AMPHI-04",
+     "w": "all"
+    },
+    {
+     "m": "STATISTIQUES DESCRIPTIVES, INFÉRENTIELLES ET EXPLORATOIRES",
+     "p": "Mourad El idrissi",
+     "g": "IA1 · ROC1 · SID1",
+     "t": "COURS",
+     "d": "LUNDI",
+     "s": "10:15",
+     "e": "11:45",
+     "r": "AMPHI-02",
+     "w": "all"
+    },
+    {
+     "m": "PERCEPTION ET CAPTEURS POUR OBJETS ET ROBOTS CONNECTÉS",
+     "p": "BOUTOUBA Mohamed",
+     "g": "ROC1",
+     "t": "COURS",
+     "d": "MARDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AR01",
+     "w": "all"
+    },
+    {
+     "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
+     "p": "Manale BOUGHANJA",
+     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "t": "COURS",
+     "d": "MERCREDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AMPHI-04",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION EMBARQUÉE",
+     "p": "Wassim KHIATI",
+     "g": "ROC1",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AR03",
+     "w": "all"
+    },
+    {
+     "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
+     "p": "Zakaria KADDARI",
+     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "10:15",
+     "e": "11:45",
+     "r": "AMPHI-04",
+     "w": "all"
+    },
+    {
+     "m": "COMPTABILITE ET CALCUL DES COUTS",
+     "p": "À affecter",
+     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "t": "COURS",
+     "d": "VENDREDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
+     "m": "FRANÇAIS 1",
+     "p": "Hayat BENTALEB",
+     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "t": "COURS",
+     "d": "VENDREDI",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "AMPHI-01",
+     "w": "all"
+    },
+    {
+     "m": "ANGLAIS 1",
+     "p": "Abderrahim FATMI",
+     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "t": "COURS",
+     "d": "VENDREDI",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    }
+   ],
+   "changed": "2026-10-04T00:00:00Z"
+  }
+ }
+}
