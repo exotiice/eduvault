@@ -1,0 +1,44 @@
+name: Surveiller le site ENIAD
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"   # toutes les 3 heures
+  workflow_dispatch:          # bouton « Run workflow » pour lancer à la main
+  push:
+    paths: ["watcher/sources.json"]   # on relance quand tu ajoutes une page à surveiller
+
+permissions:
+  contents: write
+
+concurrency:
+  group: eniad-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    env:
+      FB_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: watcher/requirements.txt
+      - run: pip install -r watcher/requirements.txt
+      - name: Lire le site ENIAD
+        run: python watcher/eniad_watch.py
+      - name: Enregistrer les changements
+        run: |
+          git config user.name "eduvault-watcher"
+          git config user.email "actions@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "Rien de nouveau"; else git commit -m "Mise à jour ENIAD $(date -u +%F\ %H:%M)" && git push; fi
+      # Notification push (facultatif) : seulement si le secret FIREBASE_SERVICE_ACCOUNT existe (voir LISEZ-MOI.md)
+      - name: Envoyer la notification push
+        if: env.FB_SA != ''
+        run: |
+          if [ -f data/.notify.json ]; then
+            cd admin && npm install --no-audit --no-fund firebase-admin && node ci-push.js
+          fi

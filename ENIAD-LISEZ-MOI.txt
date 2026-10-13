@@ -1,0 +1,18 @@
+SUIVI AUTOMATIQUE ENIAD — fichiers à AJOUTER dans ton dépôt GitHub (rien d'autre à supprimer)
+
+Contenu :
+  .github/workflows/eniad-watch.yml   le robot (toutes les 3 h)
+  watcher/eniad_watch.py              lit le site + les PDF
+  watcher/sources.json                pages ENIAD à surveiller (ajoute-en ici)
+  watcher/requirements.txt
+  data/timetables.json                données (ROC1 déjà dedans)
+  admin/ci-push.js                    notifications push (facultatif)
+  eniad-watch.yml.txt                 copie du robot, si le dossier caché .github pose problème
+
+Si l'upload du dossier .github ne marche pas :
+  GitHub > Add file > Create new file > tape le nom  .github/workflows/eniad-watch.yml
+  (les "/" créent les dossiers) > colle le contenu de eniad-watch.yml.txt > Commit.
+
+IMPORTANT : l appli doit être la v22 (ce zip) pour lire ces données : Réglages > Nouveautés ENIAD, carte en haut de « Aujourd hui ». Les pages surveillées sont dans watcher/sources.json (annonces, notes, calendrier des examens, résultats, emplois du temps). La première lecture d une page ne notifie rien.
+Ensuite : Settings > Actions > General > Workflow permissions > Read and write > Save,
+puis Actions > "Surveiller le site ENIAD" > Run workflow.

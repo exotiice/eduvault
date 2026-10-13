@@ -1,0 +1,118 @@
+{
+  "name": "EduVault",
+  "short_name": "EduVault",
+  "description": "Emploi du temps, cours, fiches et quiz",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#fbf9f5",
+  "theme_color": "#c2410c",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "./",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "shortcuts": [
+    {
+      "name": "Quiz rapide",
+      "short_name": "Quiz",
+      "description": "Lancer un quiz",
+      "url": "./?go=qz",
+      "icons": [
+        {
+          "src": "icon-shortcut-quiz.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Focus (Pomodoro)",
+      "short_name": "Focus",
+      "description": "Démarrer une session de concentration",
+      "url": "./?go=po",
+      "icons": [
+        {
+          "src": "icon-shortcut-focus.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Fiches à réviser",
+      "short_name": "Fiches",
+      "description": "Réviser mes fiches",
+      "url": "./?go=fc",
+      "icons": [
+        {
+          "src": "icon-shortcut-cards.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Agenda",
+      "short_name": "Agenda",
+      "description": "Examens et devoirs",
+      "url": "./?go=ag",
+      "icons": [
+        {
+          "src": "icon-shortcut-agenda.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "./share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": [
+            "application/pdf",
+            "image/*",
+            "audio/*",
+            "video/*",
+            "text/*",
+            ".pdf",
+            ".docx",
+            ".pptx",
+            ".xlsx",
+            ".csv",
+            ".md",
+            ".zip"
+          ]
+        }
+      ]
+    }
+  }
+}

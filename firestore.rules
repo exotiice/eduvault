@@ -1,0 +1,225 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin = un document admins/{uid} créé À LA MAIN dans la console Firebase (impossible à créer depuis l'appli)
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Chaque utilisateur ne peut lire/écrire QUE son propre espace : users/{son uid}
+    match /users/{uid} {
+      allow list: if isAdmin();   // pour compter les comptes (page admin) ; les blocs de données 'c/' restent privés
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['updatedAt', 'n', 'h', 'v', 'email', 'e', 's', 'it', 'kc'])   // e,s,it,kc = métadonnées du chiffrement côté client
+        && request.resource.data.n is int && request.resource.data.n <= 40;
+
+      // historique : 5 dernières versions (copie des blocs de la veille) users/{uid}/v/{AAAA-MM-JJ}
+      match /v/{day} {
+        allow read, delete: if request.auth != null && request.auth.uid == uid;
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && request.resource.data.keys().hasOnly(['updatedAt', 'n', 'h', 'v', 'email', 'e', 's', 'it', 'kc'])
+          && request.resource.data.n is int && request.resource.data.n <= 40;
+        match /c/{cid} {
+          allow read, delete: if request.auth != null && request.auth.uid == uid;
+          allow create, update: if request.auth != null && request.auth.uid == uid
+            && request.resource.data.keys().hasOnly(['i', 't', 'h'])
+            && request.resource.data.t is string && request.resource.data.t.size() <= 400000;
+        }
+      }
+
+      // morceaux de la sauvegarde (la sauvegarde est découpée en blocs < 1 Mo)
+      match /c/{cid} {
+        allow read, delete: if request.auth != null && request.auth.uid == uid;
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['i', 't', 'h'])
+          && request.resource.data.t is string
+          && request.resource.data.t.size() <= 400000;
+      }
+    }
+
+    // Partages par code (emploi du temps de classe, fiches/quiz) : shares/{CODE à 8 caractères}
+    //  - lecture d'UN document seulement si on connaît le code (pas de listing) et qu'on est connecté
+    //  - écriture réservée au propriétaire ; contenu limité en taille
+    match /shares/{code} {
+      allow get: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$');
+      allow list: if request.auth != null && resource.data.o == request.auth.uid;   // uniquement SES partages (suppression du compte)
+      allow create: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$')
+        && request.resource.data.o == request.auth.uid
+        && request.resource.data.keys().hasOnly(['o', 'k', 'n', 'd', 'u', 'v'])
+        && request.resource.data.k in ['tt', 'fc']
+        && request.resource.data.n is string && request.resource.data.n.size() <= 80
+        && request.resource.data.d is string && request.resource.data.d.size() <= 300000;
+      allow update: if request.auth != null && resource.data.o == request.auth.uid
+        && request.resource.data.o == request.auth.uid
+        && request.resource.data.keys().hasOnly(['o', 'k', 'n', 'd', 'u', 'v'])
+        && request.resource.data.k in ['tt', 'fc']
+        && request.resource.data.n is string && request.resource.data.n.size() <= 80
+        && request.resource.data.d is string && request.resource.data.d.size() <= 300000;
+      allow delete: if request.auth != null && resource.data.o == request.auth.uid;
+    }
+
+    // ---- v10 ----
+    match /admins/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;   // sert à savoir si JE suis admin
+      allow write: if false;
+    }
+
+    // Retours des utilisateurs (problème / idée) : écriture par tout compte connecté, lecture admin seulement
+    match /feedback/{id} {
+      allow create: if request.auth != null && request.resource.data.u == request.auth.uid
+        && request.resource.data.keys().hasOnly(['u', 't', 'm', 'ts', 'v', 'ua'])
+        && request.resource.data.t in ['bug', 'idea']
+        && request.resource.data.m is string && request.resource.data.m.size() <= 1500
+        && request.resource.data.ts is int;
+      allow read, delete: if isAdmin();
+    }
+
+    // Journal d'erreurs anonyme (message + 4 lignes de pile, jamais de données de l'utilisateur)
+    match /errors/{id} {
+      allow create: if request.auth != null && request.resource.data.u == request.auth.uid
+        && request.resource.data.keys().hasOnly(['u', 'm', 's', 'ts', 'v', 'ua'])
+        && request.resource.data.m is string && request.resource.data.m.size() <= 300
+        && request.resource.data.s is string && request.resource.data.s.size() <= 600;
+      allow read, delete: if isAdmin();
+    }
+
+    // Annonces : lisibles par les comptes connectés, publiées par l'admin
+    match /announcements/{id} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // Jeton de notification push (un par compte). L'envoi se fait avec admin/send-push.js (hors navigateur).
+    match /tokens/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['t', 'ts', 'ua'])
+        && request.resource.data.t is string && request.resource.data.t.size() <= 400;
+    }
+
+    // Classement optionnel (pseudo + XP, visible des comptes connectés)
+    match /lb/{uid} {
+      allow get, list: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['p', 'x', 'g', 'l', 't'])
+        && request.resource.data.p is string && request.resource.data.p.size() <= 20
+        && request.resource.data.x is int && request.resource.data.x >= 0 && request.resource.data.x <= 10000000
+        && request.resource.data.g is string && request.resource.data.g.size() <= 8;
+      allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+    }
+
+    // Ressources de classe = LIENS https uniquement, visibles après validation par l'admin
+    match /res/{id} {
+      allow get, list: if request.auth != null && (resource.data.ok == true || resource.data.o == request.auth.uid || isAdmin());
+      allow create: if request.auth != null && request.resource.data.o == request.auth.uid && request.resource.data.ok == false
+        && request.resource.data.keys().hasOnly(['g', 'n', 'm', 'k', 'u', 'o', 'ts', 'ok'])
+        && request.resource.data.g.matches('^[A-HJ-NP-Z2-9]{8}$')
+        && request.resource.data.n is string && request.resource.data.n.size() <= 80
+        && request.resource.data.m is string && request.resource.data.m.size() <= 60
+        && request.resource.data.k in ['epreuve', 'td', 'cours', 'autre']
+        && request.resource.data.u is string && request.resource.data.u.matches('^https://[^ ]{4,270}$');
+      allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ok']);
+      allow delete: if request.auth != null && (resource.data.o == request.auth.uid || isAdmin());
+    }
+
+    // ---- v13 : espace de classe (discussion + demandes) : cls/{CODE}/chat, cls/{CODE}/reqs/{id}/r ----
+    // Lecture/écriture par tout compte connecté qui CONNAÎT le code de classe (le code joue le rôle de clé, comme les partages).
+    match /cls/{code} {
+      match /chat/{id} {
+        allow read: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$');
+        allow create: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$')
+          && request.resource.data.u == request.auth.uid
+          && request.resource.data.keys().hasOnly(['u', 'p', 'm', 'ts'])
+          && request.resource.data.m is string && request.resource.data.m.size() > 0 && request.resource.data.m.size() <= 500
+          && request.resource.data.p is string && request.resource.data.p.size() <= 24
+          && request.resource.data.ts is int;
+        allow delete: if request.auth != null && (resource.data.u == request.auth.uid || isAdmin());
+      }
+      match /reqs/{id} {
+        allow read: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$');
+        allow create: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$')
+          && request.resource.data.u == request.auth.uid && request.resource.data.ok == false
+          && request.resource.data.keys().hasOnly(['u', 'p', 't', 'd', 'md', 'ts', 'ok'])
+          && request.resource.data.t is string && request.resource.data.t.size() > 0 && request.resource.data.t.size() <= 80
+          && request.resource.data.d is string && request.resource.data.d.size() <= 300
+          && request.resource.data.md is string && request.resource.data.md.size() <= 40
+          && request.resource.data.p is string && request.resource.data.p.size() <= 24
+          && request.resource.data.ts is int;
+        allow update: if request.auth != null && (resource.data.u == request.auth.uid || isAdmin())
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ok']);
+        allow delete: if request.auth != null && (resource.data.u == request.auth.uid || isAdmin());
+        match /r/{rid} {
+          allow read: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$');
+          allow create: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$')
+            && request.resource.data.u == request.auth.uid
+            && request.resource.data.keys().hasOnly(['u', 'p', 'm', 'ts'])
+            && request.resource.data.m is string && request.resource.data.m.size() > 0 && request.resource.data.m.size() <= 400
+            && request.resource.data.p is string && request.resource.data.p.size() <= 24
+            && request.resource.data.ts is int;
+          allow delete: if request.auth != null && (resource.data.u == request.auth.uid || isAdmin());
+        }
+      }
+    }
+
+    // ---- v13 : projets de groupe prj/{CODE} + tâches prj/{CODE}/t/{id} (tout membre qui connaît le code peut cocher / ajouter) ----
+    match /prj/{code} {
+      allow get: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$');
+      allow create: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$')
+        && request.resource.data.o == request.auth.uid
+        && request.resource.data.keys().hasOnly(['o', 'n', 'ts'])
+        && request.resource.data.n is string && request.resource.data.n.size() <= 60;
+      allow update, delete: if request.auth != null && resource.data.o == request.auth.uid;
+      match /t/{id} {
+        allow read: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$');
+        allow create, update: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$')
+          && request.resource.data.keys().hasOnly(['t', 'who', 'due', 'done', 'u', 'ts'])
+          && request.resource.data.t is string && request.resource.data.t.size() > 0 && request.resource.data.t.size() <= 100
+          && request.resource.data.who is string && request.resource.data.who.size() <= 24
+          && request.resource.data.due is string && request.resource.data.due.size() <= 10
+          && request.resource.data.done is bool;
+        allow delete: if request.auth != null && code.matches('^[A-HJ-NP-Z2-9]{8}$');
+      }
+    }
+
+    // ---- v14 : CHAT PUBLIC pour tout le serveur : chat/{id} ----
+    //  - lecture : ouverte à TOUS (même sans compte) ; l'appli ne lit que les 40 derniers messages
+    //  - création : compte connecté, non bloqué, 1 à 500 caractères, 1 message toutes les 2 secondes (via chatMeta/{uid} écrit dans le même lot)
+    //  - suppression : l'auteur ou l'admin ; blocage d'un compte : l'admin crée banned/{uid}
+    match /chat/{id} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && !exists(/databases/$(database)/documents/banned/$(request.auth.uid))
+        && request.resource.data.keys().hasOnly(['u', 'p', 'm', 'ts'])
+        && request.resource.data.u == request.auth.uid
+        && request.resource.data.m is string && request.resource.data.m.size() > 0 && request.resource.data.m.size() <= 500
+        && request.resource.data.p is string && request.resource.data.p.size() <= 24
+        && request.resource.data.ts is int
+        && getAfter(/databases/$(database)/documents/chatMeta/$(request.auth.uid)).data.t == request.resource.data.ts;
+      allow delete: if request.auth != null && (resource.data.u == request.auth.uid || isAdmin());
+    }
+    match /chatMeta/{uid} {
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['t'])
+        && request.resource.data.t is int
+        && request.resource.data.t > request.time.toMillis() - 600000 && request.resource.data.t < request.time.toMillis() + 600000;
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['t'])
+        && request.resource.data.t is int
+        && request.resource.data.t >= resource.data.t + 2000
+        && request.resource.data.t > request.time.toMillis() - 600000 && request.resource.data.t < request.time.toMillis() + 600000;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+    match /banned/{uid} {
+      allow get: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // tout le reste est interdit
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
