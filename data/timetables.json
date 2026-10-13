@@ -1,11 +1,11 @@
 {
  "v": 1,
  "baseline": true,
- "checked": "",
+ "checked": "2026-10-13T19:17:14Z",
  "docs": [],
  "news": [],
  "status": {
-  "ok": 0,
+  "ok": 6,
   "err": []
  },
  "tables": {
@@ -116,5 +116,13 @@
    ],
    "changed": "2026-10-04T00:00:00Z"
   }
- }
+ },
+ "pages": [
+  "https://eniad.ump.ma/fr/actualite",
+  "https://eniad.ump.ma/fr/calendrier-des-examens",
+  "https://eniad.ump.ma/fr/emploi-du-temps",
+  "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+  "https://eniad.ump.ma/fr/notes",
+  "https://eniad.ump.ma/fr/resultats"
+ ]
 }
