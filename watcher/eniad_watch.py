@@ -9,7 +9,8 @@ Ne plante jamais le site : en cas d'erreur réseau, les données précédentes s
 import hashlib, io, json, os, re, sys, time
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urljoin, urlparse, unquote
+from html import unescape
+from urllib.parse import urljoin, urlparse, unquote, quote
 
 import requests
 from bs4 import BeautifulSoup
@@ -20,6 +21,11 @@ FEED = DATA / "timetables.json"
 EVENTS = DATA / "events.json"
 NOTIFY = DATA / ".notify.json"
 UA = "EduVault-watcher/1.0 (suivi personnel de l'emploi du temps; contact: github)"
+# utilisé UNIQUEMENT en second essai, si la page ne donne aucun lien avec l'agent ci-dessus
+BROWSER_UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+# URL de PDF présentes dans le HTML brut (balise <a>, attribut data-*, JS, JSON...)
+PDF_IN_TEXT = re.compile(r"""["']([^"'<>\n]+?\.pdf(?:\?[^"'<>\n]*)?)["']""", re.I)
+BLOCK_HINTS = ("just a moment", "cf-chl", "attention required", "captcha", "access denied", "enable javascript")
 DAYS = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI", "DIMANCHE"]
 TIME_RE = re.compile(r"^([A-ZÉÈ]{2,8})?\s*\(?\s*(\d{1,2})[h:](\d{2})\s*[-–à]\s*(\d{1,2})[h:](\d{2})\s*\)?$")
 GROUP_RE = re.compile(r"^[A-Z]{2,6}\d?(\s*[·,/&-]\s*[A-Z]{2,6}\d?)*$")
@@ -121,11 +127,16 @@ def parse_pdf(data):
 
 
 # ------------------------------------------------------------------ pages web
-def get(url, binary=False, retries=3):
+def fix_url(u):
+    """Espaces / accents dans l'URL (ex. « A S PRINTEMPS ») -> %20, sans re-encoder les %XX déjà présents."""
+    return quote(u, safe=":/?&=%#@+,;~!$*()'[]")
+
+
+def get(url, binary=False, retries=3, ua=None):
     last = None
     for i in range(retries):
         try:
-            r = requests.get(url, headers={"User-Agent": UA, "Accept-Language": "fr"}, timeout=40)
+            r = requests.get(fix_url(url), headers={"User-Agent": ua or UA, "Accept-Language": "fr,en;q=0.5", "Accept": "text/html,application/pdf;q=0.9,*/*;q=0.8"}, timeout=40)
             r.raise_for_status()
             if binary and len(r.content) > 25_000_000:
                 raise RuntimeError("fichier trop gros")
@@ -136,27 +147,83 @@ def get(url, binary=False, retries=3):
     raise last
 
 
-def scan_page(url):
-    html = get(url, binary=True)
+def is_pdf_url(href):
+    return href.lower().split("?")[0].endswith(".pdf") or "/sites/default/files/" in href.lower()
+
+
+def link_label(a, fallback):
+    """Le bouton s'appelle « Télécharger » partout : on prend plutôt le texte de la ligne
+    (ex. « Robotique et Objets Connectés ( ROC1 ) Semestre 5 »)."""
+    own = " ".join(a.get_text(" ").split())
+    if own and not re.fullmatch(r"(?i)(t[ée]l[ée]charger|download|voir|consulter|pdf|ouvrir)\W*", own):
+        return own
+    p = a.parent
+    for _ in range(4):
+        if p is None:
+            break
+        ctx = " ".join(re.sub(r"(?i)t[ée]l[ée]charger", " ", " ".join(p.get_text(" ").split())).split())
+        if len(ctx) > 160:
+            break
+        if len(ctx) >= 3:
+            return ctx
+        p = p.parent
+    return fallback
+
+
+def parse_links(html, url):
+    """Retourne (titre, liens, diagnostic).
+    - PDF : cherchés dans TOUTE la page (balises <a> n'importe où, puis texte brut / JS en filet de sécurité).
+    - autres liens (annonces) : seulement dans la zone de contenu, hors menu / en-tête / pied de page."""
     soup = BeautifulSoup(html, "html.parser")
-    title = (soup.title.string or "").strip() if soup.title else url
+    title = " ".join(soup.title.get_text(" ").split()) if soup.title else url
+    host = urlparse(url).netloc
+    anchors = soup.find_all("a", href=True)
+    root = (soup.find("main") or soup.find(attrs={"role": "main"})
+            or soup.find(id=re.compile(r"^(main|content|contenu|main-content|page-content)$", re.I)))
+    if root is None or not root.find("a", href=True):
+        root = soup
+    in_root = {id(a) for a in root.find_all("a", href=True)}
     items, seen = [], set()
-    main = soup.find("main") or soup.find(id=re.compile("content|main", re.I)) or soup
-    for a in main.find_all("a", href=True):
-        href = urljoin(url, a["href"].split("#")[0])
-        if not href.startswith("http") or href in seen:
+    for a in anchors:
+        href = urljoin(url, a["href"].strip().split("#")[0])
+        key = fix_url(href)
+        if not href.startswith("http") or key in seen:
             continue
-        txt = " ".join(a.get_text(" ").split()) or unquote(Path(urlparse(href).path).name)
-        pdf = href.lower().split("?")[0].endswith(".pdf") or "/sites/default/files/" in href.lower()
-        same = urlparse(href).netloc == urlparse(url).netloc
-        if not (pdf or same):
+        pdf = is_pdf_url(href)
+        if not pdf and (id(a) not in in_root or urlparse(href).netloc != host or a.find_parent(["nav", "header", "footer", "aside"])):
             continue
-        # on ignore la navigation générique du site (menu, langues...)
-        if a.find_parent(["nav", "header", "footer"]):
-            continue
-        seen.add(href)
-        items.append({"t": txt[:160], "u": href, "pdf": bool(pdf)})
-    return title, items
+        seen.add(key)
+        items.append({"t": link_label(a, unquote(Path(urlparse(href).path).name))[:160], "u": href, "pdf": pdf})
+    # filet de sécurité : PDF présents dans le HTML mais pas dans une balise <a> (JS, JSON, data-href...)
+    text = (html.decode("utf-8", "ignore") if isinstance(html, bytes) else html).replace("\\/", "/")
+    for m in PDF_IN_TEXT.findall(text):
+        href = urljoin(url, unescape(m).strip())
+        key = fix_url(href)
+        if href.startswith("http") and key not in seen and is_pdf_url(href):
+            seen.add(key)
+            items.append({"t": unquote(Path(urlparse(href).path).name), "u": href, "pdf": True})
+    low = text[:20000].lower()
+    diag = {"bytes": len(html), "a": len(anchors), "title": title, "block": any(k in low for k in BLOCK_HINTS), "ua": ""}
+    return title, items, diag
+
+
+def scan_page(url):
+    """Lit la page ; si aucun lien n'est trouvé avec l'agent « bot », réessaie une fois avec un agent de navigateur classique."""
+    res = None
+    for ua in (UA, BROWSER_UA):
+        try:
+            html = get(url, binary=True, ua=ua)
+        except Exception:
+            if res is None:
+                raise
+            break
+        title, items, diag = parse_links(html, url)
+        diag["ua"] = "bot" if ua == UA else "navigateur"
+        res = (title, items, diag)
+        if items:
+            break
+        print(f"   ⚠ 0 lien avec l'agent « {diag['ua']} » ({diag['bytes']} octets, {diag['a']} balises <a>, titre : {title!r})")
+    return res
 
 
 def load_feed():
@@ -199,21 +266,33 @@ def main():
     status = {"ts": ts, "ok": [], "err": []}
     known_docs = {d["u"]: d for d in feed.get("docs", [])}
     known_news = {n["u"]: n for n in feed.get("news", [])}
-    known_pages = set(feed.get("pages", []))
+    # une page est « connue » seulement si elle a déjà donné des liens (sinon une lecture vide ancienne
+    # la marquerait connue et le premier vrai scan enverrait une notification pour chaque lien)
+    known_pages = {i.get("page") for i in list(feed.get("docs", [])) + list(feed.get("news", [])) if i.get("page")}
+    done_pdf = set()
 
     for page in src.get("pages", []):
         try:
-            title, items = scan_page(page)
+            title, items, diag = scan_page(page)
         except Exception as e:
             status["err"].append(f"{page}: {e}")
             print("✗", page, e)
             continue
         status["ok"].append(page)
         fr = first_run or page not in known_pages   # page jamais vue : on mémorise sans notifier
-        known_pages.add(page)
-        print(f"✓ {page} : {len(items)} lien(s)")
+        if items:
+            known_pages.add(page)
+        n_pdf = sum(1 for i in items if i["pdf"])
+        print(f"✓ {page} : {len(items)} lien(s) dont {n_pdf} PDF [{diag['bytes']} octets, {diag['a']} <a>, agent {diag['ua']}]")
+        if not items:
+            # visible dans data/timetables.json -> status.err (sans chiffres qui changent, pour ne pas créer de commit inutile)
+            status["err"].append(f"0 lien lu sur {page} (titre : {diag['title'][:60]!r}{', page de blocage ?' if diag['block'] else ''})")
+            print("   ⚠ aucun lien lu : le site renvoie peut-être une page vide, du JavaScript ou un blocage")
         for it in items:
             if it["pdf"]:
+                if it["u"] in done_pdf:   # même PDF listé sur plusieurs pages : une seule lecture par exécution
+                    continue
+                done_pdf.add(it["u"])
                 try:
                     data = get(it["u"], binary=True)
                 except Exception as e:
