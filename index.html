@@ -239,7 +239,7 @@ html[dir=rtl] .setbody{animation-name:setinr}@keyframes setinr{from{opacity:0;tr
 .pavx{display:inline-grid;place-items:center;width:var(--s,40px);height:var(--s,40px);border-radius:calc(var(--s,40px)*.34);font-size:calc(var(--s,40px)*.54);line-height:1;color:#fff;flex:none;box-shadow:0 8px 16px -10px #000a;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
 .pavbtn{all:unset;box-sizing:border-box;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}.pavbtn:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .pavbtn::after{content:"✎";position:absolute;inset-inline-end:-4px;bottom:-4px;width:20px;height:20px;border-radius:50%;background:#fff;color:#111827;font-size:11px;display:grid;place-items:center;box-shadow:0 2px 6px #0006}
-.pprev{display:grid;place-items:center;margin:8px 0 14px}
+.pprev{display:grid;place-items:center;margin:8px 0 10px}.pavx img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}.pfbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:0 0 12px}
 .pgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
 .pgrid button{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;display:grid;place-items:center;font-size:27px;border-radius:16px;background:var(--in);border:2px solid transparent;transition:transform .12s;-webkit-tap-highlight-color:transparent;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
 .pgrid button:hover{transform:scale(1.08)}.pgrid button.on{border-color:var(--br);background:color-mix(in srgb,var(--br) 14%,var(--in))}
@@ -2548,7 +2548,7 @@ function rSe(){
   if(sec){const S=SEC[sec];head=`<div class="sethd"><div class="seth1"><button class="setx" data-a="setSec" data-i="" aria-label="${Lg('Retour','Back','رجوع')}">${isRTL()?'›':'‹'}</button><h3>${S[1]()}</h3></div></div>`;body=S[2]()}
   else{
     head=`<div class="sethd"><div class="seth1"><h3>${tr('⚙️ Réglages')}</h3></div>
-     <div class="prof">${prof()?`<button class="pav pavbtn pavx" style="--s:56px;background:${profGrad(prof().c)};border:1px solid #fff5" data-a="prof" aria-label="${Lg('Modifier mon profil','Edit my profile','تعديل ملفي')}">${prof().a}</button>`:`<button class="pav pavbtn" data-a="prof" aria-label="${Lg('Choisir mon profil','Pick my profile','اختر ملفي')}">${UID?esc((name[0]||'?')):'🎓'}</button>`}<div style="flex:1;min-width:0"><b class="pn">${esc((prof()&&prof().n)||name)}</b>
+     <div class="prof">${prof()?`<button class="pav pavbtn pavx" style="--s:56px;background:${profGrad(prof().c)};border:1px solid #fff5" data-a="prof" aria-label="${Lg('Modifier mon profil','Edit my profile','تعديل ملفي')}">${profInner(prof())}</button>`:`<button class="pav pavbtn" data-a="prof" aria-label="${Lg('Choisir mon profil','Pick my profile','اختر ملفي')}">${UID?esc((name[0]||'?')):'🎓'}</button>`}<div style="flex:1;min-width:0"><b class="pn">${esc((prof()&&prof().n)||name)}</b>
       <div class="xpbar" role="progressbar" aria-valuenow="${pc}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pc}%"></i></div><small>${Lg('Niv.','Lvl','م')} ${l} · ${xp} XP${st?' · 🔥 '+st:''}</small></div></div>
      <button class="b pbtn" data-a="acct">${UID?Lg('Gérer mon compte','Manage my account','إدارة حسابي'):tr('Se connecter / Créer un compte')}</button></div>`;
     const pal=(PALS[localStorage.getItem('eduPal')]||PALS.terra)[0],n=(A.settings.shares||[]).length+(A.settings.joined||[]).length;
@@ -2578,7 +2578,7 @@ settings.__v11=1;
 
 <script>
 /* =====================================================================
-   Profil : avatar + couleur + pseudo, choisis parmi des modèles prêts (pas d'upload de photo).
+   Profil : avatar + couleur + pseudo, choisis parmi des modèles prêts OU photo importée (p.img, JPEG 192px).
    Stocké dans A.settings.profile (synchronisé avec le cloud / les sauvegardes).
    ===================================================================== */
 const AV_CAND=['🦊','🐼','🦁','🐯','🐨','🐸','🦉','🐧','🐙','🦄','🐲','🦅','🐺','🦋','🐬','🦈','🐢','🦖','🐝','🦜','🌵','🍀','🌸','🍉','🥑','🍕','🎸','🎮','🏀','🎨','🔭','🧩','🪐','🌙','🌈','🍩','🤖','👾','🧙','🦸'];
@@ -2587,28 +2587,35 @@ const PCOL=[['#6366f1','#8b5cf6'],['#3b82f6','#06b6d4'],['#10b981','#14b8a6'],['
 SETC.prof=['#ec4899','#8b5cf6'];
 const prof=()=>{const p=A.settings&&A.settings.profile;return p&&AVATARS.includes(p.a)?p:null};
 const profGrad=c=>{const g=PCOL[(+c||0)%PCOL.length];return`linear-gradient(135deg,${g[0]},${g[1]})`};
+const profImg=p=>p&&typeof p.img==='string'&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]{20,80000}$/.test(p.img)?p.img:'';
+const profInner=p=>profImg(p)?`<img src="${profImg(p)}" alt="">`:p.a;
+function profCrop(f,S=192){return new Promise((ok,ko)=>{const r=new FileReader();r.onerror=ko;r.onload=()=>{const im=new Image();im.onerror=ko;im.onload=()=>{const m=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,S,S);x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,S,S);ok(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(f)})}
 const profName=()=>{const p=prof();return p&&p.n?', '+esc(p.n):''};
 const lbName=()=>{const p=prof(),n=(LS('eduVault_lbp_'+UID)||(p&&p.n)||'Anonyme').slice(0,16);return(p?p.a+' ':'')+n};
-let pfD={a:AVATARS[0],c:0},profFirstRun=false;
+let pfD={a:AVATARS[0],c:0,img:''},profFirstRun=false;
 function profDlg(first){
-  const p=prof();pfD={a:p?p.a:AVATARS[Math.floor(Math.random()*AVATARS.length)],c:p?+p.c||0:Math.floor(Math.random()*PCOL.length)};profFirstRun=!!first;
+  const p=prof();pfD={a:p?p.a:AVATARS[Math.floor(Math.random()*AVATARS.length)],c:p?+p.c||0:Math.floor(Math.random()*PCOL.length),img:p?profImg(p):''};profFirstRun=!!first;
   dlgShow(`<form id="pfm" novalidate><h3>🙂 ${Lg('Mon profil','My profile','ملفي الشخصي')}</h3>
-  <div class="pprev"><span class="pavx" id="ppv" style="--s:96px;background:${profGrad(pfD.c)}">${pfD.a}</span></div>
+  <div class="pprev"><span class="pavx" id="ppv" style="--s:96px;background:${profGrad(pfD.c)}">${pfD.img?`<img src="${pfD.img}" alt="">`:pfD.a}</span></div>
+  <input id="pfi" type="file" accept="image/*" hidden>
+  <div class="pfbtns"><button type="button" class="b" onclick="$('pfi').click()">📷 ${Lg('Importer ma photo','Upload my photo','رفع صورتي')}</button><button type="button" class="b" id="pfx" style="${pfD.img?'':'display:none'}" onclick="pfNoImg()">🗑 ${Lg('Retirer la photo','Remove photo','حذف الصورة')}</button></div>
   <label>${Lg('Pseudo','Nickname','اللقب')}<input name="n" maxlength="16" autocomplete="nickname" value="${esc(p&&p.n||'')}" placeholder="${Lg('ex. Zak','e.g. Zak','مثلا زاك')}"></label>
   <h5 class="sh">${Lg('Avatar','Avatar','الصورة الرمزية')}</h5><div class="pgrid" role="radiogroup" aria-label="Avatar">${AVATARS.map((e,i)=>`<button type="button" role="radio" aria-checked="${e===pfD.a}" aria-label="Avatar ${i+1}" class="${e===pfD.a?'on':''}" onclick="pfPick('a',${i})">${e}</button>`).join('')}</div>
   <h5 class="sh">${Lg('Couleur','Color','اللون')}</h5><div class="pcols" role="radiogroup" aria-label="${Lg('Couleur','Color','اللون')}">${PCOL.map((g,i)=>`<button type="button" role="radio" aria-checked="${i===pfD.c}" aria-label="${Lg('Couleur','Color','اللون')} ${i+1}" class="${i===pfD.c?'on':''}" style="background:linear-gradient(135deg,${g[0]},${g[1]})" onclick="pfPick('c',${i})"></button>`).join('')}</div>
   <div class="row"><button type="button" class="b" onclick="profSkip()">${first?Lg('Plus tard','Later','لاحقا'):tr('Annuler')}</button><button class="b p" name="go">${Lg('Enregistrer','Save','حفظ')}</button></div></form>`);
-  $('pfm').onsubmit=e=>{e.preventDefault();const n=e.target.elements.n.value.trim().slice(0,16);A.settings.profile={a:pfD.a,c:pfD.c,n};upd();paintAcct();lbPush(true);
+  $('pfi').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(!/^image\//.test(f.type))return toast(Lg('Choisis une image','Choose an image','اختر صورة'),'er');try{pfD.img=await profCrop(f);pfPaint()}catch(x){toast(Lg('Image illisible','Unreadable image','صورة غير قابلة للقراءة'),'er')}};
+  $('pfm').onsubmit=e=>{e.preventDefault();const n=e.target.elements.n.value.trim().slice(0,16);A.settings.profile=Object.assign({a:pfD.a,c:pfD.c,n},pfD.img?{img:pfD.img}:{});upd();paintAcct();lbPush(true);
     const wasFirst=profFirstRun;profFirstRun=false;$('dlg').close();toast(Lg('Profil enregistré ✔','Profile saved ✔','تم حفظ الملف ✔'),'ok');if(wasFirst&&!LS('eduVault_tour'))setTimeout(tourStart,400)}}
-function pfPick(k,i){if(k==='a')pfD.a=AVATARS[i];else pfD.c=i;
-  const pv=$('ppv');pv.textContent=pfD.a;pv.style.background=profGrad(pfD.c);
-  document.querySelectorAll('.pgrid button').forEach((b,j)=>{const on=AVATARS[j]===pfD.a;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});
+function pfPaint(){const pv=$('ppv');pv.innerHTML=pfD.img?`<img src="${pfD.img}" alt="">`:pfD.a;pv.style.background=profGrad(pfD.c);const x=$('pfx');if(x)x.style.display=pfD.img?'':'none';
+  document.querySelectorAll('.pgrid button').forEach((b,j)=>{const on=!pfD.img&&AVATARS[j]===pfD.a;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});
   document.querySelectorAll('.pcols button').forEach((b,j)=>{const on=j===pfD.c;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}
+function pfPick(k,i){if(k==='a'){pfD.a=AVATARS[i];pfD.img=''}else pfD.c=i;pfPaint()}
+function pfNoImg(){pfD.img='';pfPaint()}
 function profSkip(){const f=profFirstRun;profFirstRun=false;$('dlg').close();if(f&&!LS('eduVault_tour'))setTimeout(tourStart,400)}
 function profFirst(){if(prof()){if(!LS('eduVault_tour'))tourStart()}else profDlg(true)}
 act.prof=()=>profDlg(false);
 /* avatar dans la barre du haut */
-{const _pa=paintAcct;paintAcct=function(){_pa();const l=$('acl'),p=prof();if(!l||!p)return;l.className='pavx';l.style.cssText='--s:26px;background:'+profGrad(p.c)+';border-radius:50%';l.textContent=p.a}}
+{const _pa=paintAcct;paintAcct=function(){_pa();const l=$('acl'),p=prof();if(!l||!p)return;l.className='pavx';l.style.cssText='--s:26px;background:'+profGrad(p.c)+';border-radius:50%';l.innerHTML=profInner(p)}}
 paintAcct();
 </script>
 
