@@ -1,5 +1,5 @@
 /* EduVault : fonctionne hors-ligne + notifie quand une nouvelle version est prete. */
-const C = 'eduvault-v36';
+const C = 'eduvault-v37';
 const CDN = ['cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 const PRE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'icon-shortcut-quiz.png', 'icon-shortcut-focus.png', 'icon-shortcut-cards.png', 'icon-shortcut-agenda.png'];
 
