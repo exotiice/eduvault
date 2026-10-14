@@ -239,7 +239,7 @@ html[dir=rtl] .setbody{animation-name:setinr}@keyframes setinr{from{opacity:0;tr
 .pavx{display:inline-grid;place-items:center;width:var(--s,40px);height:var(--s,40px);border-radius:calc(var(--s,40px)*.34);font-size:calc(var(--s,40px)*.54);line-height:1;color:#fff;flex:none;box-shadow:0 8px 16px -10px #000a;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
 .pavbtn{all:unset;box-sizing:border-box;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}.pavbtn:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .pavbtn::after{content:"✎";position:absolute;inset-inline-end:-4px;bottom:-4px;width:20px;height:20px;border-radius:50%;background:#fff;color:#111827;font-size:11px;display:grid;place-items:center;box-shadow:0 2px 6px #0006}
-.pprev{display:grid;place-items:center;margin:8px 0 10px}.pavx img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}.pfbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:0 0 12px}
+.pprev{display:grid;place-items:center;margin:8px 0 10px}.pavx img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}.chav{flex:none;width:30px;height:30px;border-radius:50%;overflow:hidden;background:var(--in);align-self:flex-end}.chav img{width:100%;height:100%;object-fit:cover;display:block}.pfsh{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px;font-size:12.5px;line-height:1.35}.pfsh input{width:auto;margin-top:2px}.pfbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:0 0 12px}
 .pgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
 .pgrid button{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;display:grid;place-items:center;font-size:27px;border-radius:16px;background:var(--in);border:2px solid transparent;transition:transform .12s;-webkit-tap-highlight-color:transparent;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
 .pgrid button:hover{transform:scale(1.08)}.pgrid button.on{border-color:var(--br);background:color-mix(in srgb,var(--br) 14%,var(--in))}
@@ -2462,7 +2462,7 @@ let postFor='';
 async function postLogin(){if(!fbUser||postFor===fbUser.uid)return;postFor=fbUser.uid;
   try{ADMIN=(await fb.db.collection('admins').doc(fbUser.uid).get()).exists}catch(e){ADMIN=false}
   if(tab==='ch'&&typeof chPaint==='function')chPaint();else if(tab==='se')render();
-  setTimeout(()=>{if(!$('dlg').open)annCheck()},1500);lbPush()}
+  setTimeout(()=>{if(!$('dlg').open)annCheck()},1500);lbPush();if(typeof avBoot==='function')avBoot()}
 {const _rj=resumeJoin;resumeJoin=function(){_rj();postLogin()}}
 /* suppression du compte : supprime aussi versions, classement, jeton push */
 {const _del2=fbDeleteCloud;fbDeleteCloud=async function(){try{const ref=fbRef(),v=await ref.collection('v').get();for(const d of v.docs){const cs=await d.ref.collection('c').get(),b=fb.db.batch();cs.docs.forEach(c=>b.delete(c.ref));b.delete(d.ref);await b.commit()}}catch(e){}
@@ -2590,6 +2590,21 @@ const profGrad=c=>{const g=PCOL[(+c||0)%PCOL.length];return`linear-gradient(135d
 const profImg=p=>p&&typeof p.img==='string'&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]{20,80000}$/.test(p.img)?p.img:'';
 const profInner=p=>profImg(p)?`<img src="${profImg(p)}" alt="">`:p.a;
 function profCrop(f,S=192){return new Promise((ok,ko)=>{const r=new FileReader();r.onerror=ko;r.onload=()=>{const im=new Image();im.onerror=ko;im.onload=()=>{const m=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,S,S);x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,S,S);ok(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(f)})}
+/* miniature de profil dans les chats : publiée seulement si la personne coche la case (av/{uid}, lisible des comptes connectés) */
+const AVC={},AVQ=new Set();
+const avImg=u=>{const v=AVC[u];return typeof v==='string'&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]{20,20000}$/.test(v)?v:''};
+const avSpan=u=>{const s=avImg(u);return s?`<span class="chav"><img src="${s}" alt=""></span>`:''};
+const avName=m=>{const p=m.p||'';return avImg(m.u)&&AVATARS.some(e=>p.startsWith(e+' '))?p.slice(p.indexOf(' ')+1):p};
+const avThumb=src=>new Promise(ok=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=72;c.getContext('2d').drawImage(im,0,0,72,72);ok(c.toDataURL('image/jpeg',.7))};im.onerror=()=>ok('');im.src=src});
+async function avSync(){
+  if(!fb||!fbUser)return false;const p=prof(),im=profImg(p),k='eduVault_avx_'+fbUser.uid;
+  try{
+    if(p&&p.sh&&im){const t=await avThumb(im);if(!t)return false;await fb.db.collection('av').doc(fbUser.uid).set({i:t,t:Date.now()});AVC[fbUser.uid]=t;LS(k,String(im.length))}
+    else{await fb.db.collection('av').doc(fbUser.uid).delete();AVC[fbUser.uid]='';LS(k,'off')}
+    return true}catch(e){console.warn('av',e);return false}}
+function avBoot(){const p=prof(),im=profImg(p);if(!p||!p.sh||!im||!fb||!fbUser)return;if(LS('eduVault_avx_'+fbUser.uid)===String(im.length))return;avSync()}
+function avLoad(us,cb){if(!fb||!fbUser)return;const need=[...new Set(us)].filter(u=>u&&!(u in AVC)&&!AVQ.has(u)).slice(0,40);if(!need.length)return;need.forEach(u=>AVQ.add(u));
+  Promise.all(need.map(u=>fb.db.collection('av').doc(u).get().then(s=>{AVC[u]=s.exists?String((s.data()||{}).i||''):''}).catch(()=>{AVC[u]=''}))).then(()=>{need.forEach(u=>AVQ.delete(u));if(need.some(u=>avImg(u)))cb()})}
 const profName=()=>{const p=prof();return p&&p.n?', '+esc(p.n):''};
 const lbName=()=>{const p=prof(),n=(LS('eduVault_lbp_'+UID)||(p&&p.n)||'Anonyme').slice(0,16);return(p?p.a+' ':'')+n};
 let pfD={a:AVATARS[0],c:0,img:''},profFirstRun=false;
@@ -2599,14 +2614,15 @@ function profDlg(first){
   <div class="pprev"><span class="pavx" id="ppv" style="--s:96px;background:${profGrad(pfD.c)}">${pfD.img?`<img src="${pfD.img}" alt="">`:pfD.a}</span></div>
   <input id="pfi" type="file" accept="image/*" hidden>
   <div class="pfbtns"><button type="button" class="b" onclick="$('pfi').click()">📷 ${Lg('Importer ma photo','Upload my photo','رفع صورتي')}</button><button type="button" class="b" id="pfx" style="${pfD.img?'':'display:none'}" onclick="pfNoImg()">🗑 ${Lg('Retirer la photo','Remove photo','حذف الصورة')}</button></div>
+  <label class="pfsh" id="pfsh" style="${pfD.img?'':'display:none'}"><input type="checkbox" name="sh" ${p&&p.sh?'checked':''}><span>${Lg('Afficher ma photo dans les chats (visible seulement des comptes connectés). Sinon, seul ton emoji/pseudo est montré.','Show my photo in chats (only visible to signed-in accounts). Otherwise only your emoji/nickname is shown.','إظهار صورتي في الدردشات (تظهر فقط للحسابات المسجلة). وإلا يظهر الرمز واللقب فقط.')}</span></label>
   <label>${Lg('Pseudo','Nickname','اللقب')}<input name="n" maxlength="16" autocomplete="nickname" value="${esc(p&&p.n||'')}" placeholder="${Lg('ex. Zak','e.g. Zak','مثلا زاك')}"></label>
   <h5 class="sh">${Lg('Avatar','Avatar','الصورة الرمزية')}</h5><div class="pgrid" role="radiogroup" aria-label="Avatar">${AVATARS.map((e,i)=>`<button type="button" role="radio" aria-checked="${e===pfD.a}" aria-label="Avatar ${i+1}" class="${e===pfD.a?'on':''}" onclick="pfPick('a',${i})">${e}</button>`).join('')}</div>
   <h5 class="sh">${Lg('Couleur','Color','اللون')}</h5><div class="pcols" role="radiogroup" aria-label="${Lg('Couleur','Color','اللون')}">${PCOL.map((g,i)=>`<button type="button" role="radio" aria-checked="${i===pfD.c}" aria-label="${Lg('Couleur','Color','اللون')} ${i+1}" class="${i===pfD.c?'on':''}" style="background:linear-gradient(135deg,${g[0]},${g[1]})" onclick="pfPick('c',${i})"></button>`).join('')}</div>
   <div class="row"><button type="button" class="b" onclick="profSkip()">${first?Lg('Plus tard','Later','لاحقا'):tr('Annuler')}</button><button class="b p" name="go">${Lg('Enregistrer','Save','حفظ')}</button></div></form>`);
   $('pfi').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(!/^image\//.test(f.type))return toast(Lg('Choisis une image','Choose an image','اختر صورة'),'er');try{pfD.img=await profCrop(f);pfPaint()}catch(x){toast(Lg('Image illisible','Unreadable image','صورة غير قابلة للقراءة'),'er')}};
-  $('pfm').onsubmit=e=>{e.preventDefault();const n=e.target.elements.n.value.trim().slice(0,16);A.settings.profile=Object.assign({a:pfD.a,c:pfD.c,n},pfD.img?{img:pfD.img}:{});upd();paintAcct();lbPush(true);
+  $('pfm').onsubmit=e=>{e.preventDefault();const n=e.target.elements.n.value.trim().slice(0,16);const had=!!(p&&p.sh);A.settings.profile=Object.assign({a:pfD.a,c:pfD.c,n},pfD.img?{img:pfD.img,sh:!!e.target.elements.sh.checked}:{});upd();paintAcct();lbPush(true);if(had||A.settings.profile.sh)avSync();
     const wasFirst=profFirstRun;profFirstRun=false;$('dlg').close();toast(Lg('Profil enregistré ✔','Profile saved ✔','تم حفظ الملف ✔'),'ok');if(wasFirst&&!LS('eduVault_tour'))setTimeout(tourStart,400)}}
-function pfPaint(){const pv=$('ppv');pv.innerHTML=pfD.img?`<img src="${pfD.img}" alt="">`:pfD.a;pv.style.background=profGrad(pfD.c);const x=$('pfx');if(x)x.style.display=pfD.img?'':'none';
+function pfPaint(){const pv=$('ppv');pv.innerHTML=pfD.img?`<img src="${pfD.img}" alt="">`:pfD.a;pv.style.background=profGrad(pfD.c);const x=$('pfx');if(x)x.style.display=pfD.img?'':'none';const sh=$('pfsh');if(sh)sh.style.display=pfD.img?'flex':'none';
   document.querySelectorAll('.pgrid button').forEach((b,j)=>{const on=!pfD.img&&AVATARS[j]===pfD.a;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});
   document.querySelectorAll('.pcols button').forEach((b,j)=>{const on=j===pfD.c;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}
 function pfPick(k,i){if(k==='a'){pfD.a=AVATARS[i];pfD.img=''}else pfD.c=i;pfPaint()}
@@ -2777,14 +2793,17 @@ async function clsSpace(g){
   <div class="seg" style="margin:10px 0"><button class="${csTab==='chat'?'on':''}" data-a="csTab" data-i="chat">💬 ${Lg('Discussion','Chat','نقاش')}</button><button class="${csTab==='req'?'on':''}" data-a="csTab" data-i="req">🆘 ${Lg('Demandes','Requests','طلبات')}</button></div>
   <div id="csb"></div><div class="warn" style="font-size:11px">${Lg("Reste respectueux. Quiconque a le code de classe peut lire cet espace ; les messages inappropriés sont supprimés par l'admin.","Stay respectful. Anyone with the class code can read this space; inappropriate messages are removed by the admin.",'كن محترما. كل من لديه رمز القسم يمكنه قراءة هذا الفضاء.')}</div>${closeBtn()}`);
   csRender()}
+let csDocs=[];
+function csChatPaint(){const l=$('chl');if(!l)return;const near=l.scrollHeight-l.scrollTop-l.clientHeight<80;
+  l.innerHTML=csDocs.map(m=>{const me=m.u===fbUser.uid;return`<div class="msg${me?' me':''}">${avSpan(m.u)}<div class="bub"><small>${esc(avName(m))} · ${ago(m.ts)}${me||ADMIN?` <button class="x-btn" style="width:22px;height:22px;display:inline-grid" data-a="csDel" data-i="chat|${m.id}" aria-label="${tr('Supprimer')}">✕</button>`:''}</small>${linkify(m.m||'')}</div></div>`}).join('')||`<p class="mu e">${Lg('Sois le premier à écrire 👋','Be the first to write 👋','كن أول من يكتب 👋')}</p>`;
+  avLoad(csDocs.map(m=>m.u),csChatPaint);
+  if(near||!l.dataset.init){l.scrollTop=l.scrollHeight;l.dataset.init=1}}
 function csRender(){csClean();const b=$('csb');if(!b)return;
   if(csTab==='chat'){
     b.innerHTML=`<div class="chatbox" id="chl" aria-live="polite"></div><form id="chf" class="row" style="margin:8px 0 0;flex-wrap:nowrap"><input name="m" maxlength="500" autocomplete="off" placeholder="${Lg('Ton message…','Your message…','رسالتك…')}" style="flex:1" aria-label="${Lg('Message','Message','رسالة')}"><button class="b p" aria-label="${Lg('Envoyer','Send','إرسال')}">➤</button></form>`;
     $('chf').onsubmit=async e=>{e.preventDefault();const f=e.target.elements,t=f.m.value.trim();if(!t||Date.now()-lastSend<1200)return;lastSend=Date.now();f.m.value='';
       try{await clsCol('chat').doc(msgId()).set({u:fbUser.uid,p:myTag(),m:t.slice(0,500),ts:Date.now()})}catch(x){toast(shErr(x),'er');f.m.value=t}};
-    csUnsubs.push(clsCol('chat').orderBy(FP(),'desc').limit(60).onSnapshot(sn=>{const l=$('chl');if(!l)return;const near=l.scrollHeight-l.scrollTop-l.clientHeight<80;
-      l.innerHTML=sn.docs.map(x=>({id:x.id,...x.data()})).reverse().map(m=>{const me=m.u===fbUser.uid;return`<div class="msg${me?' me':''}"><div class="bub"><small>${esc(m.p||'')} · ${ago(m.ts)}${me||ADMIN?` <button class="x-btn" style="width:22px;height:22px;display:inline-grid" data-a="csDel" data-i="chat|${m.id}" aria-label="${tr('Supprimer')}">✕</button>`:''}</small>${linkify(m.m||'')}</div></div>`}).join('')||`<p class="mu e">${Lg('Sois le premier à écrire 👋','Be the first to write 👋','كن أول من يكتب 👋')}</p>`;
-      if(near||!l.dataset.init){l.scrollTop=l.scrollHeight;l.dataset.init=1}},e=>toast(shErr(e),'er')))}
+    csUnsubs.push(clsCol('chat').orderBy(FP(),'desc').limit(60).onSnapshot(sn=>{csDocs=sn.docs.map(x=>({id:x.id,...x.data()})).reverse();csChatPaint()},e=>toast(shErr(e),'er')))}
   else if(!csReq){
     b.innerHTML=`<div class="row" style="justify-content:flex-start;margin:0 0 8px"><button class="b p" data-a="csNew">+ ${Lg('Nouvelle demande','New request','طلب جديد')}</button></div><div id="rql"></div>`;
     csUnsubs.push(clsCol('reqs').orderBy(FP(),'desc').limit(40).onSnapshot(sn=>{const l=$('rql');if(!l)return;
@@ -2894,7 +2913,8 @@ function chPaint(){const l=$('chl');if(!l)return;
   if(chErr){l.innerHTML=`<p class="mu e">${esc(chErr)}</p><div class="row" style="justify-content:center"><button class="b" data-a="chRetry">${Lg('Réessayer','Retry','إعادة المحاولة')}</button></div>`;return}
   if(!chMsgs.length&&(chLoading||!chUnsub)){l.innerHTML=`<p class="mu e">${Lg('Chargement…','Loading…','جار التحميل…')}</p>`;return}
   const near=l.scrollHeight-l.scrollTop-l.clientHeight<90||!l.dataset.init,me0=fbUser&&fbUser.uid;
-  l.innerHTML=chMsgs.map(m=>{const me=m.u===me0;return`<div class="msg${me?' me':''}"><div class="bub"><small><span class="nm">${esc(m.p||'')}</span> · ${ago(m.ts)}${me||ADMIN?` <button class="x-btn rowbtn" style="width:22px;height:22px" data-a="chDel" data-i="${m.id}" aria-label="${tr('Supprimer')}">✕</button>`:''}${ADMIN&&!me?` <button class="x-btn rowbtn" style="width:22px;height:22px" data-a="chBan" data-i="${m.u}" aria-label="${Lg('Bloquer','Block','حظر')}" title="${Lg('Bloquer ce compte','Block this account','حظر هذا الحساب')}">🚫</button>`:''}</small>${linkify(m.m||'')}</div></div>`}).join('')||`<p class="mu e">${Lg('Personne n\'a encore écrit. Lance la discussion 👋','Nobody has written yet. Start the conversation 👋','لم يكتب أحد بعد 👋')}</p>`;
+  l.innerHTML=chMsgs.map(m=>{const me=m.u===me0;return`<div class="msg${me?' me':''}">${avSpan(m.u)}<div class="bub"><small><span class="nm">${esc(avName(m))}</span> · ${ago(m.ts)}${me||ADMIN?` <button class="x-btn rowbtn" style="width:22px;height:22px" data-a="chDel" data-i="${m.id}" aria-label="${tr('Supprimer')}">✕</button>`:''}${ADMIN&&!me?` <button class="x-btn rowbtn" style="width:22px;height:22px" data-a="chBan" data-i="${m.u}" aria-label="${Lg('Bloquer','Block','حظر')}" title="${Lg('Bloquer ce compte','Block this account','حظر هذا الحساب')}">🚫</button>`:''}</small>${linkify(m.m||'')}</div></div>`}).join('')||`<p class="mu e">${Lg('Personne n\'a encore écrit. Lance la discussion 👋','Nobody has written yet. Start the conversation 👋','لم يكتب أحد بعد 👋')}</p>`;
+  avLoad(chMsgs.map(m=>m.u),chPaint);
   if(near){l.scrollTop=l.scrollHeight;l.dataset.init=1}}
 async function chStart(){
   if(chUnsub||chLoading||document.hidden)return;chLoading=true;
