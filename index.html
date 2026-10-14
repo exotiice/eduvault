@@ -879,12 +879,23 @@ function load(o){
     if(m.grade!=null&&m.nex==null&&m.ncc==null&&m.ntp==null){m.nex=+m.grade;m.cex=1;m.ccc=0;m.ctp=0}
     delete m.grade;
   });
+  resBkRestore();
   A.flashcards.forEach(f=>{f.efactor=f.efactor||2.5;f.interval=f.interval||0;f.repetition=f.repetition||0;f.nextRev=f.nextRev||Date.now()});
   if(!visSems().includes(A.activeSemester))A.activeSemester=curSem();
 }
 let svT=null;
-function flushSave(){clearTimeout(svT);svT=null;try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){toast('Stockage plein : supprimez des photos','er')}}
+const RESBK=()=>'eduVault_resbk_'+(UID||'g');
+/* copie de secours LEGERE des listes de documents (m.resources) : survit a une synchro qui ecraserait les donnees */
+function resBkSave(){try{const m={};A.modules.forEach(x=>{if((x.resources||[]).length)m[x.id]=x.resources});localStorage.setItem(RESBK(),JSON.stringify(m))}catch(e){}}
+function resBkRestore(){try{const b=JSON.parse(localStorage.getItem(RESBK())||'null');if(!b)return;A.modules.forEach(m=>{const l=b[m.id];if(!Array.isArray(l))return;m.resources=m.resources||[];const have=new Set(m.resources.map(r=>r.id));l.forEach(r=>{if(r&&r.id&&!have.has(r.id))m.resources.push(r)})})}catch(e){}}
+function flushSave(){clearTimeout(svT);svT=null;
+  /* un autre onglet / la PWA a ecrit des donnees plus recentes : on les fusionne au lieu de les ecraser */
+  try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(o&&Array.isArray(o.modules)&&(o.updatedAt||0)>(A.updatedAt||0)){mergeIn(o);A.updatedAt=Date.now()}}}catch(e){}
+  try{localStorage.setItem(KEY,JSON.stringify(A));resBkSave()}
+  catch(e){resBkSave();toast('Stockage plein : supprime des photos de notes, sinon tes derniers ajouts risquent d etre perdus','er')}}
 function save(){A.updatedAt=Date.now();clearTimeout(svT);svT=setTimeout(flushSave,300);drvSchedule();if(UID)fbSchedule()}
+addEventListener('storage',e=>{if(e.key!==KEY||!e.newValue)return;try{const o=JSON.parse(e.newValue);if(o&&Array.isArray(o.modules)&&(o.updatedAt||0)>(A.updatedAt||0)){mergeIn(o);A.updatedAt=Math.max(A.updatedAt||0,+o.updatedAt||0);render()}}catch(_){}});
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 addEventListener('pagehide',flushSave);document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSave()});
 function upd(){save();render()}
 
@@ -1505,15 +1516,16 @@ function applyRemote(o,ts,f){load(o);A.updatedAt=ts;try{localStorage.setItem(KEY
   LS('eduVault_syncTs',String(ts));LS('eduVault_remoteMod',f.modifiedTime||'');
   if(A.settings.level&&$('dlg').open&&$('dlg').querySelector('[data-a=lvl]'))$('dlg').close();
   render();toast('Données restaurées depuis Drive ✔','ok')}
-function mergeRemote(o){
+function mergeIn(o){
+  (o.modules||[]).forEach(rm=>{const lm=A.modules.find(x=>x.id===rm.id);if(!lm)return;lm.resources=lm.resources||[];const h=new Set(lm.resources.map(r=>r.id));(rm.resources||[]).forEach(r=>{if(r&&r.id&&!h.has(r.id))lm.resources.push(r)})});
   ['modules','tasks','flashcards','timetable','quizQs','projects'].forEach(k=>{const have=new Set(A[k].map(x=>x.id));(o[k]||[]).forEach(x=>{if(!have.has(x.id))A[k].push(x)})});
   const nk=new Set(A.notes.map(n=>n.classId));(o.notes||[]).forEach(n=>{if(!nk.has(n.classId))A.notes.push(n)});
   A.settings.holidays=[...new Set([...A.settings.holidays,...((o.settings&&o.settings.holidays)||[])])];
   A.quizHist=[...A.quizHist,...(o.quizHist||[]).filter(h=>!A.quizHist.some(x=>x.d===h.d))].sort((a,b)=>a.d-b.d).slice(-60);
   A.xp=Math.max(A.xp||0,+o.xp||0);Object.entries(o.tot||{}).forEach(([k,n])=>{A.tot[k]=Math.max(A.tot[k]||0,+n||0)});
   Object.entries(o.act||{}).forEach(([d,v])=>{const a=A.act[d]=A.act[d]||{};Object.entries(v||{}).forEach(([k,n])=>{if(k==='x'){a.x=a.x||{};Object.entries(n||{}).forEach(([mid,u])=>{a.x[mid]=Math.max(a.x[mid]||0,+u||0)});return}a[k]=Math.max(a[k]||0,+n||0)})});
-  Object.entries(o.memos||{}).forEach(([mid,l])=>{const cur=A.memos[mid]=A.memos[mid]||[];(l||[]).forEach(e=>{if(e&&e.id&&!cur.some(x=>x.id===e.id))cur.push(e)})});A.avgH=Object.assign({},o.avgH||{},A.avgH);
-  A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){}render()}
+  Object.entries(o.memos||{}).forEach(([mid,l])=>{const cur=A.memos[mid]=A.memos[mid]||[];(l||[]).forEach(e=>{if(e&&e.id&&!cur.some(x=>x.id===e.id))cur.push(e)})});A.avgH=Object.assign({},o.avgH||{},A.avgH)}
+function mergeRemote(o){mergeIn(o);A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A));resBkSave()}catch(e){}render()}
 
 /* fichiers "locaux" : envoyes aussi sur Drive pour etre disponibles sur les autres appareils */
 async function syncFiles(){
@@ -1666,7 +1678,7 @@ async function fbSync(o={}){
   }catch(e){fbErr=fbMsg(e)}
   finally{fbBusy=false;paintAcct();if(fbQ){fbQ=false;fbSchedule(1500)}}
 }
-function wipeLocal(uid){try{kdel(uid)}catch(e){}['eduVault_u_','eduVault_fbTs_','eduVault_fbH_'].forEach(p=>localStorage.removeItem(p+uid));try{indexedDB.deleteDatabase('EduVaultLocalFiles_'+uid)}catch(e){}}
+function wipeLocal(uid){try{kdel(uid)}catch(e){}['eduVault_u_','eduVault_fbTs_','eduVault_fbH_','eduVault_resbk_'].forEach(p=>localStorage.removeItem(p+uid));try{indexedDB.deleteDatabase('EduVaultLocalFiles_'+uid)}catch(e){}}
 async function fbDeleteCloud(){
   const ref=fbRef(),cs=await ref.collection('c').get(),b=fb.db.batch();cs.docs.forEach(d=>b.delete(d.ref));b.delete(ref);await b.commit()}
 function setDf(on){LS(DFK(),on?'1':'0');if(on&&tok)drvSync();else paintDrive();settings();toast(on?'Tes fichiers seront copiés dans ton Drive':'Tes fichiers resteront sur cet appareil','ok')}
