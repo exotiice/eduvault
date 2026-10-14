@@ -3247,20 +3247,20 @@ const rgb=h=>[1,3,5].map(i=>parseInt(normHex(h).slice(i,i+2),16));
 const gcol=h=>{const a=rgb(h);let best='9',bd=1e9;for(const[k,v]of Object.entries(GCOL)){const b=rgb(v),d=(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;if(d<bd){bd=d;best=k}}return best};
 
 /* ---------- jeton OAuth (séparé de celui de Drive) ---------- */
-let gtok=null,gexp=0,gct=null,gbusy=false,gerr='',gTimer=null,gArmed=false;
-try{const s=JSON.parse(sessionStorage.getItem('eduVault_gtok')||'null');if(s&&s.exp>Date.now()+60000){gtok=s.t;gexp=s.exp}}catch(e){}
+let gtok=null,gexp=0,gct=null,gbusy=false,gerr='',gTimer=null,gArmed=false,gAsked=false;
+try{const s=JSON.parse(localStorage.getItem('eduVault_gtok')||sessionStorage.getItem('eduVault_gtok')||'null');if(s&&s.exp>Date.now()+60000){gtok=s.t;gexp=s.exp}else localStorage.removeItem('eduVault_gtok')}catch(e){}
 const gHave=()=>!!gtok&&Date.now()<gexp;
 const gLib=()=>(window.google&&google.accounts&&google.accounts.oauth2)?Promise.resolve():lib('https://accounts.google.com/gsi/client');
 function gAuth(){return gLib().then(()=>new Promise((ok,ko)=>{
   gct=gct||google.accounts.oauth2.initTokenClient({client_id:cid(),scope:GSCOPE,
     callback:r=>{if(r.error)return gct._ko&&gct._ko(Error(r.error));gtok=r.access_token;gexp=Date.now()+((+r.expires_in||3600)-90)*1000;
-      try{sessionStorage.setItem('eduVault_gtok',JSON.stringify({t:gtok,exp:gexp}))}catch(e){}gerr='';gct._ok&&gct._ok()},
+      try{localStorage.setItem('eduVault_gtok',JSON.stringify({t:gtok,exp:gexp}))}catch(e){}gerr='';gct._ok&&gct._ok()},
     error_callback:e=>gct._ko&&gct._ko(Error((e&&e.type)||'popup'))});
-  gct._ok=ok;gct._ko=ko;gct.requestAccessToken({prompt:''})}))}
+  gct._ok=ok;gct._ko=ko;const em=(typeof fbUser!=='undefined'&&fbUser&&fbUser.email)||'';gct.requestAccessToken(em?{prompt:'',hint:em}:{prompt:''})}))}
 function gArm(){ /* la session Google dure 1 h : on se reconnecte au prochain toucher */
-  if(gArmed||!GC().on)return;gArmed=true;gPaint();
-  const run=()=>{['pointerup','keydown'].forEach(t=>document.removeEventListener(t,run,true));gArmed=false;if(!GC().on||gHave())return;
-    gAuth().then(()=>gSync()).catch(e=>{gerr=gMsg(e);gPaint();setTimeout(gArm,60000)})};
+  if(gArmed||gAsked||!GC().on)return;gArmed=true;gPaint();
+  const run=()=>{['pointerup','keydown'].forEach(t=>document.removeEventListener(t,run,true));gArmed=false;gAsked=true;if(!GC().on||gHave())return;
+    gAuth().then(()=>gSync()).catch(e=>{gerr=gMsg(e);gPaint()})};
   ['pointerup','keydown'].forEach(t=>document.addEventListener(t,run,true))}
 function gMsg(e){const m=String(e&&e.message||e),r=e&&e.reason;
   if(r==='accessNotConfigured'||/has not been used|disabled/i.test(m))return Lg("L'API Google Calendar n'est pas activée dans ton projet Google Cloud (voir GCAL-SETUP.md).","The Google Calendar API is not enabled in your Google Cloud project (see GCAL-SETUP.md).","واجهة Google Calendar غير مفعّلة في مشروعك على Google Cloud (راجع GCAL-SETUP.md).");
@@ -3274,7 +3274,7 @@ async function gf(path,opt={},n=0){
   if(r.status===204)return null;let j=null;try{j=await r.json()}catch(e){}
   if(r.ok)return j;
   const er=(j&&j.error)||{},reason=(er.errors&&er.errors[0]&&er.errors[0].reason)||er.status||'',e=Error(er.message||('HTTP '+r.status));e.status=r.status;e.reason=reason;
-  if(r.status===401){gtok=null;gexp=0;try{sessionStorage.removeItem('eduVault_gtok')}catch(x){}}
+  if(r.status===401){gtok=null;gexp=0;try{sessionStorage.removeItem('eduVault_gtok');localStorage.removeItem('eduVault_gtok')}catch(x){}}
   if((r.status===429||r.status>=500||(r.status===403&&/rate|quota/i.test(reason)))&&n<3){await new Promise(z=>setTimeout(z,500*Math.pow(2,n)+Math.random()*250));return gf(path,opt,n+1)}
   throw e}
 
@@ -3325,7 +3325,13 @@ function unlinkItem(k){const id=k.slice(2),it=(k[0]==='t'?A.tasks:A.timetable).f
 
 /* ---------- moteur de synchronisation ---------- */
 const calPath=()=>'calendars/'+enc(GC().calId)+'/events';
-async function gMakeCal(){const g=GC(),r=await gf('calendars',{method:'POST',body:{summary:'EduVault',description:Lg('Cours et échéances synchronisés par EduVault','Classes and deadlines synced by EduVault','الحصص والمواعيد المتزامنة من EduVault'),timeZone:TZ}});g.calId=r.id;g.map={}}
+async function gFindCals(){const out=[];let pt='';
+  do{const r=await gf('users/me/calendarList?maxResults=250&fields='+enc('nextPageToken,items(id,summary,accessRole)')+(pt?'&pageToken='+enc(pt):''));
+    (r.items||[]).forEach(c=>{if(c.summary==='EduVault'&&c.accessRole==='owner')out.push(c)});pt=r.nextPageToken||''}while(pt);
+  return out}
+async function gMakeCal(){const g=GC();
+  try{const f=await gFindCals();if(f.length){g.calId=f[0].id;g.map={};return}}catch(e){}
+  const r=await gf('calendars',{method:'POST',body:{summary:'EduVault',description:Lg('Cours et échéances synchronisés par EduVault','Classes and deadlines synced by EduVault','الحصص والمواعيد المتزامنة من EduVault'),timeZone:TZ}});g.calId=r.id;g.map={}}
 async function gList(){const out=[];let pt='';
   do{const r=await gf(calPath()+'?maxResults=2500&showDeleted=true&fields='+enc('nextPageToken,items(id,status,updated,summary,location,start,end,extendedProperties/private)')+(pt?'&pageToken='+enc(pt):''));out.push(...(r.items||[]));pt=r.nextPageToken||''}while(pt);
   return out}
@@ -3384,7 +3390,7 @@ Object.assign(act,{
       <label class="gcr">${Lg("Cours répétés jusqu'au","Classes repeat until","تتكرر الحصص حتى")} <input type="date" value="${esc(g.until||defUntil())}" onchange="act.gcSet('until',this.value)"></label>
       ${unl?`<p class="mu">⛓ ${unl} ${Lg("élément(s) supprimé(s) dans Google : ils ne sont plus synchronisés.","item(s) deleted in Google are no longer synced.","عناصر حُذفت في Google ولم تعد تتزامن.")} <button class="b" data-a="gcRelink">${Lg('Les resynchroniser','Sync them again','أعد مزامنتها')}</button></p>`:''}
       <div class="row"><button class="b p" data-a="gcNow">⟳ ${Lg('Synchroniser maintenant','Sync now','زامن الآن')}</button><button class="b" data-a="gcStop">${Lg('Arrêter la synchro','Stop syncing','إيقاف المزامنة')}</button></div>
-      <div class="row"><button class="b" style="color:var(--er)" data-a="gcWipe">🗑 ${Lg("Supprimer l'agenda EduVault de Google","Delete the EduVault calendar from Google","حذف تقويم EduVault من Google")}</button></div>`
+      <div class="row"><button class="b" data-a="gcDedupe">🧹 ${Lg('Supprimer les agendas EduVault en double','Remove duplicate EduVault calendars','حذف تقاويم EduVault المكررة')}</button><button class="b" style="color:var(--er)" data-a="gcWipe">🗑 ${Lg("Supprimer l'agenda EduVault de Google","Delete the EduVault calendar from Google","حذف تقويم EduVault من Google")}</button></div>`
     :`<p class="mu" style="margin:8px 0">${Lg("Connecte ton compte Google pour envoyer automatiquement tes cours (récurrents, semaines A/B, vacances) et tes examens/devoirs vers Google Agenda, avec rappels sur ton téléphone.","Connect your Google account to automatically send your classes (recurring, A/B weeks, holidays) and exams/homework to Google Calendar, with phone reminders.","اربط حسابك على Google لإرسال حصصك (متكررة، أسابيع A/B، العطل) وامتحاناتك وواجباتك تلقائيا إلى Google Calendar مع تذكيرات على هاتفك.")}</p>
       ${gerr?`<p class="bad">${esc(gerr)}</p>`:''}<div class="row"><button class="b p" data-a="gcConnect">${Lg('Connecter Google Agenda','Connect Google Calendar','ربط Google Calendar')}</button></div>`}
     <details style="margin-top:10px"><summary class="mu">${Lg('Ajout manuel (sans connexion)','Manual add (no sign-in)','إضافة يدوية (بدون ربط)')}</summary><div class="gcl">${l.length?l.map(t=>`<div class="rs" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="min-width:0"><b>${tIco(t)}${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))} · ${new Date(t.dueDate).toLocaleString(LOC())}</small></span><a class="b" href="${gUrl(t)}" target="_blank" rel="noopener">＋ Google</a></div>`).join(''):`<p class="mu e">${Lg('Aucune échéance à venir.','No upcoming deadlines.','لا توجد مواعيد قادمة.')}</p>`}</div><div class="row"><button class="b" data-a="exptask">⬇ .ics ${Lg('(échéances)','(deadlines)','(المواعيد)')}</button></div></details>
@@ -3394,6 +3400,15 @@ Object.assign(act,{
   gcNow:async()=>{if(!gHave()){try{await gAuth()}catch(e){gerr=gMsg(e);gPaint();return}}await gSync(true);act.gcal()},
   gcStop:()=>{GC().on=false;save();clearTimeout(gTimer);act.gcal();toast(Lg("Synchronisation arrêtée (les événements restent dans Google)","Sync stopped (events stay in Google)","تم إيقاف المزامنة (تبقى الأحداث في Google)"))},
   gcRelink:()=>{A.tasks.forEach(t=>delete t.gnosync);A.timetable.forEach(c=>delete c.gnosync);save();gSync(true).then(()=>act.gcal())},
+  gcDedupe:async()=>{
+    try{if(!gHave())await gAuth();const g=GC(),f=await gFindCals();
+      if(!g.calId&&f.length){g.calId=f[0].id;g.map={}}
+      const extra=f.filter(c=>c.id!==g.calId);
+      if(!extra.length){toast(Lg('Aucun doublon : un seul agenda EduVault ✔','No duplicates: a single EduVault calendar ✔','لا تكرار: تقويم EduVault واحد ✔'),'ok');save();return}
+      if(!confirm(Lg(`Supprimer ${extra.length} agenda(s) EduVault en double dans Google ? L'agenda utilisé par l'appli est conservé.`,`Delete ${extra.length} duplicate EduVault calendar(s) in Google? The one used by the app is kept.`,`حذف ${extra.length} تقويم(ات) EduVault مكررة في Google؟ يُحتفظ بالتقويم الذي يستخدمه التطبيق.`)))return;
+      let n=0;for(const c of extra){try{await gf('calendars/'+enc(c.id),{method:'DELETE'});n++}catch(e){if(e.status===404||e.status===410)n++}}
+      save();toast(Lg(`${n} agenda(s) en double supprimé(s) ✔`,`${n} duplicate calendar(s) removed ✔`,`تم حذف ${n} تقويم(ات) مكررة ✔`),'ok');gSync(true).then(()=>act.gcal())}
+    catch(e){toast(e&&e.status===403?Lg("Google n'autorise pas la liste des agendas : supprime les doublons à la main dans Google Agenda (Paramètres de l'agenda > Supprimer).","Google doesn't allow listing calendars: delete duplicates manually in Google Calendar (Calendar settings > Delete).","Google لا يسمح بعرض التقاويم: احذف المكررة يدويا من إعدادات التقويم."):gMsg(e),'er')}},
   gcWipe:async()=>{if(!confirm(Lg("Supprimer l'agenda « EduVault » et tous ses événements dans Google ? (tes données EduVault ne sont pas touchées)","Delete the “EduVault” calendar and all its events in Google? (your EduVault data is untouched)","حذف تقويم «EduVault» وكل أحداثه في Google؟ (بياناتك في EduVault لا تتأثر)")))return;
     const g=GC();try{if(!gHave())await gAuth();if(g.calId){try{await gf('calendars/'+enc(g.calId),{method:'DELETE'})}catch(e){if(e.status!==404&&e.status!==410){for(const k of Object.keys(g.map)){try{await gf(calPath()+'/'+enc(g.map[k].id),{method:'DELETE'})}catch(x){}}}}}
       g.calId='';g.map={};g.on=false;g.stats=null;A.tasks.forEach(t=>delete t.gnosync);A.timetable.forEach(c=>delete c.gnosync);save();act.gcal();toast(Lg('Agenda EduVault supprimé de Google','EduVault calendar removed from Google','تم حذف تقويم EduVault من Google'),'ok')}
