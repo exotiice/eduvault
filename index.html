@@ -1110,13 +1110,16 @@ const act={
   flip:(i,b)=>b.classList.toggle('fl'),
   addRes:i=>{const m=A.modules.find(x=>x.id===i);ask('Ajouter un document',[{k:'type',l:'Catégorie',t:'select',o:CATS},{k:'title',l:'Titre',r:1},{k:'src',l:'Où enregistrer ce fichier ?',t:'select',o:[['local','Sur cet appareil'+(UID?(dfOn()?' (+ copie dans mon Drive)':''):'')],['private','Sur cet appareil seulement (jamais envoyé)'],['drive','Dans mon Google Drive'],['url','Lien web']]},{k:'file',l:'Fichier',t:'file'},{k:'url',l:'Lien (si Lien web)',t:'url'}],async(v,fd)=>{
     try{const f=fd.get('file'),r={id:uid('r'),title:v.title.trim(),type:v.type};
-      if(v.src==='url'){if(!v.url)throw Error('Saisissez une URL');r.url=v.url;r.isLocal=false}
+      if(v.src!=='url'&&v.url&&!(f&&f.size))v.src='url';if(v.src==='url'){if(!v.url)throw Error('Saisissez une URL');r.url=v.url;r.isLocal=false}
       else{if(!f||!f.size)throw Error('Sélectionnez un fichier');r.fname=f.name;r.mime=f.type;r.size=f.size;
         if(v.src==='local'||v.src==='private'){r.localFileId=uid('f');r.isLocal=true;if(v.src==='private')r.skipSync=true;await fst('put',{id:r.localFileId,name:f.name,type:f.type,blob:f})}
         else{if(!tok){try{await drvAuth()}catch(e){throw Error('Connexion à Google Drive annulée ou impossible')}}const pl=dPlan(m,r),dest=await dPlace(pl.path),form=new FormData();form.append('metadata',new Blob([JSON.stringify({name:pl.name,mimeType:f.type,parents:[dest]})],{type:'application/json'}));form.append('file',f);
           const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+tok},body:form}),d=await res.json();
           if(!d.id)throw Error('Échec du téléversement Google Drive');r.url='https://drive.google.com/file/d/'+d.id+'/view';r.isLocal=false}}
-      (m.resources=m.resources||[]).push(r);upd();toast('Document enregistré','ok')}catch(e){toast(e.message,'er')}})},
+      (m.resources=m.resources||[]).push(r);upd();toast('Document enregistré','ok')}catch(e){toast(e.message,'er')}});
+    {const d=$('dlg'),ty=d.querySelector('[name=type]'),sr=d.querySelector('[name=src]'),ur=d.querySelector('[name=url]'),fl=d.querySelector('[name=file]');
+     if(ty&&sr){ty.addEventListener('change',()=>{if(ty.value==='lien')sr.value='url'});if(ty.value==='lien')sr.value='url'}
+     if(ur&&sr&&fl)ur.addEventListener('input',()=>{if(ur.value.trim()&&!(fl.files&&fl.files.length))sr.value='url'})}},
   delRes:i=>{const[mi,ri]=i.split('|'),m=A.modules.find(x=>x.id===mi),r=m?.resources.find(x=>x.id===ri);if(!r)return;if(r.isLocal)fst('delete',r.localFileId).catch(()=>{});if(r.driveId&&tok)dfetch(GAPI+'drive/v3/files/'+r.driveId,{method:'DELETE'}).catch(()=>{});m.resources=m.resources.filter(x=>x.id!==ri);upd()},
   openRes:async i=>{try{
     let r=await fst('get',i);
