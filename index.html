@@ -879,21 +879,35 @@ function load(o){
     if(m.grade!=null&&m.nex==null&&m.ncc==null&&m.ntp==null){m.nex=+m.grade;m.cex=1;m.ccc=0;m.ctp=0}
     delete m.grade;
   });
-  resBkRestore();
+  if(!A.del||typeof A.del!=='object'||Array.isArray(A.del))A.del={};
+  resBkRestore();snapIds();
   A.flashcards.forEach(f=>{f.efactor=f.efactor||2.5;f.interval=f.interval||0;f.repetition=f.repetition||0;f.nextRev=f.nextRev||Date.now()});
   if(!visSems().includes(A.activeSemester))A.activeSemester=curSem();
 }
 let svT=null;
 const RESBK=()=>'eduVault_resbk_'+(UID||'g');
+/* pierres tombales : id -> date de suppression. Sans elles, une fusion re-ajoutait les seances/devoirs/fiches supprimes */
+const DELK=['modules','tasks','flashcards','timetable','quizQs','projects'];
+let _ids=null;
+const idSets=()=>{const c={};DELK.forEach(k=>{c[k]=new Set((A[k]||[]).map(x=>x.id))});c.res=new Set(A.modules.flatMap(m=>(m.resources||[]).map(r=>r.id)));return c};
+function snapIds(){_ids=idSets()}
+function trackDel(){
+  const cur=idSets(),d=A.del||(A.del={}),now=Date.now();
+  if(_ids)Object.keys(cur).forEach(k=>{if(_ids[k])_ids[k].forEach(id=>{if(!cur[k].has(id))d[id]=now})});
+  Object.keys(cur).forEach(k=>cur[k].forEach(id=>{if(d[id])delete d[id]}));
+  _ids=cur;const lim=now-120*864e5;Object.keys(d).forEach(id=>{if(d[id]<lim)delete d[id]})}
+/* seances ENIAD supprimees a la main : l'application d'une nouvelle version du site ne doit pas les remettre */
+const enSkipKey=c=>[c.moduleId,c.day,c.startTime,c.endTime,c.week||'all'].join('|');
+function enSkipAdd(c){const e=A.settings.eniad&&typeof A.settings.eniad==='object'?A.settings.eniad:(A.settings.eniad={cls:'',hash:'',seen:''});e.skip=e.skip||[];const k=enSkipKey(c);if(!e.skip.includes(k))e.skip.push(k)}
 /* copie de secours LEGERE des listes de documents (m.resources) : survit a une synchro qui ecraserait les donnees */
 function resBkSave(){try{const m={};A.modules.forEach(x=>{if((x.resources||[]).length)m[x.id]=x.resources});localStorage.setItem(RESBK(),JSON.stringify(m))}catch(e){}}
-function resBkRestore(){try{const b=JSON.parse(localStorage.getItem(RESBK())||'null');if(!b)return;A.modules.forEach(m=>{const l=b[m.id];if(!Array.isArray(l))return;m.resources=m.resources||[];const have=new Set(m.resources.map(r=>r.id));l.forEach(r=>{if(r&&r.id&&!have.has(r.id))m.resources.push(r)})})}catch(e){}}
+function resBkRestore(){try{const b=JSON.parse(localStorage.getItem(RESBK())||'null');if(!b)return;A.modules.forEach(m=>{const l=b[m.id];if(!Array.isArray(l))return;m.resources=m.resources||[];const have=new Set(m.resources.map(r=>r.id));l.forEach(r=>{if(r&&r.id&&!have.has(r.id)&&!(A.del&&A.del[r.id]))m.resources.push(r)})})}catch(e){}}
 function flushSave(){clearTimeout(svT);svT=null;
   /* un autre onglet / la PWA a ecrit des donnees plus recentes : on les fusionne au lieu de les ecraser */
   try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(o&&Array.isArray(o.modules)&&(o.updatedAt||0)>(A.updatedAt||0)){mergeIn(o);A.updatedAt=Date.now()}}}catch(e){}
   try{localStorage.setItem(KEY,JSON.stringify(A));resBkSave()}
   catch(e){resBkSave();toast('Stockage plein : supprime des photos de notes, sinon tes derniers ajouts risquent d etre perdus','er')}}
-function save(){A.updatedAt=Date.now();clearTimeout(svT);svT=setTimeout(flushSave,300);drvSchedule();if(UID)fbSchedule()}
+function save(){trackDel();A.updatedAt=Date.now();clearTimeout(svT);svT=setTimeout(flushSave,300);drvSchedule();if(UID)fbSchedule()}
 addEventListener('storage',e=>{if(e.key!==KEY||!e.newValue)return;try{const o=JSON.parse(e.newValue);if(o&&Array.isArray(o.modules)&&(o.updatedAt||0)>(A.updatedAt||0)){mergeIn(o);A.updatedAt=Math.max(A.updatedAt||0,+o.updatedAt||0);render()}}catch(_){}});
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 addEventListener('pagehide',flushSave);document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSave()});
@@ -1517,14 +1531,16 @@ function applyRemote(o,ts,f){load(o);A.updatedAt=ts;try{localStorage.setItem(KEY
   if(A.settings.level&&$('dlg').open&&$('dlg').querySelector('[data-a=lvl]'))$('dlg').close();
   render();toast('Données restaurées depuis Drive ✔','ok')}
 function mergeIn(o){
-  (o.modules||[]).forEach(rm=>{const lm=A.modules.find(x=>x.id===rm.id);if(!lm)return;lm.resources=lm.resources||[];const h=new Set(lm.resources.map(r=>r.id));(rm.resources||[]).forEach(r=>{if(r&&r.id&&!h.has(r.id))lm.resources.push(r)})});
-  ['modules','tasks','flashcards','timetable','quizQs','projects'].forEach(k=>{const have=new Set(A[k].map(x=>x.id));(o[k]||[]).forEach(x=>{if(!have.has(x.id))A[k].push(x)})});
+  const del=A.del||(A.del={});Object.entries(o.del||{}).forEach(([id,t])=>{if(!del[id]||t>del[id])del[id]=t});
+  (o.modules||[]).forEach(rm=>{const lm=A.modules.find(x=>x.id===rm.id);if(!lm)return;lm.resources=lm.resources||[];const h=new Set(lm.resources.map(r=>r.id));(rm.resources||[]).forEach(r=>{if(r&&r.id&&!h.has(r.id)&&!del[r.id])lm.resources.push(r)})});
+  ['modules','tasks','flashcards','timetable','quizQs','projects'].forEach(k=>{const have=new Set(A[k].map(x=>x.id));(o[k]||[]).forEach(x=>{if(!have.has(x.id)&&!del[x.id])A[k].push(x)})});
   const nk=new Set(A.notes.map(n=>n.classId));(o.notes||[]).forEach(n=>{if(!nk.has(n.classId))A.notes.push(n)});
   A.settings.holidays=[...new Set([...A.settings.holidays,...((o.settings&&o.settings.holidays)||[])])];
   A.quizHist=[...A.quizHist,...(o.quizHist||[]).filter(h=>!A.quizHist.some(x=>x.d===h.d))].sort((a,b)=>a.d-b.d).slice(-60);
   A.xp=Math.max(A.xp||0,+o.xp||0);Object.entries(o.tot||{}).forEach(([k,n])=>{A.tot[k]=Math.max(A.tot[k]||0,+n||0)});
   Object.entries(o.act||{}).forEach(([d,v])=>{const a=A.act[d]=A.act[d]||{};Object.entries(v||{}).forEach(([k,n])=>{if(k==='x'){a.x=a.x||{};Object.entries(n||{}).forEach(([mid,u])=>{a.x[mid]=Math.max(a.x[mid]||0,+u||0)});return}a[k]=Math.max(a[k]||0,+n||0)})});
-  Object.entries(o.memos||{}).forEach(([mid,l])=>{const cur=A.memos[mid]=A.memos[mid]||[];(l||[]).forEach(e=>{if(e&&e.id&&!cur.some(x=>x.id===e.id))cur.push(e)})});A.avgH=Object.assign({},o.avgH||{},A.avgH)}
+  Object.entries(o.memos||{}).forEach(([mid,l])=>{const cur=A.memos[mid]=A.memos[mid]||[];(l||[]).forEach(e=>{if(e&&e.id&&!cur.some(x=>x.id===e.id))cur.push(e)})});A.avgH=Object.assign({},o.avgH||{},A.avgH);
+  DELK.forEach(k=>{A[k]=A[k].filter(x=>!del[x.id])});A.modules.forEach(m=>{m.resources=(m.resources||[]).filter(r=>!del[r.id])})}
 function mergeRemote(o){mergeIn(o);A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A));resBkSave()}catch(e){}render()}
 
 /* rangement dans Drive : EduVault / Semestre / Module / Catégorie / Titre.ext  (dossiers créés automatiquement) */
@@ -2215,7 +2231,7 @@ Object.assign(act,{
     setTimeout(()=>{if(!undone)(m.resources||[]).forEach(r=>r.isLocal&&fst('delete',r.localFileId).catch(()=>{}))},6000)},
   delTask:i=>{if(!A.tasks.some(x=>x.id===i))return;delUndo(['tasks'],Lg('Échéance supprimée','Deadline deleted','تم حذف الموعد'),()=>{A.tasks=A.tasks.filter(x=>x.id!==i)})},
   delFc:i=>{if(!A.flashcards.some(x=>x.id===i))return;delUndo(['flashcards'],Lg('Fiche supprimée','Card deleted','تم حذف البطاقة'),()=>{A.flashcards=A.flashcards.filter(x=>x.id!==i)})},
-  delCls:i=>{if(!A.timetable.some(x=>x.id===i))return;$('dlg').open&&$('dlg').close();delUndo(['timetable','notes'],Lg('Séance supprimée','Session deleted','تم حذف الحصة'),()=>{A.timetable=A.timetable.filter(x=>x.id!==i);A.notes=A.notes.filter(x=>x.classId!==i)})}
+  delCls:i=>{if(!A.timetable.some(x=>x.id===i))return;$('dlg').open&&$('dlg').close();delUndo(['timetable','notes'],Lg('Séance supprimée','Session deleted','تم حذف الحصة'),()=>{const _c=A.timetable.find(x=>x.id===i);if(_c&&_c.en)enSkipAdd(_c);A.timetable=A.timetable.filter(x=>x.id!==i);A.notes=A.notes.filter(x=>x.classId!==i)})}
 });
 
 /* ---------- Simulateur de notes ---------- */
@@ -3975,11 +3991,13 @@ function enMap(cls){
    <div class="row"><button class="b" data-a="eniad">‹</button><button class="b p" data-a="enDo">${Lg('Appliquer','Apply','تطبيق')}</button></div>`)}
 function enRun(cls,pick){
   const t=EN.feed.tables[cls],names=[...new Set(t.sessions.map(x=>x.m))],sem=A.activeSemester,map={};
+  {const cf=cfg(),cur=new Set(A.timetable.filter(c=>c.en===cls).map(enSkipKey));if(cf.cls&&cf.cls!==cls)cf.skip=[];cf.skip=(cf.skip||[]).filter(k=>!cur.has(k))}
   A.timetable=A.timetable.filter(c=>c.en!==cls);
   names.forEach((nm,i)=>{let id=pick(nm,i);const pf=(t.sessions.find(x=>x.m===nm&&x.p&&!/affecter/i.test(x.p))||{}).p||'';
     if(id==='new'||!A.modules.some(x=>x.id===id)){const m={id:uid('m'),semester:sem,name:nm.slice(0,120),prof:pf,coeff:1,color:nextModColor(),ccc:0,ctp:0,cex:1,ncc:null,ntp:null,nex:null,absences:0,pomo:0,resources:[]};A.modules.push(m);id=m.id}
     else{const m=A.modules.find(x=>x.id===id);if(m&&!m.prof&&pf)m.prof=pf}map[nm]=id});
   let n=0;t.sessions.forEach(x=>{const day=DAYS.find(d=>norm(d)===norm(x.d));if(!day||!map[x.m])return;
+    if((cfg().skip||[]).includes([map[x.m],day,x.s,x.e,x.w||'all'].join('|')))return;
     const dup=A.timetable.find(c=>!c.date&&c.moduleId===map[x.m]&&c.day===day&&c.startTime===x.s&&c.endTime===x.e);
     if(dup){dup.room=x.r||dup.room;dup.week=x.w||'all';dup.en=cls;n++;return}
     A.timetable.push({id:uid('c'),moduleId:map[x.m],day,week:x.w||'all',startTime:x.s,endTime:x.e,room:x.r||'—',en:cls});n++});
