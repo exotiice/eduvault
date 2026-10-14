@@ -4026,7 +4026,7 @@ setTimeout(()=>{const lim=iso(new Date(Date.now()-30*864e5)),n=A.timetable.lengt
     }
     /* raccourcis */
     const sc=(a,i,t)=>`<button class="b" data-a="${a}"${i?` data-i="${i}"`:''}>${t}</button>`;
-    out+=`<div class="c"><h4>⚡ ${Lg('Raccourcis','Shortcuts','اختصارات')}</h4><div class="row" style="justify-content:center;flex-wrap:wrap">${sc('addTask','','➕ '+Lg('Échéance','Deadline','موعد'))}${sc('addFc','','🃏 '+Lg('Fiche','Card','بطاقة'))}${sc('go','po','⏱ Focus')}${sc('go','qz','🧠 Quiz')}${sc('go','mo','📚 '+Lg('Cours','Subjects','المواد'))}${sc('go','ag','📅 Agenda')}</div></div>`;
+    out+=`<div class="c"><h4>⚡ ${Lg('Raccourcis','Shortcuts','اختصارات')}</h4><div class="qk">${sc('addTask','','➕ '+Lg('Échéance','Deadline','موعد'))}${sc('addFc','','🃏 '+Lg('Fiche','Card','بطاقة'))}${sc('go','po','⏱ Focus')}${sc('go','qz','🧠 Quiz')}${sc('go','mo','📚 '+Lg('Cours','Subjects','المواد'))}${sc('go','ag','📅 Agenda')}</div></div>`;
     /* demain */
     out+=`<div class="c"><h4>📆 ${Lg('Demain','Tomorrow','غدا')}${tom.length?' · '+tom.length+' '+Lg('cours','classes','حصص')+' · '+esc(tom[0].startTime)+' → '+esc(tom[tom.length-1].endTime):''}</h4>${tom.slice(0,4).map(c=>row(c,esc(c.startTime)+' – '+esc(c.endTime))).join('')||`<p class="mu e">${isHol(iso(tmr))?'🌴 '+Lg('Vacances demain','Holiday tomorrow','عطلة غدا'):Lg('Aucun cours demain 🎉','No classes tomorrow 🎉','لا حصص غدا 🎉')}</p>`}${tom.length>4?`<p class="mu e">+${tom.length-4}</p>`:''}</div>`;
     return out;
@@ -4069,6 +4069,31 @@ setTimeout(()=>{const lim=iso(new Date(Date.now()-30*864e5)),n=A.timetable.lengt
 .ckf{color:var(--mu);font-size:12px;text-align:center;padding:8px 0 2px}
 .ckh-row{display:flex;justify-content:space-between;gap:10px;padding:7px 4px;border-bottom:1px solid var(--ln)}
 .ckh-row kbd{background:var(--bs);border:1px solid var(--ln);border-radius:6px;padding:1px 7px;font:inherit;font-weight:700}
+/* ===== mise en page mobile : en-tete sur 2 lignes, barre du bas qui tient en entier ===== */
+@media (max-width:560px){
+  header{flex-wrap:wrap;row-gap:8px;padding:8px 12px 10px}
+  header h1{flex:1 1 auto;min-width:0;white-space:nowrap}
+  header>div:last-child{flex:0 0 auto}
+  header .b{padding:7px 11px;min-width:40px}
+  .s-bar{order:3;flex:1 1 100%;margin:0}
+  .s-bar input{padding:9px 14px;font-size:15px}
+  nav{overflow:hidden;gap:0;padding-left:4px;padding-right:4px}
+  nav button{flex:1 1 0;min-width:0;padding:8px 0;font-size:0;gap:0;border-radius:14px;transition:flex-grow .2s,background .2s}
+  nav button span{font-size:20px}
+  nav button.on{flex:2.2 1 0;font-size:11px;gap:2px}
+}
+/* ===== finitions communes ===== */
+/* texte lisible sur les couleurs claires du mode sombre */
+html.dark[data-th=ocean],html.dark[data-th=teal],html.dark[data-th=indigo],html.dark[data-th=forest],html.dark[data-th=sepia],html.dark[data-th=lavender],html.dark[data-th=sunset],html.dark[data-th=amoled],html.dark[data-th=amber],html.dark[data-th=emerald],html.dark[data-th=violet],html.dark[data-th=rose],html.dark[data-th=slate]{--on:#0b1220}
+.p,.b.p,.b.p:hover,.sbadge b,.pbtn,.seg button.on,.msg.me .bub,.av,#fab,h1 .ic{color:var(--on,#fff)!important}
+.qk{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}
+.qk .b{display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:8px 6px;text-align:center;border:1px solid var(--ln);background:var(--card)}
+.c>.cl:last-child{margin-bottom:0}
+main{max-width:1100px;margin-inline:auto}
+.pav.pavbtn:not(.pavx){width:56px;height:56px;display:grid;place-items:center;border-radius:var(--rs,20px);background:var(--in);border:1px solid var(--ln);color:var(--br);font:800 24px system-ui,sans-serif;text-transform:uppercase}
+button:focus-visible,[data-a]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--br);outline-offset:2px}
+.c{transition:box-shadow .2s,border-color .2s}
+@media (hover:hover){.c:hover{border-color:color-mix(in srgb,var(--br) 35%,var(--ln))}.cl:hover{filter:brightness(.98)}}
 </style>
 <button id="fab" class="off" aria-label="Actions rapides" aria-expanded="false">+</button>
 <div id="fabm" role="menu"></div>
@@ -4145,6 +4170,7 @@ setTimeout(()=>{const lim=iso(new Date(Date.now()-30*864e5)),n=A.timetable.lengt
   $$('ckh').addEventListener('click',closeHelp);
 
   /* ---- bouton + ---- */
+  document.querySelectorAll('#nav [data-t]').forEach(b=>{if(!b.title)b.title=(b.textContent||'').trim()});
   const fab=$$('fab'),fm=$$('fabm');
   function fabItems(){return [
     ['➕ '+Lg('Échéance','Deadline','موعد'),()=>act.addTask()],['🃏 '+Lg('Fiche','Card','بطاقة'),()=>act.addFc()],
