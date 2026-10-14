@@ -686,7 +686,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const LV={CP1:['S1','S2'],CP2:['S3','S4'],CI1:['S5','S6'],CI2:['S7','S8'],CI3:['S9','S10']};
 const ALLS=Object.values(LV).flat();
 const DAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-const CATS=[['cours','📚 Cours'],['td','📝 TD / TP'],['examen','🎯 Examens'],['resume','⚡ Résumés']];
+const CATS=[['cours','📚 Cours'],['td','📝 TD / TP'],['examen','🎯 Examens'],['resume','⚡ Résumés'],['lien','🔗 Liens']];
 /* icône + libellé selon le format du fichier (emoji distincts de ceux remplacés par des SVG) */
 const FK=[['img',/^(jpe?g|png|gif|webp|heic|heif|bmp|svg|avif|tiff?)$/,'🖼️','Image'],['pdf',/^pdf$/,'📕','PDF'],['doc',/^(docx?|odt|rtf|pages)$/,'📘','Word'],['xls',/^(xlsx?|ods|csv|tsv|numbers)$/,'📗','Excel'],['ppt',/^(pptx?|odp|key)$/,'📙','Slides'],['txt',/^(txt|md|markdown|tex|log)$/,'🗒️','Texte'],
  ['code',/^(c|h|cpp|hpp|cc|ino|py|ipynb|js|ts|java|html|css|json|xml|php|sql|m|v|vhd|vhdl|asm|sh|rs|go|kt|yaml|yml)$/,'💻','Code'],['zip',/^(zip|rar|7z|tar|gz|tgz|bz2)$/,'🗜️','Archive'],['vid',/^(mp4|mov|mkv|webm|avi|m4v)$/,'🎬','Vidéo'],['aud',/^(mp3|wav|m4a|ogg|flac|aac|opus)$/,'🎵','Audio'],
@@ -1046,7 +1046,7 @@ function mgrid(){
     ${passedByRat?`<span class="badge-ok">✅ ${tr('Admis après rattrapage')}</span>`:''}
     ${a0!=null&&a0<10?`<div class="rat"><span>📘 ${tr('Rattrapage')}</span><input type="number" min="0" max="20" step="0.25" placeholder="-" value="${m.nrat!=null?m.nrat:''}" onchange="act.sRat('${m.id}',this.value)"><small class="mu">/20</small></div>`:''}
     <div class="n3">${inp('ncc','ccc','CC')}${inp('ntp','ctp','TP')}${inp('nex','cex','Examen')}</div>`+
-    CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>resRow(m,x)).join('')}</div>`}).join('')+'</div>'
+    CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>resRow(m,x)).join('')}</div>`}).join('')+(()=>{const o=(m.resources||[]).filter(x=>!CATS.some(c=>c[0]===x.type));return o.length?`<div class="rs"><small class="mu"><b>📁 Autres (${o.length})</b></small>${o.map(x=>resRow(m,x)).join('')}</div>`:''})()+'</div>'
   }).join(''):(q?`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`:emptyBox('📚',Lg('Aucun module en '+A.activeSemester,'No module in '+A.activeSemester,'لا توجد مواد في '+A.activeSemester),Lg('Ajoute tes matières pour suivre tes notes, tes cours et tes fiches.','Add your subjects to track grades, courses and cards.','أضف موادك لتتبع النقط والدروس والبطاقات.'),[['+ '+Lg('Ajouter un module','Add a module','إضافة مادة'),'addMod',1]]));
 }
 function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="recolor" title="${tr('🎨 Varier les couleurs')}">🎨</button><button class="b" data-a="memo" title="${Lg('Aide-mémoire','Cheat sheet','ملخص سريع')}">📌</button><button class="b" data-a="sim" title="${Lg('Simulateur de notes','Grade simulator','محاكي النقط')}">🎯</button><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
@@ -1545,7 +1545,7 @@ function mergeRemote(o){mergeIn(o);A.updatedAt=Date.now();try{localStorage.setIt
 
 /* rangement dans Drive : EduVault / Semestre / Module / Catégorie / Titre.ext  (dossiers créés automatiquement) */
 const DRVF={};
-const DCAT={cours:'Cours',td:'TD - TP',examen:'Examens',resume:'Résumés'};
+const DCAT={cours:'Cours',td:'TD - TP',examen:'Examens',resume:'Résumés',lien:'Liens'};
 const dSan=x=>String(x||'').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'-').replace(/\s+/g,' ').trim().slice(0,100)||'Sans nom';
 const dQ=x=>String(x).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 const dExt=x=>(/\.[A-Za-z0-9]{1,8}$/.exec(String(x||''))||[''])[0];
