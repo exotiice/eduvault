@@ -1266,7 +1266,7 @@ Object.assign(act,{
       if(!key)return toast("Configurez d'abord l'IA : bouton ✨ IA dans Horaires",'er');
       toast('Génération du quiz...');
       try{
-        const raw=(await aiCall(prov,key,aiModel(prov),[],'Crée '+v.n+' questions QCM en français à partir de ce cours. Réponds STRICTEMENT avec un tableau JSON valide, sans markdown : [{"q":"Question","opts":["A","B","C","D"],"ans":0,"exp":"Courte explication"}] où ans est l\'index (0 à 3) de la bonne proposition et opts contient exactement 4 propositions plausibles.\n\nCours :\n'+v.txt.slice(0,12000))).replace(/<think>[\s\S]*?<\/think>/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
+        const raw=(await aiCallFO(prov,key,aiModel(prov),[],'Crée '+v.n+' questions QCM en français à partir de ce cours. Réponds STRICTEMENT avec un tableau JSON valide, sans markdown : [{"q":"Question","opts":["A","B","C","D"],"ans":0,"exp":"Courte explication"}] où ans est l\'index (0 à 3) de la bonne proposition et opts contient exactement 4 propositions plausibles.\n\nCours :\n'+v.txt.slice(0,12000))).replace(/<think>[\s\S]*?<\/think>/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
         if(a<0||b<a)throw Error('réponse sans JSON valide');
         const qs=JSON.parse(raw.slice(a,b+1)).filter(x=>x&&x.q&&Array.isArray(x.opts)&&x.opts.length===4&&Number.isInteger(+x.ans)&&+x.ans>=0&&+x.ans<4);
         if(!qs.length)throw Error('aucune question valide');
@@ -1303,7 +1303,7 @@ Object.assign(act,{
     if(!txt||!txt.trim())return;
     toast('Génération des fiches...');
     try{
-      const raw=(await aiCall(prov,key,aiModel(prov),[],'Génère 5 à 8 flashcards question/réponse en français à partir de ce cours. Réponds STRICTEMENT avec un tableau JSON valide, sans markdown : [{"q":"Question","a":"Réponse"}].\n\nCours :\n'+txt.slice(0,12000))).replace(/<think>[\s\S]*?<\/think>/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
+      const raw=(await aiCallFO(prov,key,aiModel(prov),[],'Génère 5 à 8 flashcards question/réponse en français à partir de ce cours. Réponds STRICTEMENT avec un tableau JSON valide, sans markdown : [{"q":"Question","a":"Réponse"}].\n\nCours :\n'+txt.slice(0,12000))).replace(/<think>[\s\S]*?<\/think>/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
       if(a<0||b<a)throw Error("réponse sans JSON valide");
       const cards=JSON.parse(raw.slice(a,b+1)).filter(c=>c.q&&c.a);
       if(!cards.length)throw Error('aucune fiche générée');
@@ -1333,7 +1333,7 @@ Object.assign(act,{
       ?'Résume ce cours en français, sous forme de points clés (bullet points courts), pour une révision rapide avant un examen. Pas de markdown, juste des lignes commençant par "- ". Texte :\n'+txt.slice(0,16000)
       :"Explique ce concept de façon simple et claire en français, comme à un débutant complet qui découvre juste la matière. Utilise un exemple concret si possible. Reste concis (200 mots max). Pas de markdown. Concept :\n"+txt.slice(0,8000);
     try{
-      const raw=(await aiCall(prov,key,aiModel(prov),[],prompt)).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```/g,'').trim();
+      const raw=(await aiCallFO(prov,key,aiModel(prov),[],prompt)).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```/g,'').trim();
       if(!raw)throw Error('réponse vide');
       AIOUT=raw;const d=$('dlg');d.innerHTML=`<h3>${kind==='sum'?'🧾 '+tr('Résumer'):'💬 '+tr('Explique-moi')} · ${esc(modName(id))}</h3><div class="sheet">${esc(raw)}</div><div class="row"><button class="b" data-a="copyAI">📋 Copier</button><button class="b p" onclick="$('dlg').close()">${tr('Fermer')}</button></div>`;d.oncancel=null;d.showModal();
     }catch(e){toast(e instanceof TypeError?'Connexion impossible (internet, Brave Shields, VPN)':'Erreur IA : '+e.message,'er')}},
@@ -1428,10 +1428,10 @@ const normDay=s=>{const x=String(s||'').normalize('NFD').replace(/[\u0300-\u036f
 const AI_PROMPT='Extrais l\'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"jour":"LUNDI","debut":"08:30","fin":"10:30","matiere":"Nom du module","salle":"Amphi A"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI).';
 async function postJSON(url,headers,body){
   let r,j;
-  for(let t=1;t<=5;t++){
+  const MX=postJSON.max||5;for(let t=1;t<=MX;t++){
     r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify(body)});
     j=await r.json().catch(()=>({}));
-    if(r.ok||![429,500,503,504].includes(r.status)||t===5)break;
+    if(r.ok||![429,500,503,504].includes(r.status)||t===MX)break;
     toast('IA occupée, nouvelle tentative '+t+'/4...');await new Promise(z=>setTimeout(z,t*3000));
   }
   return{ok:r.ok,status:r.status,j};
@@ -1449,12 +1449,12 @@ async function aiCall(prov,key,model,imgs,prompt=AI_PROMPT){
       for(const m of alt){r=await call(m);if(r.ok){localStorage.setItem('eduVault_aiModel_groq',m);toast('Modèle utilisé : '+m,'ok');break}}
       if(!r.ok)throw Error((r.j.error?.message||'Erreur Groq')+(ids.length?' | Modèles disponibles : '+ids.slice(0,12).join(', '):''));
     }
-    if(!r.ok)throw Error(r.j.error?.message||'Erreur Groq HTTP '+r.status);
+    if(!r.ok)throw Object.assign(Error(r.j.error?.message||'Erreur Groq HTTP '+r.status),{status:r.status});
     return r.j.choices?.[0]?.message?.content||'';
   }
   const r=await postJSON(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,{},
     {contents:[{parts:[{text:prompt},...imgs.map(i=>({inline_data:{mime_type:'image/jpeg',data:i.split(',')[1]}}))]}],generationConfig:{temperature:.1}});
-  if(!r.ok)throw Error(r.j.error?.message||'Erreur Gemini HTTP '+r.status);
+  if(!r.ok)throw Object.assign(Error(r.j.error?.message||'Erreur Gemini HTTP '+r.status),{status:r.status});
   return(r.j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
 }
 const hm=t=>{const m=String(t||'').match(/(\d{1,2})\s*[:hH]\s*(\d{2})/);return m?m[1].padStart(2,'0')+':'+m[2]:null};
@@ -1464,7 +1464,7 @@ async function aiImport(v,fd){
   localStorage.setItem('eduVault_aiProv',prov);localStorage.setItem('eduVault_aiKey_'+prov,key);localStorage.setItem('eduVault_aiModel_'+prov,model);
   toast('Analyse en cours ('+AI[prov].n+')...');
   try{
-    const raw=(await aiCall(prov,key,model,await toImages(f))).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```(?:json)?/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
+    const raw=(await aiCallFO(prov,key,model,await toImages(f))).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```(?:json)?/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
     if(a<0||b<a)throw Error("L'IA n'a pas renvoyé de JSON valide.");
     const ss=JSON.parse(raw.slice(a,b+1)).map(s=>({...s,debut:hm(s.debut),fin:hm(s.fin)})).filter(s=>s.matiere&&s.debut&&s.fin&&s.fin>s.debut&&normDay(s.jour));
     if(!ss.length)throw Error('Aucun cours trouvé dans ce document.');
@@ -2298,10 +2298,10 @@ async function pdfcRun(v,fd){
       const body=imgs?'':'\n\nCours :\n'+parts[pi];
       toast(Lg('IA : partie '+(pi+1)+'/'+parts.length+'…','AI: part '+(pi+1)+'/'+parts.length+'…','الذكاء الاصطناعي: الجزء '+(pi+1)+'/'+parts.length));
       if(v.what!=='quiz'){
-        const cs=jsonArr(await aiCall(prov,key,model,imgs||[],'Crée '+per+' fiches de révision en français à partir de ce cours : question courte, réponse concise. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"q":"Question","a":"Réponse"}].'+body));
+        const cs=jsonArr(await aiCallFO(prov,key,model,imgs||[],'Crée '+per+' fiches de révision en français à partir de ce cours : question courte, réponse concise. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"q":"Question","a":"Réponse"}].'+body));
         cs.forEach(c=>{const q=String(c&&c.q||'').trim(),a=String(c&&c.a||'').trim();if(q&&a&&!A.flashcards.some(x=>x.moduleId===v.moduleId&&x.q===q)){A.flashcards.push(newCard({moduleId:v.moduleId,q:q.slice(0,1000),a:a.slice(0,2000)}));nc++}})}
       if(v.what!=='cards'){
-        const qs=jsonArr(await aiCall(prov,key,model,imgs||[],'Crée '+per+' questions QCM en français à partir de ce cours. Réponds STRICTEMENT avec un tableau JSON valide, sans markdown : [{"q":"Question","opts":["A","B","C","D"],"ans":0,"exp":"Courte explication"}] où ans est l\'index (0 à 3) de la bonne proposition et opts contient exactement 4 propositions plausibles.'+body));
+        const qs=jsonArr(await aiCallFO(prov,key,model,imgs||[],'Crée '+per+' questions QCM en français à partir de ce cours. Réponds STRICTEMENT avec un tableau JSON valide, sans markdown : [{"q":"Question","opts":["A","B","C","D"],"ans":0,"exp":"Courte explication"}] où ans est l\'index (0 à 3) de la bonne proposition et opts contient exactement 4 propositions plausibles.'+body));
         qs.filter(x=>x&&x.q&&Array.isArray(x.opts)&&x.opts.length===4&&Number.isInteger(+x.ans)&&+x.ans>=0&&+x.ans<4&&!A.quizQs.some(z=>z.moduleId===v.moduleId&&z.q===String(x.q))).forEach(x=>{A.quizQs.push({id:uid('q'),moduleId:v.moduleId,q:String(x.q),opts:x.opts.map(String),ans:+x.ans,exp:String(x.exp||'')});nq++})}
       upd()}
     toast(Lg(nc+' fiches et '+nq+' questions ajoutées',nc+' cards and '+nq+' questions added','أضيفت '+nc+' بطاقة و '+nq+' سؤال'),'ok')
@@ -2771,7 +2771,7 @@ async function photoRun(v,fd){
   const prov=localStorage.getItem('eduVault_aiProv')||'gemini',key=aiKey(prov);
   if(!key)return toast(Lg("Configure d'abord l'IA : bouton ✨ IA dans Horaires","Set up the AI first: ✨ AI button in Timetable",'اضبط الذكاء الاصطناعي أولا'),'er');
   try{toast(Lg('Lecture de la photo…','Reading the photo…','جاري قراءة الصورة…'));const imgs=[];for(const f of files)imgs.push(...await toImages(f));
-    const raw=await aiCall(prov,key,aiModel(prov),imgs,'Ces photos montrent un tableau ou un cahier de cours. Transcris le contenu en notes structurées en français (titres, formules, définitions, exemples) puis crée jusqu\'à 8 fiches de révision (question courte, réponse concise). Réponds STRICTEMENT avec un objet JSON valide sans markdown : {"notes":"texte des notes avec retours à la ligne","cards":[{"q":"Question","a":"Réponse"}]}');
+    const raw=await aiCallFO(prov,key,aiModel(prov),imgs,'Ces photos montrent un tableau ou un cahier de cours. Transcris le contenu en notes structurées en français (titres, formules, définitions, exemples) puis crée jusqu\'à 8 fiches de révision (question courte, réponse concise). Réponds STRICTEMENT avec un objet JSON valide sans markdown : {"notes":"texte des notes avec retours à la ligne","cards":[{"q":"Question","a":"Réponse"}]}');
     const a=raw.replace(/<think>[\s\S]*?<\/think>/g,'').indexOf('{'),r2=raw.replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```(?:json)?/g,''),i0=r2.indexOf('{'),i1=r2.lastIndexOf('}');if(i0<0||i1<i0)throw Error(Lg("l'IA n'a pas renvoyé de JSON valide","the AI did not return valid JSON",'لم يُرجع الذكاء الاصطناعي JSON صالحا'));
     const o=JSON.parse(r2.slice(i0,i1+1));let nc=0,nn=0;
     if(v.what!=='cards'&&String(o.notes||'').trim()){(A.memos[v.moduleId]=A.memos[v.moduleId]||[]).push({id:uid('e'),k:'note',t:'📷 '+new Date().toLocaleDateString(LOC()),b:String(o.notes).slice(0,6000)});nn=1}
@@ -3090,7 +3090,7 @@ async function botSend(root){
   const hist=BOT.msgs.slice(-9,-1).map(m=>(m.r==='u'?'Étudiant : ':'Assistant : ')+m.t.slice(0,1500)).join('\n');
   const prompt=`Tu es un assistant de révision pour un étudiant (électronique, électricité, informatique, robotique, systèmes embarqués). Réponds de façon claire et concise, dans la langue de la dernière question. Pour le code, utilise des blocs \`\`\`langage. Pour les formules, utilise LaTeX avec $...$ (en ligne) ou $$...$$ (bloc).${ctx}\nConversation :\n${hist}\nÉtudiant : ${t}\nAssistant :`;
   BOT.busy=true;paintBot();
-  try{const out=await aiCall(prov,key,aiModel(prov),[],prompt);BOT.msgs.push({r:'a',t:(out||'').trim()||'…'})}
+  try{const out=await aiCallFO(prov,key,aiModel(prov),[],prompt);BOT.msgs.push({r:'a',t:(out||'').trim()||'…'})}
   catch(e){BOT.msgs.push({r:'a',t:'⚠️ '+(e&&e.message||'Erreur')})}
   BOT.busy=false;BOT.msgs=BOT.msgs.slice(-30);paintBot()}
 document.addEventListener('submit',e=>{const f=e.target.closest&&e.target.closest('.botf');if(!f)return;e.preventDefault();botSend(f.closest('.botp'))});
@@ -4614,6 +4614,30 @@ const end=e=>{if(!g)return;const s=g;g=null;clearTimeout(s.tm);if(!s.on)return;g
   [m.resources[i],m.resources[j]]=[m.resources[j],m.resources[i]];vib(12);upd();toast(L('Ressources échangées','Swapped','تم التبديل'),'ok')};
 document.addEventListener('pointerup',end);document.addEventListener('pointercancel',()=>end());
 document.addEventListener('click',e=>{if(Date.now()-gt<450&&e.target.closest&&e.target.closest('.fr')){e.stopImmediatePropagation();e.preventDefault()}},true);
+})();
+</script>
+<script id="ux-failover-js">
+/* API Fallback : essaie le fournisseur choisi, puis les autres dont la clé est enregistrée. */
+(function(){'use strict';
+const COOL={};/* fournisseur -> timestamp jusqu'auquel on évite de l'utiliser (après un 429) */
+const limited=e=>(e&&e.status)===429||/rate.?limit|quota|exhausted|too many/i.test(String(e&&e.message||''));
+const failable=e=>{const s=e&&e.status,m=String(e&&e.message||'');return e instanceof TypeError||[408,401,403].includes(s)||s>=500||limited(e)||/overload|capacity|unavailable|model|image|vision|support/i.test(m)};
+window.aiCallFO=async function(prov,key,model,imgs,prompt){
+  const chain=[{p:prov,k:key,m:model},...Object.keys(AI).filter(p=>p!==prov&&aiKey(p)).map(p=>({p,k:aiKey(p),m:aiModel(p)}))];
+  chain.sort((a,b)=>(COOL[a.p]>Date.now())-(COOL[b.p]>Date.now()));/* ceux en pause passent en dernier */
+  const fails=[];
+  try{
+    for(let i=0;i<chain.length;i++){const c=chain[i],last=i===chain.length-1;
+      postJSON.max=last?5:1;/* s'il reste un autre fournisseur : on n'attend pas, on bascule tout de suite */
+      try{return await aiCall(c.p,c.k,c.m,imgs,prompt)}
+      catch(e){
+        if(limited(e))COOL[c.p]=Date.now()+60000;
+        fails.push(AI[c.p].n+' ('+(e.status||String(e.message||'').slice(0,60))+')');
+        if(!failable(e))throw e;
+        if(last){if(chain.length===1)throw e;throw Error('Tous les fournisseurs ont échoué : '+fails.join(', '))}
+        toast(AI[c.p].n+' indisponible → bascule vers '+AI[chain[i+1].p].n+'...')}}
+  }finally{delete postJSON.max}
+};
 })();
 </script>
 </body>
