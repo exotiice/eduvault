@@ -4566,5 +4566,18 @@ const fix=()=>{const r=d.querySelector('[data-a="acReset"]');if(!r||d.querySelec
 if(d)new MutationObserver(fix).observe(d,{childList:true});fix();
 })();
 </script>
+<script id="ux-grades-js">
+(function(){'use strict';
+const L=(f,e,a)=>Lg(f,e,a),CK={ncc:['ccc','CC'],ntp:['ctp','TP'],nex:['cex','Examen']},v=document.getElementById('v');
+const fix=()=>{v.querySelectorAll('input[type="number"][disabled][onchange*="sNote"]').forEach(i=>{
+  const m=/sNote\('([^']+)','([^']+)'/.exec(i.getAttribute('onchange')||'');if(!m||!CK[m[2]])return;
+  i.disabled=false;i.readOnly=true;i.style.opacity='.55';i.style.cursor='pointer';i.title=L('Coef 0 : touche pour activer ce champ','Coef 0: tap to enable this field','المعامل 0: اضغط للتفعيل');
+  i.addEventListener('click',()=>{const mod=A.modules.find(x=>x.id===m[1]);if(!mod)return;
+    ask(L('Activer '+CK[m[2]][1],'Enable '+CK[m[2]][1],'تفعيل '+CK[m[2]][1]),[{k:'c',l:L('Coefficient de '+CK[m[2]][1]+' (ex. 0.3 ; 0 = ignoré)','Weight of '+CK[m[2]][1]+' (e.g. 0.3; 0 = ignored)','المعامل'),t:'number',v:'0.3',r:1,a:' step="0.05" min="0" max="10"'}],r=>{
+      const c=Math.max(0,+r.c||0);if(!(c>0))return toast(L('Mets un coefficient > 0','Enter a weight > 0','ضع معاملا أكبر من 0'),'er');
+      mod[CK[m[2]][0]]=c;upd();toast(L('Champ activé. Tu peux ajuster les autres coefficients avec ✏️','Field enabled. Adjust other weights with ✏️','تم التفعيل'),'ok')})})})};
+if(v)new MutationObserver(fix).observe(v,{childList:true,subtree:true});fix();
+})();
+</script>
 </body>
 </html>
