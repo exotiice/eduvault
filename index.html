@@ -4725,5 +4725,20 @@ document.addEventListener('submit',e=>{if(!e.target||e.target.id!=='uxkf'||!UID)
 const w=window.wipeLocal;if(typeof w==='function')window.wipeLocal=function(){try{if(A.aiKeys){Object.keys(AI).forEach(p=>localStorage.removeItem(K(p)));localStorage.removeItem('eduVault_aiKey');localStorage.removeItem(AT)}}catch(e){}return w.apply(this,arguments)};
 })();
 </script>
+<script id="ux-keytile-js">
+/* tuile « Clés API (IA) » dans la page Réglages, à côté de « Compte & sécurité » */
+(function(){'use strict';
+const v=document.getElementById('v');
+const inject=()=>{const acct=v.querySelector('.tiles .tile[data-a="acct"]');if(!acct||v.querySelector('.tiles .tile[data-a="apiKeys"]'))return;
+  const c=acct.cloneNode(true),n=Object.keys(AI).filter(p=>aiKey(p)).length,t=Object.keys(AI).length,ic=c.firstElementChild;
+  c.dataset.a='apiKeys';c.removeAttribute('data-i');[c,ic].forEach(e=>{if(e){e.style.setProperty('--c1','#f59e0b');e.style.setProperty('--c2','#f97316')}});
+  if(ic&&ic!==c.querySelector('span:last-child'))ic.textContent='🔑';
+  const b=c.querySelector('b'),sm=c.querySelector('small');
+  if(b)b.textContent=Lg('Clés API (IA)','API keys (AI)','مفاتيح API (الذكاء الاصطناعي)');
+  if(sm)sm.textContent=n?n+'/'+t+' '+Lg('configurée(s)','configured','مضبوطة'):Lg('Gemini, Groq, Hugging Face','Gemini, Groq, Hugging Face','Gemini, Groq, Hugging Face');
+  acct.insertAdjacentElement('afterend',c)};
+if(v)new MutationObserver(inject).observe(v,{childList:true});inject();
+})();
+</script>
 </body>
 </html>
