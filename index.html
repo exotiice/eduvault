@@ -4549,5 +4549,22 @@ const run=()=>{try{const t=tab();if(t==='ag')agenda();else if(t==='qz')quiz();ba
 if(v)new MutationObserver(run).observe(v,{childList:true});run();setInterval(badge,60000);
 })();
 </script>
+<script id="ux-email-js">
+(function(){'use strict';
+const L=(f,e,a)=>Lg(f,e,a),bad=/\.(cpom|con|cm|comm|coom|ocm|vom)$/i;
+act.acEmail=()=>{$('dlg').close();
+  ask(L("Changer l'email","Change email",'تغيير البريد'),[{k:'email',l:L("Nouvel email (vérifie l'orthographe)","New email (check spelling)",'البريد الجديد'),t:'email',r:1}],async v=>{
+    const em=v.email.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/.test(em)||bad.test(em))return toast(L('Email invalide ou mal écrit','Invalid or misspelled email','بريد غير صالح'),'er');
+    const go=async()=>{await fbUser.verifyBeforeUpdateEmail(em);toast(L('Lien envoyé à '+em+' : clique dessus pour confirmer (vérifie les spams)','Link sent to '+em+': click it to confirm (check spam)','تم إرسال رابط إلى '+em),'ok')};
+    try{await fbLoad();await go()}catch(e){
+      if(e&&e.code==='auth/requires-recent-login')askPw(L('Confirme avec ton mot de passe actuel','Confirm with your current password','أكّد بكلمة المرور الحالية'),async pw=>{try{await fbUser.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(fbUser.email,pw));await go()}catch(x){toast(fbMsg(x),'er')}});
+      else toast(fbMsg(e),'er')}})};
+const d=document.getElementById('dlg');
+const fix=()=>{const r=d.querySelector('[data-a="acReset"]');if(!r||d.querySelector('[data-a="acEmail"]'))return;
+  r.insertAdjacentHTML('afterend','<button class="b" data-a="acEmail">✉️ '+L("Changer l'email","Change email",'تغيير البريد')+'</button>');
+  const b=d.querySelector('.rs b');if(b&&bad.test(b.textContent.trim()))b.parentElement.insertAdjacentHTML('afterend','<p class="bad" style="margin:0 0 8px;font-size:13px">⚠ '+L("Cet email semble mal écrit : l'email de réinitialisation n'arrivera pas. Utilise « Changer l'email ».","This email looks misspelled: the reset email won't arrive. Use “Change email”.",'هذا البريد يبدو خاطئا')+'</p>')};
+if(d)new MutationObserver(fix).observe(d,{childList:true});fix();
+})();
+</script>
 </body>
 </html>
