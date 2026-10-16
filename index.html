@@ -4656,5 +4656,40 @@ window.hfCall=async function(key,model,imgs,prompt){
   return r.j.choices&&r.j.choices[0]&&r.j.choices[0].message&&r.j.choices[0].message.content||'';
 };
 </script>
+<script id="ux-keys-js">
+/* Écran unique « Mes clés API » : saisie, test et choix du fournisseur principal */
+(function(){'use strict';
+const L=(f,e,a)=>Lg(f,e,a),HELP={gemini:'aistudio.google.com/apikey',groq:'console.groq.com/keys',hf:'huggingface.co/settings/tokens'};
+const SK=p=>'eduVault_aiKey_'+p,SM=p=>'eduVault_aiModel_'+p;
+act.apiKeys=()=>{const d=$('dlg'),main=localStorage.getItem('eduVault_aiProv')||'gemini',P=Object.keys(AI);
+  d.innerHTML=`<h3>🔑 ${L('Mes clés API','My API keys','مفاتيح API')}</h3><p class="mu" style="margin:0 0 10px;font-size:13px">${L("Entre toutes tes clés ici. Si une IA atteint sa limite, l'appli passe toute seule à la suivante. Les clés restent sur cet appareil.","Enter all your keys here. If one AI hits its limit, the app switches to the next one automatically. Keys stay on this device.",'أدخل كل مفاتيحك هنا. إذا بلغ أحدها حده ينتقل التطبيق تلقائيا إلى التالي. المفاتيح تبقى في هذا الجهاز.')}</p>
+  <form id="uxkf">${P.map(p=>`<div class="rs" style="display:block;margin-bottom:8px"><b>${esc(AI[p].n)}</b> <span id="uxst_${p}">${aiKey(p)?'✅':'○'}</span><small class="mu" style="display:block">${HELP[p]||''}</small>
+    <div style="display:flex;gap:6px;margin-top:6px"><input type="password" name="k_${p}" value="${esc(aiKey(p))}" placeholder="${L('Clé API','API key','مفتاح API')}" autocomplete="off" style="flex:1;min-width:0;margin:0"><button type="button" class="b" data-a="uxEye" data-i="${p}" aria-label="👁">👁</button></div>
+    <input name="m_${p}" value="${esc(aiModel(p))}" placeholder="${L('Modèle','Model','النموذج')}" autocomplete="off" style="margin:6px 0 0">
+    <div class="row" style="justify-content:flex-start;margin:6px 0 0;gap:12px"><button type="button" class="b" data-a="uxTest" data-i="${p}" id="uxtb_${p}">🧪 ${L('Tester','Test','اختبار')}</button><label style="margin:0;display:flex;align-items:center;gap:6px"><input type="radio" name="main" value="${p}"${p===main?' checked':''} style="width:auto;margin:0"> ${L('Principal','Main','الرئيسي')}</label></div></div>`).join('')}
+  <div class="row"><button type="button" class="b" onclick="$('dlg').close()">${L('Fermer','Close','إغلاق')}</button><button class="b p">${L('Enregistrer','Save','حفظ')}</button></div></form>`;
+  d.querySelector('form').onsubmit=e=>{e.preventDefault();const f=e.target;let n=0;
+    P.forEach(p=>{const k=f['k_'+p].value.trim(),m=f['m_'+p].value.trim();
+      if(k){localStorage.setItem(SK(p),k);n++}else{localStorage.removeItem(SK(p));if(p==='gemini')localStorage.removeItem('eduVault_aiKey')}
+      if(m)localStorage.setItem(SM(p),m)});
+    const mp=f.main.value;if(f['k_'+mp].value.trim())localStorage.setItem('eduVault_aiProv',mp);
+    d.close();toast(n?L(n+' clé(s) enregistrée(s)',n+' key(s) saved',n+' مفاتيح محفوظة'):L('Aucune clé enregistrée','No key saved','لا مفتاح'),n?'ok':'');};
+  d.oncancel=null;d.showModal()};
+act.uxEye=p=>{const i=document.querySelector('#uxkf [name="k_'+p+'"]');if(i)i.type=i.type==='password'?'text':'password'};
+act.uxTest=async p=>{const f=document.getElementById('uxkf'),b=document.getElementById('uxtb_'+p),st=document.getElementById('uxst_'+p),key=f['k_'+p].value.trim(),model=f['m_'+p].value.trim();
+  if(!key)return toast(L("Colle d'abord la clé",'Paste the key first','الصق المفتاح أولا'),'er');
+  const t=b.textContent;b.disabled=true;b.textContent='…';
+  try{postJSON.max=1;const t0=Date.now();await aiCall(p,key,model,[],'Réponds uniquement par le mot OK.');st.textContent='✅';toast(AI[p].n+' ✓ '+L('fonctionne','works','يعمل')+' ('+(Date.now()-t0)+' ms)','ok')}
+  catch(e){st.textContent='⚠️';toast(AI[p].n+' ✗ '+(e.status?e.status+' · ':'')+String(e.message||e).slice(0,140),'er')}
+  finally{delete postJSON.max;b.disabled=false;b.textContent=t}};
+/* points d'entrée : Réglages et fenêtre d'import IA */
+const d=document.getElementById('dlg'),btn='<div class="row" style="justify-content:flex-start;margin:0 0 8px"><button type="button" class="b" data-a="apiKeys">🔑 '+L('Clés API (IA)','API keys (AI)','مفاتيح API (الذكاء الاصطناعي)')+'</button></div>';
+const fix=()=>{if(d.querySelector('[data-a="apiKeys"]'))return;
+  const acct=d.querySelector('[data-a="acct"]'),h=d.querySelector('h3');
+  if(acct&&d.querySelector('[data-a="setLang"]'))acct.parentElement.insertAdjacentHTML('afterend',btn);
+  else if(h&&h.textContent.trim()==='Importation IA'){const r=d.querySelector('form .row');r&&r.insertAdjacentHTML('beforebegin',btn)}};
+if(d)new MutationObserver(fix).observe(d,{childList:true});
+})();
+</script>
 </body>
 </html>
