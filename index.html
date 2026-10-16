@@ -711,7 +711,7 @@ const keyFor=u=>u?'eduVault_u_'+u:GUEST_KEY;
 let KEY=keyFor(UID);
 const TOD=()=>DAYS[(new Date().getDay()+6)%7];
 const GEMINI_MODEL='gemini-3.8-flash'; /* verifie le nom actuel sur ai.google.dev/gemini-api/docs/models */
-const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'qwen/qwen3.8-27b'}}; /* modele vision : modifiable dans la fenetre d'import */
+const AI={gemini:{n:'Google Gemini',model:GEMINI_MODEL},groq:{n:'Groq Cloud',model:'qwen/qwen3.8-27b'},hf:{n:'Hugging Face',model:'meta-llama/Llama-3.3-70B-Instruct'}}; /* modele vision : modifiable dans la fenetre d'import */
 const aiKey=p=>localStorage.getItem('eduVault_aiKey_'+p)||(p==='gemini'?localStorage.getItem('eduVault_aiKey'):'')||'';
 const aiModel=p=>{const m=localStorage.getItem('eduVault_aiModel_'+p);return(!m||m==='gemini-2.5-flash')?AI[p].model:m};
 const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.';
@@ -1140,7 +1140,7 @@ const act={
   ptoggle:()=>{if(P.t){clearInterval(P.t);P.t=null;P.left=Math.max(0,Math.round((P.end-Date.now())/1000))}else{P.end=Date.now()+P.left*1000;P.t=setInterval(ptick,300)}ppaint()},
   preset:()=>{clearInterval(P.t);P.t=null;P.left=P.total;ppaint()},
   ai:()=>{const p0=localStorage.getItem('eduVault_aiProv')||'gemini';
-    ask('Importation IA',[{k:'prov',l:'Fournisseur',t:'select',o:Object.keys(AI).map(k=>[k,AI[k].n]),v:p0},{k:'key',l:'Clé API (Gemini : aistudio.google.com/apikey · Groq : console.groq.com/keys)',t:'password',r:1,v:aiKey(p0)},{k:'model',l:'Modèle avec vision',r:1,v:aiModel(p0)},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport);
+    ask('Importation IA',[{k:'prov',l:'Fournisseur',t:'select',o:Object.keys(AI).map(k=>[k,AI[k].n]),v:p0},{k:'key',l:'Clé API (Gemini : aistudio.google.com/apikey · Groq : console.groq.com/keys · Hugging Face : huggingface.co/settings/tokens)',t:'password',r:1,v:aiKey(p0)},{k:'model',l:'Modèle avec vision',r:1,v:aiModel(p0)},{k:'file',l:'Emploi du temps (PDF ou image)',t:'file',a:' accept="application/pdf,image/*" required'}],aiImport);
     const f=$('dlg').querySelector('form'),sel=f.elements.prov;sel.onchange=()=>{f.elements.key.value=aiKey(sel.value);f.elements.model.value=aiModel(sel.value)}},
   drive:async()=>{
     if(linked()){if(!confirm('Désactiver la sauvegarde automatique Google Drive sur cet appareil ?'))return;
@@ -1437,7 +1437,7 @@ async function postJSON(url,headers,body){
   return{ok:r.ok,status:r.status,j};
 }
 async function aiCall(prov,key,model,imgs,prompt=AI_PROMPT){
-  imgs=imgs||[];
+  imgs=imgs||[];if(prov==='hf')return hfCall(key,model,imgs,prompt);
   if(prov==='groq'){
     const content=imgs.length?[{type:'text',text:prompt},...imgs.map(u=>({type:'image_url',image_url:{url:u}}))]:prompt;
     const call=m=>postJSON('https://api.groq.com/openai/v1/chat/completions',{Authorization:'Bearer '+key},{model:m,temperature:.1,max_completion_tokens:4096,messages:[{role:'user',content}]});
@@ -4620,7 +4620,7 @@ document.addEventListener('click',e=>{if(Date.now()-gt<450&&e.target.closest&&e.
 /* API Fallback : essaie le fournisseur choisi, puis les autres dont la clé est enregistrée. */
 (function(){'use strict';
 const COOL={};/* fournisseur -> timestamp jusqu'auquel on évite de l'utiliser (après un 429) */
-const limited=e=>(e&&e.status)===429||/rate.?limit|quota|exhausted|too many/i.test(String(e&&e.message||''));
+const limited=e=>(e&&[429,402].includes(e.status))||/rate.?limit|quota|exhausted|too many/i.test(String(e&&e.message||''));
 const failable=e=>{const s=e&&e.status,m=String(e&&e.message||'');return e instanceof TypeError||[408,401,403].includes(s)||s>=500||limited(e)||/overload|capacity|unavailable|model|image|vision|support/i.test(m)};
 window.aiCallFO=async function(prov,key,model,imgs,prompt){
   const chain=[{p:prov,k:key,m:model},...Object.keys(AI).filter(p=>p!==prov&&aiKey(p)).map(p=>({p,k:aiKey(p),m:aiModel(p)}))];
@@ -4639,6 +4639,22 @@ window.aiCallFO=async function(prov,key,model,imgs,prompt){
   }finally{delete postJSON.max}
 };
 })();
+</script>
+<script id="ux-hf-js">
+/* Hugging Face Inference Providers : API compatible OpenAI (https://router.huggingface.co/v1) */
+window.hfCall=async function(key,model,imgs,prompt){
+  imgs=imgs||[];
+  const content=imgs.length?[{type:'text',text:prompt},...imgs.map(u=>({type:'image_url',image_url:{url:u}}))]:prompt;
+  const r=await postJSON('https://router.huggingface.co/v1/chat/completions',{Authorization:'Bearer '+key},{model,temperature:.1,max_tokens:4096,messages:[{role:'user',content}]});
+  if(!r.ok){
+    const msg=(r.j.error&&r.j.error.message)||(typeof r.j.error==='string'?r.j.error:'')||r.j.message||'Erreur Hugging Face HTTP '+r.status;
+    let extra='';
+    if(/model|not found|not supported|does not exist/i.test(msg)){/* modele inconnu : on liste ceux du compte pour aider */
+      const ml=await fetch('https://router.huggingface.co/v1/models',{headers:{Authorization:'Bearer '+key}}).then(x=>x.json()).catch(()=>({})),ids=(ml.data||[]).map(x=>x.id);
+      if(ids.length)extra=' | Modèles disponibles : '+ids.slice(0,12).join(', ')}
+    throw Object.assign(Error(msg+extra),{status:r.status})}
+  return r.j.choices&&r.j.choices[0]&&r.j.choices[0].message&&r.j.choices[0].message.content||'';
+};
 </script>
 </body>
 </html>
