@@ -4360,7 +4360,7 @@ if(v)new MutationObserver(()=>{count();fx()}).observe(v,{childList:true});count(
 const TB=['da','tt','ag','mo','fc','qz','po','se'];let ts=null,pr=null;
 const ptr=document.createElement('div');ptr.id='uxptr';ptr.innerHTML='<b>↻</b>';document.body.append(ptr);
 document.addEventListener('touchstart',e=>{ts=pr=null;if(e.touches.length!==1||dlgOpen())return;const t=e.target,x=e.touches[0].clientX,y=e.touches[0].clientY;
-  if(scrollY<=0&&!t.closest('input,textarea,select,.fc,svg,audio,video'))pr={y,d:0};
+  if(scrollY<=0&&!t.closest('input,textarea,select,.fc,.fr,svg,audio,video'))pr={y,d:0};
   if(!t.closest('header,nav,.pills,.ph,.fc,input,textarea,select,table,svg,audio,video,.kbc,.kbk,[data-noswipe]')&&!['qz','po','ch'].includes(curTab())&&x>24&&x<innerWidth-24)ts={x,y,t:Date.now()}},{passive:true});
 document.addEventListener('touchmove',e=>{if(!pr)return;const d=e.touches[0].clientY-pr.y;if(d<=0){pr.d=0;ptr.style.transform='translateY(-60px)';return}
   pr.d=d;ptr.classList.remove('go');ptr.style.transform=`translateY(${Math.min(90,d/2)-30}px) rotate(${d*2}deg)`},{passive:true});
@@ -4577,6 +4577,43 @@ const fix=()=>{v.querySelectorAll('input[type="number"][disabled][onchange*="sNo
       const c=Math.max(0,+r.c||0);if(!(c>0))return toast(L('Mets un coefficient > 0','Enter a weight > 0','ضع معاملا أكبر من 0'),'er');
       mod[CK[m[2]][0]]=c;upd();toast(L('Champ activé. Tu peux ajuster les autres coefficients avec ✏️','Field enabled. Adjust other weights with ✏️','تم التفعيل'),'ok')})})})};
 if(v)new MutationObserver(fix).observe(v,{childList:true,subtree:true});fix();
+})();
+</script>
+<style id="ux-rs">
+.fr{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}.fr .rfb{-webkit-user-drag:none}
+.fr.ux-src{opacity:.35}.fr.ux-tgt{outline:2px solid var(--br);outline-offset:2px;background:var(--bs);border-radius:14px}.fr.ux-no{outline:2px dashed #dc2626;outline-offset:2px;border-radius:14px}
+.ux-rg{position:fixed;z-index:600;pointer-events:none;opacity:.94;transform:rotate(-1.5deg) scale(1.02);box-shadow:0 16px 34px -10px #0007;border-radius:14px}
+</style>
+<script id="ux-rs-js">
+(function(){'use strict';
+const L=(f,e,a)=>Lg(f,e,a),vib=n=>{try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}},v=document.getElementById('v');
+const ids=r=>{const b=r.querySelector('[data-a="delRes"]');return b?b.dataset.i.split('|'):null},ttl=r=>{const b=r.querySelector('.fxt b');return b?b.textContent.trim():'?'};
+let g=null,gt=0,hint=0;
+const mark=()=>v.querySelectorAll('.fr:not([data-noswipe])').forEach(r=>r.dataset.noswipe='');
+if(v)new MutationObserver(mark).observe(v,{childList:true,subtree:true});mark();
+const clr=()=>v.querySelectorAll('.ux-tgt,.ux-no').forEach(x=>x.classList.remove('ux-tgt','ux-no'));
+function start(){if(!g||g.on)return;g.on=1;vib(15);const r=g.r,b=r.getBoundingClientRect(),h=r.cloneNode(true);h.className+=' ux-rg';h.style.width=b.width+'px';h.style.left=b.left+'px';h.style.top=b.top+'px';
+  document.body.append(h);g.gh=h;g.ox=g.x-b.left;g.oy=g.y-b.top;r.classList.add('ux-src');
+  if(!hint){hint=1;try{if(!localStorage.getItem('uxrs')){localStorage.setItem('uxrs','1');toast(L('Dépose sur une autre ressource pour les échanger','Drop on another item to swap them','ضعه على عنصر آخر للتبديل'))}}catch(e){}}}
+document.addEventListener('pointerdown',e=>{if(e.target.closest('.x-btn')||(e.pointerType==='mouse'&&e.button))return;const r=e.target.closest&&e.target.closest('.fr');if(!r||!ids(r))return;
+  g={r,x:e.clientX,y:e.clientY,on:0,mouse:e.pointerType==='mouse'};if(!g.mouse)g.tm=setTimeout(start,380)},{passive:true});
+document.addEventListener('pointermove',e=>{if(!g)return;
+  if(!g.on){if(Math.hypot(e.clientX-g.x,e.clientY-g.y)>(g.mouse?8:10)){if(g.mouse)start();else{clearTimeout(g.tm);g=null}}if(!g||!g.on)return}
+  g.gh.style.left=e.clientX-g.ox+'px';g.gh.style.top=e.clientY-g.oy+'px';
+  if(e.clientY<80)scrollBy(0,-14);else if(e.clientY>innerHeight-80)scrollBy(0,14);
+  clr();const o=document.elementFromPoint(e.clientX,e.clientY),t=o&&o.closest('.fr');
+  if(t&&t!==g.r&&ids(t)){t.classList.add(t.parentElement===g.r.parentElement?'ux-tgt':'ux-no')}},{passive:true});
+document.addEventListener('touchmove',e=>{if(g&&g.on)e.preventDefault()},{passive:false});
+document.addEventListener('contextmenu',e=>{if(g&&g.on)e.preventDefault()});
+const end=e=>{if(!g)return;const s=g;g=null;clearTimeout(s.tm);if(!s.on)return;gt=Date.now();s.gh.remove();s.r.classList.remove('ux-src');clr();
+  const o=e&&e.clientX!=null?document.elementFromPoint(e.clientX,e.clientY):null,t=o&&o.closest('.fr');if(!t||t===s.r)return;
+  const a=ids(s.r),b=ids(t);if(!a||!b)return;
+  if(a[0]!==b[0]||s.r.parentElement!==t.parentElement)return toast(L('Échange possible seulement dans la même catégorie du même module','Swap only within the same category of the same module','التبديل ممكن داخل نفس الفئة فقط'));
+  if(!confirm(L('Échanger « '+ttl(s.r)+' » avec « '+ttl(t)+' » ?','Swap “'+ttl(s.r)+'” with “'+ttl(t)+'”?','هل تريد تبديل «'+ttl(s.r)+'» مع «'+ttl(t)+'»؟')))return;
+  const m=A.modules.find(x=>x.id===a[0]);if(!m)return;const i=m.resources.findIndex(x=>x.id===a[1]),j=m.resources.findIndex(x=>x.id===b[1]);if(i<0||j<0)return;
+  [m.resources[i],m.resources[j]]=[m.resources[j],m.resources[i]];vib(12);upd();toast(L('Ressources échangées','Swapped','تم التبديل'),'ok')};
+document.addEventListener('pointerup',end);document.addEventListener('pointercancel',()=>end());
+document.addEventListener('click',e=>{if(Date.now()-gt<450&&e.target.closest&&e.target.closest('.fr')){e.stopImmediatePropagation();e.preventDefault()}},true);
 })();
 </script>
 </body>
