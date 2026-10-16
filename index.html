@@ -1156,7 +1156,7 @@ const act={
   copyAI:()=>{navigator.clipboard&&navigator.clipboard.writeText(AIOUT).catch(()=>{});toast('Copié','ok')},
   addHol:()=>{const a=$('h1').value,b=$('h2').value||a;if(!a||b<a)return toast('Dates invalides','er');const d=new Date(a+'T00:00');for(let n=0;iso(d)<=b&&n<400;n++){const s=iso(d);if(!isHol(s))A.settings.holidays.push(s);d.setDate(d.getDate()+1)}upd();settings()},
   delHol:i=>{const[a,b]=i.split('|');A.settings.holidays=A.settings.holidays.filter(d=>d<a||d>b);upd();settings()},
-  exp:()=>{dlBlob('EduVault_Sauvegarde_'+iso(new Date())+'.json',new Blob([JSON.stringify(A,null,2)],{type:'application/json'}));toast('Sauvegarde exportée','ok')},
+  exp:()=>{dlBlob('EduVault_Sauvegarde_'+iso(new Date())+'.json',new Blob([JSON.stringify(A,(k,v)=>k==='aiKeys'||k==='aiKeysAt'?void 0:v,2)],{type:'application/json'}));toast('Sauvegarde exportée','ok')},
   imp:()=>$('jf').click()
 };
 function clsForm(c){ask(c?'Modifier la séance':'Séance',[{k:'moduleId',l:'Module',t:'select',o:modOpts(),v:c?.moduleId},{k:'day',l:'Jour',t:'select',o:DAYS.map(d=>[d,d]),v:c?.day},{k:'week',l:'Semaine',t:'select',o:[['all','Toutes les semaines'],['A','Semaine A'],['B','Semaine B']],v:c?.week},{k:'startTime',l:'Début',t:'time',r:1,v:c?.startTime},{k:'endTime',l:'Fin',t:'time',r:1,v:c?.endTime},{k:'room',l:'Salle ou amphi',r:1,v:c?.room}],v=>{
@@ -4689,6 +4689,40 @@ const fix=()=>{if(d.querySelector('[data-a="apiKeys"]'))return;
   if(acct&&d.querySelector('[data-a="setLang"]'))acct.parentElement.insertAdjacentHTML('afterend',btn);
   else if(h&&h.textContent.trim()==='Importation IA'){const r=d.querySelector('form .row');r&&r.insertAdjacentHTML('beforebegin',btn)}};
 if(d)new MutationObserver(fix).observe(d,{childList:true});
+})();
+</script>
+<script id="ux-keysync-js">
+/* Synchronisation des clés API avec le compte : les clés voyagent dans les données du compte (A.aiKeys),
+   donc elles profitent du chiffrement de bout en bout si la personne l'a activé. Exclues de l'export JSON. */
+(function(){'use strict';
+const L=(f,e,a)=>Lg(f,e,a),K=p=>'eduVault_aiKey_'+p,M=p=>'eduVault_aiModel_'+p,AT='ux_aiKeysAt',ON=()=>localStorage.getItem('ux_aiSync')!=='0';
+const snap=()=>{const keys={};Object.keys(AI).forEach(p=>{const k=localStorage.getItem(K(p))||(p==='gemini'?localStorage.getItem('eduVault_aiKey'):'')||'';if(k)keys[p]={k,m:localStorage.getItem(M(p))||''}});return{keys,main:localStorage.getItem('eduVault_aiProv')||''}};
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+function pushNow(){const s=snap();if(!Object.keys(s.keys).length){delete A.aiKeys;delete A.aiKeysAt}else{A.aiKeys=s;A.aiKeysAt=Date.now();localStorage.setItem(AT,String(A.aiKeysAt))}save()}
+function reconcile(){
+  if(!UID||typeof A!=='object'||!ON())return;
+  const lat=+localStorage.getItem(AT)||0,r=A.aiKeys,rat=+A.aiKeysAt||0,loc=snap();
+  if(r&&r.keys&&rat>lat){/* le compte a des clés plus récentes : on les applique sur cet appareil */
+    Object.keys(AI).forEach(p=>{const x=r.keys[p];if(x&&x.k){localStorage.setItem(K(p),x.k);if(x.m)localStorage.setItem(M(p),x.m)}else localStorage.removeItem(K(p))});
+    if(r.main&&AI[r.main])localStorage.setItem('eduVault_aiProv',r.main);
+    localStorage.setItem(AT,String(rat));return}
+  const has=Object.keys(loc.keys).length;
+  if(has&&!(r&&same(r,loc)))pushNow();           /* clés locales nouvelles ou modifiées : on les envoie */
+  else if(!has&&r){delete A.aiKeys;delete A.aiKeysAt;save()}/* tout a été effacé ici : on efface aussi dans le compte */
+}
+setInterval(()=>{if(!document.hidden)try{reconcile()}catch(e){}},5000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)try{reconcile()}catch(e){}});
+/* case à cocher dans l'écran « Mes clés API » */
+const d=document.getElementById('dlg');
+const fix=()=>{const f=d.querySelector('#uxkf');if(!f||d.querySelector('#uxsynclbl'))return;const r=f.querySelector('.row:last-child');if(!r)return;
+  let enc='';try{enc=(typeof ENCST!=='undefined'&&ENCST==='on')?'🔒 '+L('Chiffrement activé : tes clés seront chiffrées dans le cloud.','Encryption on: your keys will be encrypted in the cloud.','التشفير مفعّل: ستُشفَّر مفاتيحك في السحابة.'):'⚠ '+L('Chiffrement désactivé : tes clés seront stockées en clair dans Firebase (protégées par les règles d\'accès). Active le chiffrement dans « Mon compte » pour les chiffrer.','Encryption off: your keys will be stored in clear in Firebase (protected by access rules). Turn on encryption in “My account” to encrypt them.','التشفير معطّل: ستُخزَّن المفاتيح بدون تشفير في Firebase. فعّل التشفير من «حسابي».')}catch(e){}
+  r.insertAdjacentHTML('beforebegin',UID?`<label id="uxsynclbl" style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" id="uxsync" ${ON()?'checked':''} style="width:auto;margin:0"> ☁️ ${L('Synchroniser mes clés avec mon compte','Sync my keys with my account','مزامنة مفاتيحي مع حسابي')}</label><small class="mu" id="uxsyncn" style="display:block;margin-bottom:8px">${enc}</small>`:`<small class="mu" id="uxsynclbl" style="display:block;margin:4px 0 8px">☁️ ${L('Connecte-toi (Réglages → compte) pour synchroniser tes clés entre tes appareils.','Sign in (Settings → account) to sync your keys across devices.','سجّل الدخول لمزامنة مفاتيحك بين أجهزتك.')}</small>`)};
+if(d)new MutationObserver(fix).observe(d,{childList:true});
+document.addEventListener('submit',e=>{if(!e.target||e.target.id!=='uxkf'||!UID)return;const on=!!(document.getElementById('uxsync')||{}).checked;
+  setTimeout(()=>{/* après l'enregistrement local fait par l'écran des clés */
+    if(on){localStorage.setItem('ux_aiSync','1');pushNow()}else{localStorage.setItem('ux_aiSync','0');if(A.aiKeys){delete A.aiKeys;delete A.aiKeysAt;save()}}},0)},true);
+/* « effacer cet appareil » : on retire aussi les clés d'ici si elles sont sauvegardées dans le compte */
+const w=window.wipeLocal;if(typeof w==='function')window.wipeLocal=function(){try{if(A.aiKeys){Object.keys(AI).forEach(p=>localStorage.removeItem(K(p)));localStorage.removeItem('eduVault_aiKey');localStorage.removeItem(AT)}}catch(e){}return w.apply(this,arguments)};
 })();
 </script>
 </body>
