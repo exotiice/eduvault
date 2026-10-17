@@ -1144,7 +1144,7 @@ const act={
     const f=$('dlg').querySelector('form'),sel=f.elements.prov;sel.onchange=()=>{f.elements.key.value=aiKey(sel.value);f.elements.model.value=aiModel(sel.value)}},
   drive:async()=>{
     if(linked()){if(!confirm('Désactiver la sauvegarde automatique Google Drive sur cet appareil ?'))return;
-      tok=null;clearTimeout(tokT);LS(LK(),null);LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();settings();return toast('Drive déconnecté')}
+      tok=null;clearTimeout(tokT);LS(LK(),null);try{localStorage.removeItem('ux_gdhint')}catch(e){}LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();settings();return toast('Drive déconnecté')}
     try{toast('Connexion à Google Drive...');await drvAuth();toast('Connecté. Synchronisation...','ok');await drvSync();toast(drvErr||'Sauvegarde automatique activée ✔',drvErr?'er':'ok');settings()}
     catch(e){toast('Connexion Drive impossible ('+e.message+')','er')}},
   dh:async()=>{
@@ -1348,7 +1348,7 @@ Object.assign(act,{
   calNav:i=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+(+i),1);lastCalDay=null;render()},
   calDay:i=>{lastCalDay=i;render()},
   setCid:()=>ask('Client ID Google (OAuth)',[{k:'cid',l:"Client ID (…apps.googleusercontent.com). L'adresse de cette page doit être une origine autorisée dans Google Cloud.",v:localStorage.getItem('eduVault_cid')||''}],v=>{
-    v.cid.trim()?localStorage.setItem('eduVault_cid',v.cid.trim()):localStorage.removeItem('eduVault_cid');tc=null;tok=null;LS(LK(),null);LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();toast('Client ID enregistré. Reconnectez Drive.','ok')})
+    v.cid.trim()?localStorage.setItem('eduVault_cid',v.cid.trim()):localStorage.removeItem('eduVault_cid');tc=null;tok=null;LS(LK(),null);try{localStorage.removeItem('ux_gdhint')}catch(e){}LS('eduVault_syncTs',null);LS('eduVault_remoteMod',null);paintDrive();toast('Client ID enregistré. Reconnectez Drive.','ok')})
 });
 document.addEventListener('click',e=>{if(!e.target.closest('.s-bar'))$('s-res').style.display='none';const b=e.target.closest('[data-a]');if(b&&act[b.dataset.a])act[b.dataset.a](b.dataset.i,b)});
 $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)go(b.dataset.t)});
@@ -1489,17 +1489,17 @@ function paintDrive(){const st=dstate(),e=$('dd'),b=$('dv');
   if(e)e.style.color={ok:'#10b981',busy:'#3b82f6',wait:'#f59e0b',off:'#ef4444'}[st];
   if(b)b.title={ok:'Drive : synchronisé',busy:'Drive : synchronisation...',wait:'Drive : reconnexion au prochain toucher',off:'Drive : non connecté'}[st]}
 function driveStatusHTML(){const st=dstate(),ts=lastTs();
-  if(UID)return `<b>${{ok:'🟢 Drive connecté',busy:'🔵 Envoi des fichiers...',wait:'🟠 Drive lié · reconnexion au prochain toucher',off:'⚪ Drive non connecté (optionnel)'}[st]}</b><small class="mu">${dfOn()?'Tes fichiers sont aussi copiés dans TON Google Drive et disponibles sur tous tes appareils. Rangement : EduVault › Semestre › Module › Catégorie › Titre.':'Tes fichiers restent uniquement sur cet appareil.'}</small>${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Tes données (cours, horaires, notes...) sont sauvegardées par ton compte EduVault, pas par Drive.</small>`;
+  if(UID)return `<b>${{ok:'🟢 Drive connecté',busy:'🔵 Envoi des fichiers...',wait:'🟠 Drive en pause · touche le nuage ☁ en haut pour reconnecter',off:'⚪ Drive non connecté (optionnel)'}[st]}</b><small class="mu">${dfOn()?'Tes fichiers sont aussi copiés dans TON Google Drive et disponibles sur tous tes appareils. Rangement : EduVault › Semestre › Module › Catégorie › Titre.':'Tes fichiers restent uniquement sur cet appareil.'}</small>${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Tes données (cours, horaires, notes...) sont sauvegardées par ton compte EduVault, pas par Drive.</small>`;
   return `<b>${{ok:'🟢 Connecté · sauvegarde automatique active',busy:'🔵 Synchronisation en cours...',wait:'🟠 Lié à Drive · reconnexion automatique au prochain toucher',off:'🔴 Non connecté'}[st]}</b>${ts?`<small class="mu">Dernière synchronisation : ${new Date(ts).toLocaleString(LOC())}</small>`:''}${drvErr?`<small style="color:var(--er)">${esc(drvErr)}</small>`:''}<small class="mu">Modules, horaires, devoirs, fiches, quiz, notes et fichiers locaux sont envoyés automatiquement.</small>`}
 
 function drvAuth(){
   return lib('https://accounts.google.com/gsi/client').then(()=>new Promise((ok,ko)=>{
     tc=tc||google.accounts.oauth2.initTokenClient({client_id:cid(),scope:SCOPE,
       callback:r=>{if(r.error)return tc._ko&&tc._ko(Error(r.error));
-        tok=r.access_token;for(const k in DRVF)delete DRVF[k];clearTimeout(tokT);const ms=((+r.expires_in||3600)-90)*1000;tokT=setTimeout(()=>{tok=null;paintDrive();armReconnect()},ms);
-        LS(LK(),'1');drvErr='';paintDrive();tc._ok&&tc._ok()},
+        tok=r.access_token;for(const k in DRVF)delete DRVF[k];clearTimeout(tokT);const ms=((+r.expires_in||3600)-90)*1000;tokT=setTimeout(()=>{tok=null;paintDrive();if(!UID)armReconnect()},ms);
+        LS(LK(),'1');drvErr='';paintDrive();window.uxGHint&&uxGHint();tc._ok&&tc._ok()},
       error_callback:e=>tc._ko&&tc._ko(Error(e&&e.type||'popup'))});
-    tc._ok=ok;tc._ko=ko;tc.requestAccessToken();
+    tc._ok=ok;tc._ko=ko;tc.requestAccessToken(Object.assign({prompt:''},(()=>{try{const h=localStorage.getItem('ux_gdhint');return h?{hint:h}:{}}catch(e){return{}}})()));
   }));
 }
 /* la session Google expire apres 1 h : au prochain toucher/clic on se reconnecte silencieusement */
@@ -1510,7 +1510,7 @@ function armReconnect(){
     drvAuth().then(()=>drvSync()).catch(()=>{paintDrive();setTimeout(armReconnect,60000)})};
   ['pointerup','keydown'].forEach(t=>document.addEventListener(t,run,true));
 }
-function drvSchedule(){if(!linked())return;if(!tok){armReconnect();return}clearTimeout(syncT);syncT=setTimeout(()=>drvSync(),4000)}
+function drvSchedule(){if(!linked())return;if(!tok){if(!UID)armReconnect();return}clearTimeout(syncT);syncT=setTimeout(()=>drvSync(),4000)}
 
 async function dfetch(url,opt={}){
   if(!tok){const e=Error('Drive non connecté');e.code=401;throw e}
@@ -1600,7 +1600,7 @@ async function syncFiles(){
   if(n){A.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(A))}catch(e){}if(UID)fbSchedule(300);else await drvPut(await drvFind())}}
 
 async function drvSync(o={}){
-  if(!linked())return;if(!tok){armReconnect();return}
+  if(!linked())return;if(!tok){if(!UID)armReconnect();return}
   if(drvBusy){drvQueued=true;return}
   drvBusy=true;paintDrive();
   try{
@@ -1615,12 +1615,12 @@ async function drvSync(o={}){
       else if(rts>lastTs()){if(!dirty||!hasData())applyRemote(rm,rts,f);else{mergeRemote(rm);await drvPut(f);toast('Données fusionnées avec Drive ✔','ok')}}
       else{LS('eduVault_remoteMod',f.modifiedTime||'');if(dirty)await drvPut(f)}}
     await syncFiles();drvErr=''}
-  catch(e){if(e.code===401){armReconnect()}else drvErr=e instanceof TypeError?'Hors ligne : nouvelle tentative automatique':e.message}
+  catch(e){if(e.code===401){if(!UID)armReconnect()}else drvErr=e instanceof TypeError?'Hors ligne : nouvelle tentative automatique':e.message}
   finally{drvBusy=false;paintDrive();if(drvQueued){drvQueued=false;drvSchedule()}}
 }
 function drvBoot(){
   if(linked())lib('https://accounts.google.com/gsi/client').catch(()=>{});paintDrive();
-  if(linked())armReconnect();
+  if(linked()&&!UID)armReconnect();
   setInterval(()=>{if(tok)drvSync()},5*60000);
   addEventListener('online',()=>{if(linked())drvSchedule()});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&tok&&(A.updatedAt||0)>lastTs())drvSync()});
@@ -1662,7 +1662,7 @@ async function switchUser(uid,email){
   UID=uid;KEY=keyFor(uid);db=null;tok=null;clearTimeout(tokT);
   if(wiping){wipeLocal(leaving);wipeNext=null}
   if(uid)localStorage.setItem('eduVault_acct',JSON.stringify({uid,email}));else localStorage.removeItem('eduVault_acct');
-  fbErr='';ENC=null;ENCST='off';encAsked='';resetA();load();paintDrive();if(linked())armReconnect();
+  fbErr='';ENC=null;ENCST='off';encAsked='';resetA();load();paintDrive();if(linked()&&!UID)armReconnect();
   if(!A.settings.level)onboard();else closeOnboard();
   render();paintAcct();
 }
@@ -4739,6 +4739,12 @@ const inject=()=>{const acct=v.querySelector('.tiles .tile[data-a="acct"]');if(!
   acct.insertAdjacentElement('afterend',c)};
 if(v)new MutationObserver(inject).observe(v,{childList:true});inject();
 })();
+</script>
+<script id="ux-gdhint-js">
+/* mémorise l'adresse du compte Google de Drive : les reconnexions suivantes évitent l'écran « Sélectionnez un compte » */
+window.uxGHint=function(){try{if(localStorage.getItem('ux_gdhint')||typeof tok==='undefined'||!tok)return;
+  fetch('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)',{headers:{Authorization:'Bearer '+tok}}).then(r=>r.ok?r.json():null)
+   .then(j=>{const e=j&&j.user&&j.user.emailAddress;if(e)localStorage.setItem('ux_gdhint',e)}).catch(()=>{})}catch(e){}};
 </script>
 </body>
 </html>
