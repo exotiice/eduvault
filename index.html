@@ -4768,5 +4768,129 @@ const v=document.getElementById('v');if(v)new MutationObserver(mark).observe(v,{
 try{applyTheme()}catch(e){}/* applique un thème choisi avant le chargement de cette liste */
 })();
 </script>
+<script id="ux-import-js">
+/* Import IA de l'emploi du temps : aperçu + fusion intelligente.
+   - reconnaît les modules aux noms proches (accents, pluriels, noms tronqués « … »)
+   - lit la semaine A/B
+   - met à jour les séances existantes au lieu de les ignorer ; mode « Remplacer » en option
+   - outil « fusionner les modules en double » + annulation après application */
+(function(){'use strict';
+const L=(f,e,a)=>Lg(f,e,a);
+const STOP=new Set(['pour','dans','avec','des','les','aux','sur','une','par']);
+const nm=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/…|\.{2,}/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
+const toks=t=>new Set(nm(t).split(' ').filter(w=>w.length>=4&&!STOP.has(w)).map(w=>w.replace(/s$/,'')));
+const clean=t=>String(t||'').replace(/(…|\.{2,})\s*$/,'').replace(/\s+/g,' ').trim();
+const mn=x=>{const p=String(x||'0:0').split(':');return(+p[0])*60+(+p[1]||0)};
+const ov=(a1,a2,b1,b2)=>Math.max(0,Math.min(a2,b2)-Math.max(a1,b1));
+const wk=x=>{const m=String(x||'').trim().toUpperCase().match(/^(?:SEMAINE\s*)?([AB])$/);return m?m[1]:'all'};
+const wlab=w=>w==='all'?L('toutes sem.','every week','كل الأسابيع'):L('Sem. ','Wk ','أسبوع ')+w;
+function sim(a,b){
+  const x=nm(a),y=nm(b);if(!x||!y)return 0;if(x===y)return 1;
+  if(Math.min(x.length,y.length)>=10&&(x.startsWith(y)||y.startsWith(x)))return .95;
+  const p=toks(a),q=toks(b);if(p.size<2||q.size<2)return 0;
+  let n=0;p.forEach(w=>{if(q.has(w))n++});return n>=2?n/Math.min(p.size,q.size):0}
+const PROMPT='Extrais l\'emploi du temps de ces images. Réponds STRICTEMENT avec un tableau JSON valide sans markdown : [{"jour":"LUNDI","debut":"08:15","fin":"09:45","matiere":"Nom du module","salle":"AMPHI-04","semaine":"A"}]. Utilise les jours en français (LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI). "semaine" vaut "A" ou "B" si le document indique « Semaine A » ou « Semaine B », sinon "TOUS". Recopie le nom de la matière et la salle exactement comme écrits. Une ligne par séance, n\'invente rien.';
+
+/* ---------- calcul du plan (ne modifie rien) ---------- */
+function plan(ss,week,mode){
+  const sem=A.activeSemester,mods=A.modules.filter(m=>m.semester===sem),mid=new Set(mods.map(m=>m.id));
+  const pool=mods.map(m=>({id:m.id,name:m.name,key:null})),tt=A.timetable.filter(c=>!c.date&&mid.has(c.moduleId)),used=new Set(),rows=[];
+  ss.forEach(s=>{
+    const w=week==='auto'?(s.w||'all'):week;let b=null,bs=0;
+    pool.forEach(p=>{const v=sim(s.matiere,p.name);if(v>bs){bs=v;b=p}});
+    if(!b||bs<.75){b={id:null,key:'n'+pool.length,name:clean(s.matiere)};pool.push(b)}
+    else if(!b.id&&clean(s.matiere).length>b.name.length)b.name=clean(s.matiere);
+    rows.push({s,w,mod:b,c:null,st:'new',clash:false})});
+  rows.forEach(r=>{const s=r.s;if(!r.mod.id)return;
+    const cand=tt.filter(c=>{const cw=c.week||'all';return!used.has(c.id)&&c.moduleId===r.mod.id&&c.day===s.day&&(cw===r.w||cw==='all'||r.w==='all')})
+      .map(c=>{const o=ov(mn(c.startTime),mn(c.endTime),mn(s.debut),mn(s.fin)),len=Math.min(mn(c.endTime)-mn(c.startTime),mn(s.fin)-mn(s.debut));
+        return{c,sc:(c.startTime===s.debut?2:0)+((c.week||'all')===r.w?1:0)+(len>0?o/len:0),ok:c.startTime===s.debut||(len>0&&o/len>=.5)}})
+      .filter(x=>x.ok).sort((a,b)=>b.sc-a.sc);
+    if(cand.length){const c=cand[0].c;used.add(c.id);r.c=c;
+      r.st=(c.startTime===s.debut&&c.endTime===s.fin&&(c.week||'all')===r.w&&(!s.salle||c.room===s.salle))?'same':'upd'}});
+  const tw=new Set(rows.map(r=>r.w));
+  const rm=mode==='replace'?tt.filter(c=>!used.has(c.id)&&!c.en&&(tw.has('all')||tw.has(c.week||'all')||(c.week||'all')==='all')):[],rmS=new Set(rm.map(c=>c.id));
+  rows.forEach(r=>{r.clash=tt.some(c=>!used.has(c.id)&&!rmS.has(c.id)&&c.moduleId!==r.mod.id&&c.day===r.s.day&&(r.w==='all'||(c.week||'all')==='all'||c.week===r.w)&&ov(mn(c.startTime),mn(c.endTime),mn(r.s.debut),mn(r.s.fin))>0)});
+  rows.sort((a,b)=>DAYS.indexOf(a.s.day)-DAYS.indexOf(b.s.day)||a.s.debut.localeCompare(b.s.debut));
+  return{rows,rm,newMods:pool.filter(p=>!p.id&&rows.some(r=>r.mod===p))}}
+
+/* ---------- doublons déjà présents ---------- */
+function dupPairs(){
+  const ms=A.modules.filter(m=>m.semester===A.activeSemester),out=[],seen=new Set();
+  ms.forEach((a,i)=>ms.slice(i+1).forEach(b=>{if(!seen.has(a.id)&&!seen.has(b.id)&&sim(a.name,b.name)>=.75){out.push([a,b]);seen.add(b.id)}}));return out}
+function ttDupCount(){const s=new Set();let n=0;A.timetable.forEach(c=>{if(c.date)return;const k=[c.moduleId,c.day,c.startTime,c.endTime,c.week||'all'].join('|');if(s.has(k))n++;else s.add(k)});return n}
+function mergeMods(a,b){
+  A.timetable.forEach(c=>{if(c.moduleId===b.id)c.moduleId=a.id});
+  ['tasks','flashcards','quizQs'].forEach(k=>A[k].forEach(x=>{if(x.moduleId===b.id)x.moduleId=a.id}));
+  (A.projects||[]).forEach(p=>(p.cards||[]).forEach(c=>{if(c.moduleId===b.id)c.moduleId=a.id}));
+  a.resources=(a.resources||[]).concat(b.resources||[]);a.absences=(a.absences||0)+(b.absences||0);a.pomo=(a.pomo||0)+(b.pomo||0);
+  ['ncc','ntp','nex','nrat'].forEach(k=>{if(a[k]==null&&b[k]!=null)a[k]=b[k]});if(!a.prof&&b.prof)a.prof=b.prof;
+  if(A.memos&&A.memos[b.id]){(A.memos[a.id]=A.memos[a.id]||[]).push(...A.memos[b.id]);delete A.memos[b.id]}
+  A.modules=A.modules.filter(m=>m!==b)}
+function dedupeTT(){
+  const keep=new Map(),drop=new Map();
+  A.timetable.forEach(c=>{if(c.date)return;const k=[c.moduleId,c.day,c.startTime,c.endTime,c.week||'all'].join('|');if(keep.has(k))drop.set(c.id,keep.get(k));else keep.set(k,c.id)});
+  A.notes.forEach(n=>{if(drop.has(n.classId)&&!A.notes.some(x=>x.classId===drop.get(n.classId)))n.classId=drop.get(n.classId)});
+  A.timetable=A.timetable.filter(c=>!drop.has(c.id));A.notes=A.notes.filter(n=>!drop.has(n.classId)||A.notes.some(x=>x!==n&&x.classId===n.classId))}
+
+/* ---------- aperçu ---------- */
+function draw(){
+  const I=window.__aiImp,P=plan(I.ss,I.week,I.mode),cnt=k=>P.rows.filter(r=>r.st===k).length,dp=dupPairs().length,td=ttDupCount();
+  const ico={new:'➕',upd:'✏️',same:'＝'};
+  const opt=(v,l,c)=>`<option value="${v}"${c===v?' selected':''}>${l}</option>`;
+  dlgShow(`<h3>✨ ${L("Aperçu de l'import","Import preview",'معاينة الاستيراد')} · ${esc(A.activeSemester)}</h3>
+  <label>${L('Semaine','Week','الأسبوع')}<select onchange="act.impSet('week',this.value)">${opt('auto',L("Détectée par l'IA","Detected by the AI",'يحددها الذكاء الاصطناعي')+(I.hasWk?'':' ('+L('aucune → toutes','none → all','لا شيء ← الكل')+')'),I.week)}${opt('all',L('Toutes les semaines','Every week','كل الأسابيع'),I.week)}${opt('A',L('Semaine A','Week A','الأسبوع A'),I.week)}${opt('B',L('Semaine B','Week B','الأسبوع B'),I.week)}</select></label>
+  <label>${L('Mode','Mode','النمط')}<select onchange="act.impSet('mode',this.value)">${opt('merge',L('Fusionner : met à jour et ajoute, ne supprime rien','Merge: update and add, never delete','دمج: تحديث وإضافة دون حذف'),I.mode)}${opt('replace',L("Remplacer : supprime aussi les séances de cette semaine absentes du document","Replace: also removes this week's sessions missing from the document",'استبدال: يحذف أيضا حصص هذا الأسبوع غير الموجودة في الوثيقة'),I.mode)}</select></label>
+  <div class="rs" style="display:block"><b>➕ ${cnt('new')} · ✏️ ${cnt('upd')} · ＝ ${cnt('same')}</b>${P.newMods.length?`<small class="mu">${P.newMods.length} ${L('nouveau(x) module(s) à créer','new module(s) to create','مواد جديدة سيتم إنشاؤها')}</small>`:''}${P.rm.length?`<small style="color:var(--er)">🗑 ${P.rm.length} ${L('séance(s) seront retirées','session(s) will be removed','حصص ستُحذف')}</small>`:''}</div>
+  <div class="gcl icsl">${P.rows.map(r=>{const s=r.s,c=r.c;return`<div class="rs" style="display:block;margin-top:4px"><b>${ico[r.st]} ${esc(r.mod.name)}</b>${r.mod.id?'':` <span class="pr m">${L('nouveau','new','جديد')}</span>`}${r.clash?` <span class="pr h">⚠️ ${L('chevauche','overlaps','تتداخل')}</span>`:''}<small class="mu">${esc(s.day)} ${esc(s.debut)}–${esc(s.fin)} · ${esc(s.salle||'—')} · ${wlab(r.w)}</small>${r.st==='upd'?`<small class="mu">${L('avant','before','قبل')} : ${esc(c.startTime)}–${esc(c.endTime)} · ${esc(c.room||'—')} · ${wlab(c.week||'all')}</small>`:''}</div>`}).join('')}</div>
+  ${P.rm.length?`<details style="margin-top:6px"><summary class="mu">🗑 ${L('Séances qui seront retirées','Sessions to be removed','الحصص التي ستُحذف')}</summary>${P.rm.map(c=>`<div class="enl">${esc(modName(c.moduleId))} · ${esc(c.day)} ${esc(c.startTime)}–${esc(c.endTime)} · ${wlab(c.week||'all')}</div>`).join('')}</details>`:''}
+  ${(dp||td)?`<div class="row" style="justify-content:flex-start"><button class="b" data-a="impDedupe">🧹 ${L('Nettoyer les doublons existants','Clean existing duplicates','تنظيف التكرارات الموجودة')} (${dp} ${L('module(s)','module(s)','مواد')}, ${td} ${L('séance(s)','session(s)','حصص')})</button></div>`:''}
+  <div class="row"><button class="b" onclick="$('dlg').close()">${tr('Annuler')}</button><button class="b p" data-a="impApply">${L('Appliquer','Apply','تطبيق')}</button></div>`)}
+
+/* ---------- application (avec annulation) ---------- */
+function snapAll(){return JSON.stringify({modules:A.modules,timetable:A.timetable,notes:A.notes,tasks:A.tasks,flashcards:A.flashcards,quizQs:A.quizQs,memos:A.memos})}
+function undoer(snap,label){toastUndo(label,()=>{const o=JSON.parse(snap);Object.keys(o).forEach(k=>{A[k]=o[k]});upd()})}
+function apply(){
+  const I=window.__aiImp;if(!I)return;const P=plan(I.ss,I.week,I.mode),snap=snapAll(),ids={};let na=0,nu=0;
+  P.newMods.forEach(p=>{const m={id:uid('m'),semester:A.activeSemester,name:p.name.slice(0,120),prof:'',coeff:1,color:nextModColor(),ccc:0,ctp:0,cex:1,ncc:null,ntp:null,nex:null,absences:0,pomo:0,resources:[]};A.modules.push(m);ids[p.key]=m.id});
+  P.rows.forEach(r=>{const s=r.s;
+    if(r.c){if(r.st==='upd'){Object.assign(r.c,{day:s.day,week:r.w,startTime:s.debut,endTime:s.fin,room:s.salle||r.c.room||'—'});nu++}}
+    else{A.timetable.push({id:uid('c'),moduleId:r.mod.id||ids[r.mod.key],day:s.day,week:r.w,startTime:s.debut,endTime:s.fin,room:s.salle||'—'});na++}});
+  const gone=new Set(P.rm.map(c=>c.id));A.timetable=A.timetable.filter(c=>!gone.has(c.id));A.notes=A.notes.filter(n=>!gone.has(n.classId));
+  window.__aiImp=null;$('dlg').close();upd();
+  toast(L(na+' ajoutée(s), '+nu+' mise(s) à jour'+(gone.size?', '+gone.size+' retirée(s)':''),na+' added, '+nu+' updated'+(gone.size?', '+gone.size+' removed':''),'أضيفت '+na+' · حُدثت '+nu+(gone.size?' · حُذفت '+gone.size:'')),'ok');
+  undoer(snap,L('Import appliqué','Import applied','تم تطبيق الاستيراد'))}
+
+/* ---------- lecture du document par l'IA ---------- */
+window.aiImport=async function(v,fd){
+  const f=fd.get('file');if(!f||!f.size)return toast('Sélectionnez un document','er');
+  const prov=AI[v.prov]?v.prov:'gemini',key=v.key.trim(),model=v.model.trim();
+  localStorage.setItem('eduVault_aiProv',prov);localStorage.setItem('eduVault_aiKey_'+prov,key);localStorage.setItem('eduVault_aiModel_'+prov,model);
+  toast('Analyse en cours ('+AI[prov].n+')...');
+  try{
+    const raw=(await aiCallFO(prov,key,model,await toImages(f),PROMPT)).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/```(?:json)?/g,''),a=raw.indexOf('['),b=raw.lastIndexOf(']');
+    if(a<0||b<a)throw Error("L'IA n'a pas renvoyé de JSON valide.");
+    const seen=new Set(),ss=[];
+    JSON.parse(raw.slice(a,b+1)).forEach(x=>{if(!x)return;
+      const s={debut:hm(x.debut),fin:hm(x.fin),matiere:String(x.matiere||'').trim(),salle:String(x.salle||'').trim(),w:wk(x.semaine)},day=normDay(x.jour);
+      if(!s.matiere||!s.debut||!s.fin||s.fin<=s.debut||!day)return;s.day=day;
+      const k=[nm(s.matiere),day,s.debut,s.fin,s.w].join('|');if(seen.has(k))return;seen.add(k);ss.push(s)});
+    if(!ss.length)throw Error('Aucun cours trouvé dans ce document.');
+    window.__aiImp={ss,week:'auto',mode:'merge',hasWk:ss.some(s=>s.w!=='all')};draw();
+  }catch(e){toast(e instanceof TypeError?'Connexion impossible (internet, Brave Shields, VPN)':'Erreur IA : '+e.message,'er')}};
+
+Object.assign(act,{
+  impSet:(k,v)=>{if(window.__aiImp){window.__aiImp[k]=v;draw()}},
+  impApply:apply,
+  impDedupe:()=>{
+    const pr=dupPairs(),td=ttDupCount();
+    if(!pr.length&&!td)return toast(L('Aucun doublon','No duplicates','لا تكرار'),'ok');
+    if(!confirm(L('Fusionner ces modules (leurs séances, devoirs, fiches et fichiers sont regroupés) ?\n\n','Merge these modules (their sessions, tasks, cards and files are combined)?\n\n','دمج هذه المواد؟\n\n')+pr.map(p=>'• '+p[1].name+'  →  '+p[0].name).join('\n')+(td?'\n\n'+td+' '+L('séance(s) identiques seront supprimées','identical session(s) will be removed','حصص مطابقة ستُحذف'):'')))return;
+    const snap=snapAll();pr.forEach(p=>mergeMods(p[0],p[1]));dedupeTT();upd();
+    if(window.__aiImp)draw();else if($('dlg').open)$('dlg').close();
+    toast(L('Doublons nettoyés ✔','Duplicates cleaned ✔','تم تنظيف التكرارات ✔'),'ok');undoer(snap,L('Nettoyage appliqué','Cleanup applied','تم التنظيف'))}
+});
+})();
+</script>
 </body>
 </html>
