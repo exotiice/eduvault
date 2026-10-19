@@ -4220,7 +4220,9 @@ button:focus-visible,[data-a]:focus-visible,input:focus-visible,select:focus-vis
     (A.tasks||[]).filter(x=>norm(x.title).includes(q)).slice(0,5).forEach(x=>out.push({i:x.type==='exam'?'🚨':x.type==='review'?'📖':'📝',t:x.title,sub:mn(x.moduleId)+(x.dueDate?' · '+new Date(x.dueDate).toLocaleDateString():''),f:()=>go('ag')}));
     (A.flashcards||[]).filter(f=>norm(plain(f.q||f.front)).includes(q)||norm(plain(f.a||f.back)).includes(q)).slice(0,5).forEach(f=>out.push({i:'🃏',t:plain(f.q||f.front).slice(0,80),sub:mn(f.moduleId),f:()=>go('fc')}));
     (A.notes||[]).filter(n=>n.text&&norm(n.text).includes(q)&&(A.timetable||[]).some(c=>c.id===n.classId)).slice(0,4).forEach(n=>{const c=A.timetable.find(c=>c.id===n.classId),p=norm(n.text).indexOf(q);out.push({i:'🗒',t:plain(n.text).slice(Math.max(0,p-15),p+60),sub:mn(c.moduleId),f:()=>act.cls(c.id)})});
-    (A.timetable||[]).filter(c=>norm(mn(c.moduleId)).includes(q)).slice(0,3).forEach(c=>out.push({i:'📅',t:mn(c.moduleId),sub:c.day+' · '+c.startTime+'–'+c.endTime,f:()=>act.cls(c.id)}));
+    {const tm=q.match(/(?:^|\s)(tp|td|cours|cm)(?=\s|$)/);if(tm){const tf=tm[1]==='cm'?'cours':tm[1],q2=q.replace(tm[0],' ').trim(),ids=curIds();
+      return (A.timetable||[]).filter(c=>c.typ===tf&&ids.has(c.moduleId)&&(!q2||norm(mn(c.moduleId)+' '+(c.room||'')+' '+(c.prof||'')+' '+(c.day||'')).includes(q2))).sort((a,b)=>(DAYS.indexOf(a.day)-DAYS.indexOf(b.day))||String(a.startTime).localeCompare(b.startTime)).slice(0,14).map(c=>({i:'🗓',t:mn(c.moduleId)+' · '+tyName(c.typ),sub:(c.date||c.day)+' · '+c.startTime+'–'+c.endTime+' · '+(c.room||'')+(c.prof?' · '+c.prof:''),f:()=>act.cls(c.id)}))}}
+    (A.timetable||[]).filter(c=>norm(mn(c.moduleId)+' '+(c.room||'')+' '+(c.prof||'')+' '+(c.typ||'')).includes(q)).slice(0,3).forEach(c=>out.push({i:'📅',t:mn(c.moduleId)+(c.typ?' · '+tyName(c.typ):''),sub:c.day+' · '+c.startTime+'–'+c.endTime,f:()=>act.cls(c.id)}));
     return out.slice(0,14);
   }
   let items=[],sel=0;
@@ -4772,7 +4774,7 @@ try{applyTheme()}catch(e){}/* applique un thème choisi avant le chargement de c
 })();
 </script>
 <style id="ux-ty">
-.ty{display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:99px;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;vertical-align:1px;border:1px solid;line-height:1.5}
+.ty{display:inline-block;margin-inline-start:7px;padding:2px 10px;border-radius:99px;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;vertical-align:1px;border:1.5px solid;line-height:1.5}
 .ty-cours{color:#1d4ed8;background:#3b82f61f;border-color:#3b82f655}
 .ty-td{color:#b45309;background:#f59e0b24;border-color:#f59e0b66}
 .ty-tp{color:#15803d;background:#16a34a1f;border-color:#16a34a55}
@@ -4942,6 +4944,41 @@ Object.assign(act,{
     toast(L('Doublons nettoyés ✔','Duplicates cleaned ✔','تم تنظيف التكرارات ✔'),'ok');undoer(snap,L('Nettoyage appliqué','Cleanup applied','تم التنظيف'))}
 });
 window.__impFns={parsePdfTT,plan,sim};
+})();
+</script>
+<script id="ux-typefilter-js">
+/* Filtre par type (COURS / TD / TP) dans la recherche du haut : puces + mots « tp », « td », « cours » (ex. « tp java ») */
+(function(){'use strict';
+const L=(f,e,a)=>Lg(f,e,a);
+const nz=x=>String(x==null?'':x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const TRE=/(?:^|\s)(tp|td|cours|cm)(?=\s|$)/;
+let TYF='';
+function sessions(typ,text){
+  const ids=curIds(),t=nz(text).trim();
+  return A.timetable.filter(c=>ids.has(c.moduleId)&&(!typ||c.typ===typ)&&(!t||nz(modName(c.moduleId)+' '+(c.room||'')+' '+(c.prof||'')+' '+(c.day||'')+' '+(c.typ?tyName(c.typ):'')).includes(t)))
+    .sort((a,b)=>(a.date?1:0)-(b.date?1:0)||(a.date&&b.date?String(a.date).localeCompare(b.date):0)||DAYS.indexOf(a.day)-DAYS.indexOf(b.day)||String(a.startTime).localeCompare(b.startTime))}
+const row=c=>`<div class="cl" data-a="sgoCls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${esc(c.date||c.day)} · ${esc(c.startTime)} – ${esc(c.endTime)}${!c.date&&c.week&&c.week!=='all'?' · '+L('Sem. ','Wk ','أسبوع ')+esc(c.week):''}</small><b>${esc(modName(c.moduleId))}${tyTag(c)}</b><small class="mu">📍 ${esc(c.room||'—')}${profBit(c)}</small></div>`;
+window.doSearch2=function(){
+  const inp=$('sq'),res=$('s-res'),raw=inp.value.trim(),k=raw.toLowerCase(),tm=nz(raw).match(TRE);
+  let typ=TYF,text=nz(raw);if(tm){typ=tm[1]==='cm'?'cours':tm[1];text=text.replace(tm[0],' ').trim()}
+  const chips=`<div class="row" style="justify-content:flex-start;align-items:center;margin:0 0 8px;gap:6px;flex-wrap:wrap"><small class="mu">${L('Type','Type','النوع')} :</small>${[['',L('Tous','All','الكل')],['cours',tyName('cours')],['td','TD'],['tp','TP']].map(c=>`<button type="button" class="b${typ===c[0]?' p':''}" style="padding:4px 12px;min-height:32px" data-a="tyf" data-i="${c[0]}">${esc(c[1])}</button>`).join('')}</div>`;
+  const un=A.timetable.filter(c=>curIds().has(c.moduleId)&&!c.date&&!c.typ).length,
+    hint=`<small class="mu" style="display:block">${L('Tape « tp », « td » ou « cours » (ex. « tp java ») ou choisis un type.','Type “tp”, “td” or “cours” (e.g. “tp java”) or pick a type.','اكتب «tp» أو «td» أو «cours» (مثال «tp java») أو اختر نوعا.')}${un?'<br>'+L(un+' séance(s) sans type : réimporte ton PDF (Horaires → ✨ IA) pour les remplir.',un+' session(s) without a type: re-import your PDF (Timetable → ✨ AI) to fill them.',un+' حصة بدون نوع: أعد استيراد ملف PDF لملئها.'):''}</small>`;
+  if(!k&&!typ){res.innerHTML=chips+hint;res.style.display='block';return}
+  let h=chips;
+  if(typ){const l=sessions(typ,text);
+    h+=l.length?`<small class="mu" style="display:block;margin-bottom:4px">${l.length} ${L('séance(s)','session(s)','حصة')} · ${esc(typ==='cours'?tyName('cours'):typ.toUpperCase())}</small>`+l.slice(0,40).map(row).join(''):`<small class="mu">${L('Aucune séance de ce type.','No session of this type.','لا توجد حصص من هذا النوع.')}</small>${hint}`}
+  else{
+    A.modules.filter(m=>m.name.toLowerCase().includes(k)).forEach(m=>h+=`<div class="cl" data-a="sgo" data-i="mo|${m.semester}">📚 ${esc(m.name)} <small class="mu">${m.semester}</small></div>`);
+    sessions('',raw).slice(0,8).forEach(c=>h+=row(c));
+    A.flashcards.filter(f=>(f.q+' '+f.a).toLowerCase().includes(k)).slice(0,8).forEach(f=>h+=`<div class="cl" data-a="sgo" data-i="fc|${(A.modules.find(m=>m.id===f.moduleId)||{}).semester||A.activeSemester}">🃏 ${esc(f.q)}</div>`);
+    A.tasks.filter(t=>t.title.toLowerCase().includes(k)).forEach(t=>h+=`<div class="cl" data-a="sgo" data-i="ag|${(A.modules.find(m=>m.id===t.moduleId)||{}).semester||A.activeSemester}">📝 ${esc(t.title)}</div>`);
+    if(h===chips)h+=`<small class="mu">${L('Aucun résultat','No result','لا نتيجة')}</small>`}
+  res.innerHTML=h;res.style.display='block'};
+Object.assign(act,{
+  tyf:v=>{TYF=TYF===v?'':v;const inp=$('sq');inp.value=inp.value.replace(/(?:^|\s)(tp|td|cours|cm)(?=\s|$)/ig,' ').replace(/\s+/g,' ').trim();window.doSearch2()},
+  sgoCls:id=>{$('s-res').style.display='none';$('sq').value='';TYF='';act.cls(id)}});
+$('sq').addEventListener('focus',()=>window.doSearch2());
 })();
 </script>
 </body>
