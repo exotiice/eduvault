@@ -1012,7 +1012,7 @@ function rTTGrid(tt,days,nowD,nowM,tmin){
     tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).forEach(c=>{
       const s=tmin(c.startTime),e=tmin(c.endTime),top=Math.round((s-mn)/span*H),h=Math.max(26,Math.round((e-s)/span*H)),col=modCol(c.moduleId);
       const live=d===TOD()&&!isHol(iso(nowD))&&nowM>=s&&nowM<e,n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
-      evs+=`<div class="ev${live?' live':''}" data-a="cls" data-i="${c.id}" style="top:${top}px;height:${h}px;${tint(col)}"><small class="br">${esc(c.startTime)}${h>38?'–'+esc(c.endTime):''}${live?' · ●':''}</small><b>${esc(modName(c.moduleId))}${tyTag(c)}</b>${h>56?`<small class="mu">📍 ${esc(c.room)}${n?' 📝':''}</small>`:''}</div>`;
+      evs+=`<div class="ev${live?' live':''}" data-a="cls" data-i="${c.id}" title="${esc(modName(c.moduleId)+(c.typ?' · '+tyName(c.typ):'')+(c.prof?' · '+c.prof:'')+' · '+c.startTime+'–'+c.endTime+' · '+(c.room||''))}" style="top:${top}px;height:${h}px;${tint(col)}"><small class="br">${esc(c.startTime)}${h>38?'–'+esc(c.endTime):''}${live?' · ●':''}${tyTag(c)}</small><b style="-webkit-line-clamp:${Math.max(2,Math.floor((h-(h>56?46:30))/14))}">${esc(modName(c.moduleId))}</b>${h>56?`<small class="mu">📍 ${esc(c.room)}${h>=100?profBit(c):''}${n?' 📝':''}</small>`:''}</div>`;
     });
     return `<div class="daycol2"><div class="gh2${d===TOD()?' today':''}">${d.slice(0,3)}${d===TOD()?' •':''}</div><div class="track" style="height:${H}px">${evs}</div></div>`;
   }).join('');
@@ -4778,6 +4778,7 @@ try{applyTheme()}catch(e){}/* applique un thème choisi avant le chargement de c
 .ty-cours{color:#1d4ed8;background:#3b82f61f;border-color:#3b82f655}
 .ty-td{color:#b45309;background:#f59e0b24;border-color:#f59e0b66}
 .ty-tp{color:#15803d;background:#16a34a1f;border-color:#16a34a55}
+.tgrid2 .ev .ty{font-size:9.5px;padding:0 7px;margin-inline-start:6px;border-width:1px;letter-spacing:.05em}
 .dark .ty-cours{color:#93c5fd}.dark .ty-td{color:#fcd34d}.dark .ty-tp{color:#86efac}
 </style>
 <script id="ux-import-js">
