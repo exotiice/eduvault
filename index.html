@@ -966,6 +966,11 @@ function doSearch2(){
 }
 
 const fmtMin=m=>m>=60?Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):''):m+' min';
+/* séance non assurée une semaine donnée : c.skip = ['AAAA-MM-JJ', …], c.skipWhy = {date: raison} */
+const skipped=(c,k)=>!!(c&&c.skip&&c.skip.indexOf(k)>=0);
+const occDate=c=>{if(c.date)return c.date;const m=monday(new Date()),i=Math.max(0,DAYS.indexOf(c.day));return iso(new Date(m.getFullYear(),m.getMonth(),m.getDate()+i))};
+const isCx=c=>!c.date&&skipped(c,occDate(c));
+const cxTag=c=>isCx(c)?` <span class="ty ty-cx" title="${esc((c.skipWhy&&c.skipWhy[occDate(c)])||'')}">🚫 ${Lg('Annulée','Cancelled','ملغاة')}</span>`:'';
 const inThisWeek=d=>{const m=monday(new Date()),x=new Date(d+'T00:00');return x>=m&&x<new Date(m.getFullYear(),m.getMonth(),m.getDate()+7)};
 const tyName=k=>({cours:Lg('Cours','Lecture','درس'),td:'TD',tp:'TP'})[k]||'';
 const tyTag=c=>c&&c.typ&&tyName(c.typ)?` <span class="ty ty-${c.typ}">${esc(tyName(c.typ))}</span>`:'';
@@ -974,7 +979,7 @@ const xTag=c=>tyTag(c)+(c.date?` <span class="pr h">${Lg('Supp.','Extra','إضا
 function rDa(){
   const ids=curIds();
   const t=Date.now(),n=new Date(),hol=isHol(iso(n)),nm=n.getHours()*60+n.getMinutes(),tm=x=>{const[h,m]=x.split(':');return+h*60+ +m};
-  const cls=A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&(c.date?c.date===iso(n):(!hol&&(c.week==='all'||c.week===curWeek())))).sort((a,b)=>a.startTime.localeCompare(b.startTime));
+  const cls=A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&(c.date?c.date===iso(n):(!hol&&(c.week==='all'||c.week===curWeek())&&!skipped(c,iso(n))))).sort((a,b)=>a.startTime.localeCompare(b.startTime));
   const due=A.tasks.filter(x=>ids.has(x.moduleId)&&!x.completed&&x.type!=='review'&&new Date(x.dueDate).getTime()<t+7*864e5).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
   const nFc=A.flashcards.filter(f=>ids.has(f.moduleId)&&(!f.nextRev||f.nextRev<=t)).length,nx=cls.find(c=>tm(c.endTime)>nm);
   const hist=A.quizHist,avgQ=hist.length?Math.round(hist.reduce((s,x)=>s+x.sc/x.n,0)/hist.length*100):null,focus=Math.round(A.modules.reduce((s,m)=>s+(m.pomo||0),0)/60);
@@ -995,8 +1000,8 @@ function rTT(){
   return head+`<div class="g">`+
   days.map(d=>`<div class="c${d===TOD()?' tod':''}"><h4>${d}${d===TOD()?' · aujourd’hui':''}</h4>`+(tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(c=>{
     const n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
-    const live=c.day===TOD()&&!isHol(iso(nowD))&&nowM>=tmin(c.startTime)&&nowM<tmin(c.endTime);
-    return`<div class="cl${n?' nt':''}${live?' live':''}" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}${live?' · En cours':''}</small><b>${esc(modName(c.moduleId))}${xTag(c)}</b><small class="mu">📍 ${esc(c.room)}${profBit(c)}${n?' 📝':''}</small></div>`}).join('')||`<p class="mu e">${tr('Aucune séance')}</p>`)+'</div>').join('')+'</div>';
+    const live=c.day===TOD()&&!isHol(iso(nowD))&&nowM>=tmin(c.startTime)&&nowM<tmin(c.endTime)&&!isCx(c);
+    return`<div class="cl${n?' nt':''}${live?' live':''}${isCx(c)?' cx':''}" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${esc(c.startTime)} – ${esc(c.endTime)}${live?' · En cours':''}</small><b>${esc(modName(c.moduleId))}${xTag(c)}${cxTag(c)}</b><small class="mu">📍 ${esc(c.room)}${profBit(c)}${n?' 📝':''}</small></div>`}).join('')||`<p class="mu e">${tr('Aucune séance')}</p>`)+'</div>').join('')+'</div>';
 }
 
 /* Vue grille horaire (flexbox : chaque jour contient son propre en-tete + sa piste,
@@ -1011,8 +1016,8 @@ function rTTGrid(tt,days,nowD,nowM,tmin){
     let evs='';
     tt.filter(c=>c.day===d).sort((a,b)=>a.startTime.localeCompare(b.startTime)).forEach(c=>{
       const s=tmin(c.startTime),e=tmin(c.endTime),top=Math.round((s-mn)/span*H),h=Math.max(26,Math.round((e-s)/span*H)),col=modCol(c.moduleId);
-      const live=d===TOD()&&!isHol(iso(nowD))&&nowM>=s&&nowM<e,n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
-      evs+=`<div class="ev${live?' live':''}" data-a="cls" data-i="${c.id}" title="${esc(modName(c.moduleId)+(c.typ?' · '+tyName(c.typ):'')+(c.prof?' · '+c.prof:'')+' · '+c.startTime+'–'+c.endTime+' · '+(c.room||''))}" style="top:${top}px;height:${h}px;${tint(col)}"><small class="br">${esc(c.startTime)}${h>38?'–'+esc(c.endTime):''}${live?' · ●':''}${tyTag(c)}</small><b style="-webkit-line-clamp:${Math.max(2,Math.floor((h-(h>56?46:30))/14))}">${esc(modName(c.moduleId))}</b>${h>56?`<small class="mu">📍 ${esc(c.room)}${h>=100?profBit(c):''}${n?' 📝':''}</small>`:''}</div>`;
+      const live=d===TOD()&&!isHol(iso(nowD))&&nowM>=s&&nowM<e&&!isCx(c),n=A.notes.some(x=>x.classId===c.id&&(x.text||(x.photos||[]).length));
+      evs+=`<div class="ev${live?' live':''}${isCx(c)?' cx':''}" data-a="cls" data-i="${c.id}" title="${esc(modName(c.moduleId)+(c.typ?' · '+tyName(c.typ):'')+(c.prof?' · '+c.prof:'')+' · '+c.startTime+'–'+c.endTime+' · '+(c.room||''))}" style="top:${top}px;height:${h}px;${tint(col)}"><small class="br">${esc(c.startTime)}${h>38?'–'+esc(c.endTime):''}${live?' · ●':''}${tyTag(c)}${cxTag(c)}</small><b style="-webkit-line-clamp:${Math.max(2,Math.floor((h-(h>56?46:30))/14))}">${esc(modName(c.moduleId))}</b>${h>56?`<small class="mu">📍 ${esc(c.room)}${h>=100?profBit(c):''}${n?' 📝':''}</small>`:''}</div>`;
     });
     return `<div class="daycol2"><div class="gh2${d===TOD()?' today':''}">${d.slice(0,3)}${d===TOD()?' •':''}</div><div class="track" style="height:${H}px">${evs}</div></div>`;
   }).join('');
@@ -1360,7 +1365,7 @@ $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)
 function drawPh(){$('ph').innerHTML=cur.ph.map((s,i)=>`<div><img src="${s}" alt="Photo ${i+1}" data-a="viewPh" data-i="${i}"><button data-a="delPh" data-i="${i}" aria-label="Retirer">✕</button></div>`).join('')}
 function clsDlg(id){
   const c=A.timetable.find(x=>x.id===id);if(!c)return;const n=A.notes.find(x=>x.classId===id)||{text:'',photos:[]};cur={id,ph:[...(n.photos||[])]};
-  const d=$('dlg');d.innerHTML=`<h3>${esc(modName(c.moduleId))}${tyTag(c)}</h3><small class="mu">${esc(c.day)} ${esc(c.startTime)} – ${esc(c.endTime)} · 📍 ${esc(c.room)}${profBit(c)}</small><label>Notes du cours<textarea id="nt" rows="4" placeholder="Points importants, chapitres traités...">${esc(n.text)}</textarea></label><div id="ph" class="ph"></div><input id="pf" type="file" accept="image/*" multiple hidden><div class="row"><button class="b" data-a="pf">📷 Photo (max 3)</button><button class="b" data-a="editCls" data-i="${id}">✏️ Modifier</button><button class="b" style="color:var(--er)" data-a="delCls" data-i="${id}">🗑 Supprimer</button><button class="b" onclick="$('dlg').close()">Fermer</button><button class="b p" data-a="saveNote">Sauvegarder</button></div>`;
+  const d=$('dlg');d.innerHTML=`<h3>${esc(modName(c.moduleId))}${tyTag(c)}</h3><small class="mu">${esc(c.day)} ${esc(c.startTime)} – ${esc(c.endTime)} · 📍 ${esc(c.room)}${profBit(c)}</small><label>Notes du cours<textarea id="nt" rows="4" placeholder="Points importants, chapitres traités...">${esc(n.text)}</textarea></label><div id="ph" class="ph"></div><input id="pf" type="file" accept="image/*" multiple hidden><div class="row"><button class="b" data-a="pf">📷 Photo (max 3)</button><button class="b" data-a="editCls" data-i="${id}">✏️ Modifier</button>${c.date?'':`<button class="b" data-a="skipCls" data-i="${id}">${isCx(c)?'↩️ '+Lg('Rétablir cette semaine','Restore this week','استرجاع هذا الأسبوع'):'🚫 '+Lg('Pas cours cette semaine','No class this week','لا حصة هذا الأسبوع')}</button>`}<button class="b" style="color:var(--er)" data-a="delCls" data-i="${id}">🗑 Supprimer</button><button class="b" onclick="$('dlg').close()">Fermer</button><button class="b p" data-a="saveNote">Sauvegarder</button></div>`;
   $('pf').onchange=async e=>{const fs=[...e.target.files];if(cur.ph.length+fs.length>3)return toast('Maximum 3 photos','er');for(const f of fs)try{cur.ph.push(await shrink(f))}catch(x){toast('Image illisible','er')}drawPh()};
   drawPh();d.oncancel=null;d.showModal();
 }
@@ -1896,7 +1901,7 @@ function chkCls(){
   const mins=+(localStorage.getItem('eduVault_clsRem')||10);if(!mins)return;
   const n=new Date();if(isHol(iso(n)))return;
   const nm=n.getHours()*60+n.getMinutes(),ids=curIds(),k=iso(n);
-  A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&(c.date?c.date===k:(c.week==='all'||c.week===curWeek()))).forEach(c=>{
+  A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&(c.date?c.date===k:(c.week==='all'||c.week===curWeek())&&!skipped(c,k))).forEach(c=>{
     const[h,m]=c.startTime.split(':'),st=+h*60+ +m,key=k+c.id;
     if(st-nm>0&&st-nm<=mins&&!fired.has(key)){fired.add(key);notify(modName(c.moduleId)+' · dans '+(st-nm)+' min','📍 '+(c.room||'')+' · '+c.startTime)}})}
 setInterval(()=>{chk();chkCls();if(!document.hidden&&(tab==='da'||tab==='tt'))(window.renderSoft||render)()},6e4);chk();chkCls();
@@ -2368,7 +2373,7 @@ function planCompute(v){
   for(let d=new Date(today);d<lastDay;d.setDate(d.getDate()+1)){const wd=(d.getDay()+6)%7;if(!we&&wd>=5)continue;days.push(new Date(d))}
   if(!days.length)return toast(Lg("L'examen est trop proche pour planifier (il faut au moins un jour avant)","The exam is too close to plan (at least one day before is needed)",'الامتحان قريب جدا للتخطيط'),'er');
   const placed={},busyOf=d=>{const k=iso(d),wd=DAYS[(d.getDay()+6)%7],w=weekOfDate(d),out=[];
-    A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===wd&&(c.date?c.date===k:(c.week==='all'||c.week===w))).forEach(c=>out.push([tmin(c.startTime)-15,tmin(c.endTime)+15]));
+    A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===wd&&(c.date?c.date===k:(c.week==='all'||c.week===w)&&!skipped(c,k))).forEach(c=>out.push([tmin(c.startTime)-15,tmin(c.endTime)+15]));
     A.tasks.filter(t=>t.id!==exam.id&&t.plan!==exam.id&&!t.completed&&iso(t.dueDate)===k).forEach(t=>{const s=new Date(t.dueDate),m=s.getHours()*60+s.getMinutes();out.push([m-15,m+(+t.dur||60)+15])});
     (placed[k]||[]).forEach(p=>out.push([p[0]-15,p[0]+len+15]));return out.sort((a,b)=>a[0]-b[0])};
   const slotOf=d=>{let f=from;if(iso(d)===iso(now))f=Math.max(f,Math.ceil((now.getHours()*60+now.getMinutes()+30)/15)*15);let cur=f;const fr=[];busyOf(d).forEach(([s,e])=>{if(s>cur&&Math.min(s,to)-cur>=len)fr.push([cur,Math.min(s,to)]);cur=Math.max(cur,e)});if(to-cur>=len)fr.push([cur,to]);
@@ -4089,7 +4094,7 @@ setTimeout(()=>{const lim=iso(new Date(Date.now()-30*864e5)),n=A.timetable.lengt
   const dur=m=>m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):'');
   const dayCls=(d,wk)=>{
     const hol=isHol(iso(d)),name=DAYS[(d.getDay()+6)%7];
-    return A.timetable.filter(c=>curIds().has(c.moduleId)&&c.day===name&&(c.date?c.date===iso(d):(!hol&&(c.week==='all'||c.week===wk)))).sort((a,b)=>a.startTime.localeCompare(b.startTime));
+    return A.timetable.filter(c=>curIds().has(c.moduleId)&&c.day===name&&(c.date?c.date===iso(d):(!hol&&(c.week==='all'||c.week===wk)&&!skipped(c,iso(d))))).sort((a,b)=>a.startTime.localeCompare(b.startTime));
   };
   const row=(c,label)=>`<div class="cl" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${label}</small><b>${esc(modName(c.moduleId))}${xTag(c)}</b><small class="mu">📍 ${esc(c.room||'')}${profBit(c)}</small></div>`;
   function plus(){
@@ -4779,6 +4784,7 @@ try{applyTheme()}catch(e){}/* applique un thème choisi avant le chargement de c
 .ty-td{color:#b45309;background:#f59e0b24;border-color:#f59e0b66}
 .ty-tp{color:#15803d;background:#16a34a1f;border-color:#16a34a55}
 .tgrid2 .ev .ty{font-size:9.5px;padding:0 7px;margin-inline-start:6px;border-width:1px;letter-spacing:.05em}
+.ev.cx,.cl.cx{opacity:.5}.ev.cx b,.cl.cx b{text-decoration:line-through}.ty-cx{color:#b91c1c;background:#ef44441f;border-color:#ef444466}.dark .ty-cx{color:#fca5a5}
 .dark .ty-cours{color:#93c5fd}.dark .ty-td{color:#fcd34d}.dark .ty-tp{color:#86efac}
 </style>
 <script id="ux-import-js">
@@ -4981,6 +4987,25 @@ Object.assign(act,{
   sgoCls:id=>{$('s-res').style.display='none';$('sq').value='';TYF='';act.cls(id)}});
 $('sq').addEventListener('focus',()=>window.doSearch2());
 })();
+</script>
+<script id="ux-skip">
+/* « Pas cours cette semaine » : retire UNE occurrence d'une séance récurrente (prof absent, jour férié…), sans toucher aux autres semaines */
+Object.assign(act,{skipCls:i=>{
+  const c=A.timetable.find(x=>x.id===i);if(!c||c.date)return;
+  const k0=occDate(c),close=()=>{const d=$('dlg');if(d.open)d.close()};
+  if(skipped(c,k0)){c.skip=c.skip.filter(x=>x!==k0);if(c.skipWhy)delete c.skipWhy[k0];close();upd();return toast(Lg('Séance rétablie','Session restored','تمت استعادة الحصة'),'ok')}
+  close();
+  ask('🚫 '+Lg('Séance non assurée','Session cancelled','حصة غير مؤمّنة'),[
+    {k:'date',l:Lg('Date de la séance','Session date','تاريخ الحصة'),t:'date',r:1,v:k0},
+    {k:'why',l:Lg('Raison (facultatif)','Reason (optional)','السبب (اختياري)'),v:''}],
+  v=>{
+    const wd=DAYS[(new Date(v.date+'T00:00').getDay()+6)%7];
+    if(wd!==c.day)return toast(Lg('Cette date ne tombe pas un ','This date is not a ','هذا التاريخ ليس يوم ')+c.day,'er');
+    const lim=iso(new Date(Date.now()-120*864e5));
+    c.skip=(c.skip||[]).filter(x=>x>=lim&&x!==v.date).concat(v.date);
+    c.skipWhy=c.skipWhy||{};if((v.why||'').trim())c.skipWhy[v.date]=v.why.trim();
+    upd();toast('🚫 '+Lg('Séance retirée pour cette date','Session removed for this date','تم إلغاء الحصة في هذا التاريخ'),'ok')})
+}});
 </script>
 </body>
 </html>
