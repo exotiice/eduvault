@@ -968,7 +968,10 @@ function doSearch2(){
 const fmtMin=m=>m>=60?Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):''):m+' min';
 /* séance non assurée une semaine donnée : c.skip = ['AAAA-MM-JJ', …], c.skipWhy = {date: raison} */
 const skipped=(c,k)=>!!(c&&c.skip&&c.skip.indexOf(k)>=0);
-const occDate=c=>{if(c.date)return c.date;const m=monday(new Date()),i=Math.max(0,DAYS.indexOf(c.day));return iso(new Date(m.getFullYear(),m.getMonth(),m.getDate()+i))};
+let _occD='',_occM=null;
+/* date de la séance : cette semaine (ou la semaine prochaine si la séance n'a lieu qu'en semaine A/B opposée) */
+const occDate=c=>{if(c.date)return c.date;const t=new Date().toDateString();if(t!==_occD){_occD=t;_occM=monday(new Date())}
+  const i=Math.max(0,DAYS.indexOf(c.day))+(c.week&&c.week!=='all'&&c.week!==curWeek()?7:0);return iso(new Date(_occM.getFullYear(),_occM.getMonth(),_occM.getDate()+i))};
 const absCount=mid=>A.timetable.reduce((n,c)=>n+(c.moduleId===mid&&c.abs?c.abs.length:0),0);
 const isAbs=c=>!!(c.abs&&c.abs.indexOf(occDate(c))>=0);
 const isCx=c=>!c.date&&skipped(c,occDate(c));
@@ -3346,6 +3349,7 @@ function gArm(){ /* la session Google dure 1 h : on se reconnecte au prochain to
   ['pointerup','keydown'].forEach(t=>document.addEventListener(t,run,true))}
 function gMsg(e){const m=String(e&&e.message||e),r=e&&e.reason;
   if(r==='accessNotConfigured'||/has not been used|disabled/i.test(m))return Lg("L'API Google Calendar n'est pas activée dans ton projet Google Cloud (voir GCAL-SETUP.md).","The Google Calendar API is not enabled in your Google Cloud project (see GCAL-SETUP.md).","واجهة Google Calendar غير مفعّلة في مشروعك على Google Cloud (راجع GCAL-SETUP.md).");
+  if(/interaction_required/.test(m))return Lg('Reconnexion Google nécessaire : appuie sur « Synchroniser maintenant ».','Google reconnection needed: tap “Sync now”.','يلزم إعادة الاتصال بـ Google: اضغط «مزامنة الآن».');
   if(/access_denied/.test(m))return Lg('Autorisation refusée.','Permission denied.','تم رفض الإذن.');
   if(/popup/.test(m))return Lg('Fenêtre de connexion bloquée ou fermée.','Sign-in window blocked or closed.','نافذة تسجيل الدخول محظورة أو أُغلقت.');
   if(e&&e.status===403)return Lg("Permission insuffisante : reconnecte-toi et accepte l'accès à Google Agenda.",'Insufficient permission: reconnect and allow Google Calendar access.','صلاحية غير كافية: أعد الاتصال ووافق على الوصول إلى Google Calendar.');
