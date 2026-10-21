@@ -969,8 +969,12 @@ const fmtMin=m=>m>=60?Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0
 /* séance non assurée une semaine donnée : c.skip = ['AAAA-MM-JJ', …], c.skipWhy = {date: raison} */
 const skipped=(c,k)=>!!(c&&c.skip&&c.skip.indexOf(k)>=0);
 const occDate=c=>{if(c.date)return c.date;const m=monday(new Date()),i=Math.max(0,DAYS.indexOf(c.day));return iso(new Date(m.getFullYear(),m.getMonth(),m.getDate()+i))};
+const absCount=mid=>A.timetable.reduce((n,c)=>n+(c.moduleId===mid&&c.abs?c.abs.length:0),0);
+const isAbs=c=>!!(c.abs&&c.abs.indexOf(occDate(c))>=0);
 const isCx=c=>!c.date&&skipped(c,occDate(c));
-const cxTag=c=>isCx(c)?` <span class="ty ty-cx" title="${esc((c.skipWhy&&c.skipWhy[occDate(c)])||'')}">🚫 ${Lg('Annulée','Cancelled','ملغاة')}</span>`:'';
+const earlyOf=c=>c.early&&c.early[occDate(c)]||'';
+const earlyStat=mid=>{let n=0,m=0;A.timetable.forEach(c=>{if(c.moduleId!==mid||!c.early)return;Object.keys(c.early).forEach(k=>{n++;m+=Math.max(0,tmin(c.endTime)-tmin(c.early[k]))})});return{n,m}};
+const cxTag=c=>(isCx(c)?` <span class="ty ty-cx" title="${esc((c.skipWhy&&c.skipWhy[occDate(c)])||'')}">🚫 ${Lg('Annulée','Cancelled','ملغاة')}</span>`:'')+(earlyOf(c)?` <span class="ty ty-td">🚪 ${esc(earlyOf(c))}</span>`:'');
 const inThisWeek=d=>{const m=monday(new Date()),x=new Date(d+'T00:00');return x>=m&&x<new Date(m.getFullYear(),m.getMonth(),m.getDate()+7)};
 const tyName=k=>({cours:Lg('Cours','Lecture','درس'),td:'TD',tp:'TP'})[k]||'';
 const tyTag=c=>c&&c.typ&&tyName(c.typ)?` <span class="ty ty-${c.typ}">${esc(tyName(c.typ))}</span>`:'';
@@ -1365,7 +1369,7 @@ $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)
 function drawPh(){$('ph').innerHTML=cur.ph.map((s,i)=>`<div><img src="${s}" alt="Photo ${i+1}" data-a="viewPh" data-i="${i}"><button data-a="delPh" data-i="${i}" aria-label="Retirer">✕</button></div>`).join('')}
 function clsDlg(id){
   const c=A.timetable.find(x=>x.id===id);if(!c)return;const n=A.notes.find(x=>x.classId===id)||{text:'',photos:[]};cur={id,ph:[...(n.photos||[])]};
-  const d=$('dlg');d.innerHTML=`<h3>${esc(modName(c.moduleId))}${tyTag(c)}</h3><small class="mu">${esc(c.day)} ${esc(c.startTime)} – ${esc(c.endTime)} · 📍 ${esc(c.room)}${profBit(c)}</small><label>Notes du cours<textarea id="nt" rows="4" placeholder="Points importants, chapitres traités...">${esc(n.text)}</textarea></label><div id="ph" class="ph"></div><input id="pf" type="file" accept="image/*" multiple hidden><div class="row"><button class="b" data-a="pf">📷 Photo (max 3)</button><button class="b" data-a="editCls" data-i="${id}">✏️ Modifier</button>${c.date?'':`<button class="b" data-a="skipCls" data-i="${id}">${isCx(c)?'↩️ '+Lg('Rétablir cette semaine','Restore this week','استرجاع هذا الأسبوع'):'🚫 '+Lg('Pas cours cette semaine','No class this week','لا حصة هذا الأسبوع')}</button>`}<button class="b" style="color:var(--er)" data-a="delCls" data-i="${id}">🗑 Supprimer</button><button class="b" onclick="$('dlg').close()">Fermer</button><button class="b p" data-a="saveNote">Sauvegarder</button></div>`;
+  const d=$('dlg');d.innerHTML=`<h3>${esc(modName(c.moduleId))}${tyTag(c)}</h3><small class="mu">${esc(c.day)} ${esc(c.startTime)} – ${esc(c.endTime)} · 📍 ${esc(c.room)}${profBit(c)}</small>${earlyStat(c.moduleId).n?`<small class="mu"> · 🚪 ${earlyStat(c.moduleId).n} ${Lg('sortie(s) anticipée(s)','early exit(s)','خروج مبكر')} · ~${earlyStat(c.moduleId).m} min ${Lg('gagnées','saved','مكتسبة')}</small>`:''}${absCount(c.moduleId)||isAbs(c)?`<small class="mu"> · ✋ ${absCount(c.moduleId)} ${Lg('absence(s) dans ce module','absence(s) in this module','غياب في هذه المادة')}${isAbs(c)?' ('+Lg('dont cette séance','incl. this session','منها هذه الحصة')+')':''}</small>`:''}<label>Notes du cours<textarea id="nt" rows="4" placeholder="Points importants, chapitres traités...">${esc(n.text)}</textarea></label><div id="ph" class="ph"></div><input id="pf" type="file" accept="image/*" multiple hidden><div class="row"><button class="b" data-a="pf">📷 Photo (max 3)</button><button class="b" data-a="editCls" data-i="${id}">✏️ Modifier</button><button class="b" data-a="earlyCls" data-i="${id}">${earlyOf(c)?'↩️ '+Lg('Pas sorti tôt','Not early','لم أخرج مبكرا'):'🚪 '+Lg('Sorti tôt','Left early','خرجت مبكرا')}</button><button class="b" data-a="absCls" data-i="${id}">${isAbs(c)?'↩️ '+Lg('Pas absent','Not absent','لم أغب'):'✋ '+Lg('Absent','Absent','غائب')}</button>${c.date?'':`<button class="b" data-a="skipCls" data-i="${id}">${isCx(c)?'↩️ '+Lg('Rétablir cette semaine','Restore this week','استرجاع هذا الأسبوع'):'🚫 '+Lg('Pas cours cette semaine','No class this week','لا حصة هذا الأسبوع')}</button>`}<button class="b" style="color:var(--er)" data-a="delCls" data-i="${id}">🗑 Supprimer</button><button class="b" onclick="$('dlg').close()">Fermer</button><button class="b p" data-a="saveNote">Sauvegarder</button></div>`;
   $('pf').onchange=async e=>{const fs=[...e.target.files];if(cur.ph.length+fs.length>3)return toast('Maximum 3 photos','er');for(const f of fs)try{cur.ph.push(await shrink(f))}catch(x){toast('Image illisible','er')}drawPh()};
   drawPh();d.oncancel=null;d.showModal();
 }
@@ -3372,7 +3376,7 @@ function classEv(c){
   const di=DAYS.indexOf(c.day);if(di<0||!c.startTime||!c.endTime)return null;
   const g=GC(),m=g.map['c_'+c.id],wk=c.week&&c.week!=='all'?c.week:'all',sig=c.day+'|'+wk,iv=wk==='all'?1:2;
   const sd=m&&m.sig===sig&&m.s?m.s:firstDate(c,di),until=g.until||defUntil(),ex=[];
-  for(let d=new Date(sd+'T00:00'),n=0;iso(d)<=until&&n<80;n++,d.setDate(d.getDate()+7*iv)){const s=iso(d);if(isHol(s))ex.push(s.replace(/-/g,'')+'T'+c.startTime.replace(':','')+'00')}
+  for(let d=new Date(sd+'T00:00'),n=0;iso(d)<=until&&n<80;n++,d.setDate(d.getDate()+7*iv)){const s=iso(d);if(isHol(s)||skipped(c,s))ex.push(s.replace(/-/g,'')+'T'+c.startTime.replace(':','')+'00')}
   const mod=A.modules.find(x=>x.id===c.moduleId);
   const rec=[`RRULE:FREQ=WEEKLY;INTERVAL=${iv};BYDAY=${BYD[di]};UNTIL=${until.replace(/-/g,'')}T235959Z`];
   if(ex.length)rec.push(`EXDATE;TZID=${TZ}:${ex.join(',')}`);
@@ -4003,6 +4007,7 @@ function enMap(cls){
 function enRun(cls,pick){
   const t=EN.feed.tables[cls],names=[...new Set(t.sessions.map(x=>x.m))],sem=A.activeSemester,map={};
   {const cf=cfg(),cur=new Set(A.timetable.filter(c=>c.en===cls).map(enSkipKey));if(cf.cls&&cf.cls!==cls)cf.skip=[];cf.skip=(cf.skip||[]).filter(k=>!cur.has(k))}
+  const keepOld=new Map(A.timetable.filter(c=>c.en===cls).map(c=>[[c.moduleId,c.day,c.startTime,c.endTime,c.week||'all'].join('|'),c]));
   A.timetable=A.timetable.filter(c=>c.en!==cls);
   names.forEach((nm,i)=>{let id=pick(nm,i);const pf=(t.sessions.find(x=>x.m===nm&&x.p&&!/affecter/i.test(x.p))||{}).p||'';
     if(id==='new'||!A.modules.some(x=>x.id===id)){const m={id:uid('m'),semester:sem,name:nm.slice(0,120),prof:pf,coeff:1,color:nextModColor(),ccc:0,ctp:0,cex:1,ncc:null,ntp:null,nex:null,absences:0,pomo:0,resources:[]};A.modules.push(m);id=m.id}
@@ -4011,7 +4016,9 @@ function enRun(cls,pick){
     if((cfg().skip||[]).includes([map[x.m],day,x.s,x.e,x.w||'all'].join('|')))return;
     const dup=A.timetable.find(c=>!c.date&&c.moduleId===map[x.m]&&c.day===day&&c.startTime===x.s&&c.endTime===x.e);
     if(dup){dup.room=x.r||dup.room;dup.week=x.w||'all';dup.en=cls;n++;return}
-    A.timetable.push({id:uid('c'),moduleId:map[x.m],day,week:x.w||'all',startTime:x.s,endTime:x.e,room:x.r||'—',en:cls});n++});
+    const kk=[map[x.m],day,x.s,x.e,x.w||'all'].join('|'),old=keepOld.get(kk),ex={};
+    if(old){keepOld.delete(kk);['typ','prof','skip','skipWhy','abs','early'].forEach(f=>{if(old[f]!==undefined)ex[f]=old[f]})}
+    A.timetable.push(Object.assign({id:old?old.id:uid('c'),moduleId:map[x.m],day,week:x.w||'all',startTime:x.s,endTime:x.e,room:x.r||'—',en:cls},ex));n++});
   const c=cfg();c.cls=cls;c.hash=t.hash;c.ign='';c.snap=t.sessions.map(x=>[x.m,x.d,x.s,x.e,x.r||'',x.w||'all']);c.map=map;save();if($('dlg').open)$('dlg').close();upd();toast(n+' '+Lg('séances appliquées à','sessions applied to','حصة طُبقت على')+' '+sem,'ok')}
 function enDiff(cls){
   const t=EN.feed.tables[cls],old=cfg().snap;if(!old)return null;
@@ -5005,6 +5012,30 @@ Object.assign(act,{skipCls:i=>{
     c.skip=(c.skip||[]).filter(x=>x>=lim&&x!==v.date).concat(v.date);
     c.skipWhy=c.skipWhy||{};if((v.why||'').trim())c.skipWhy[v.date]=v.why.trim();
     upd();toast('🚫 '+Lg('Séance retirée pour cette date','Session removed for this date','تم إلغاء الحصة في هذا التاريخ'),'ok')})
+}});
+</script>
+<script id="ux-early">
+/* « Sorti tôt » : le prof nous a libérés avant l'heure (heure réelle de sortie notée, minutes gagnées comptées) */
+const _tm=x=>{const[h,m]=String(x).split(':');return+h*60+ +m};
+Object.assign(act,{earlyCls:i=>{
+  const c=A.timetable.find(x=>x.id===i);if(!c)return;
+  const k=occDate(c),d=$('dlg');if(d&&d.open)d.close();
+  if(earlyOf(c)){delete c.early[k];upd();return toast(Lg('Sortie annulée','Early exit removed','تم حذف الخروج المبكر'),'ok')}
+  const nowT=new Date(),hm=('0'+nowT.getHours()).slice(-2)+':'+('0'+nowT.getMinutes()).slice(-2);
+  const def=(iso(nowT)===k&&_tm(hm)>_tm(c.startTime)&&_tm(hm)<_tm(c.endTime))?hm:c.endTime;
+  ask('🚪 '+Lg('Heure de sortie','Time you left','وقت الخروج'),[{k:'t',l:Lg('Sorti à','Left at','خرجت على'),t:'time',r:1,v:def}],v=>{
+    if(!(_tm(v.t)>_tm(c.startTime)&&_tm(v.t)<_tm(c.endTime)))return toast(Lg('L’heure doit être pendant le cours','Time must be during the class','يجب أن يكون الوقت أثناء الحصة'),'er');
+    c.early=c.early||{};c.early[k]=v.t;upd();toast('🚪 '+Lg('Sorti à ','Left at ','خرجت على ')+v.t+' · '+(_tm(c.endTime)-_tm(v.t))+' min '+Lg('gagnées','saved','مكتسبة'),'ok')})
+}});
+</script>
+<script id="ux-abs">
+/* « Absent » : compte les absences par module (affiché dans la fiche du cours et sur la carte / les widgets Android) */
+Object.assign(act,{absCls:i=>{
+  const c=A.timetable.find(x=>x.id===i);if(!c)return;
+  const k=occDate(c),d=$('dlg');if(d&&d.open)d.close();
+  c.abs=c.abs||[];
+  if(c.abs.indexOf(k)>=0)c.abs=c.abs.filter(x=>x!==k);else c.abs.push(k);
+  upd();toast('✋ '+modName(c.moduleId)+' : '+absCount(c.moduleId)+' '+Lg('absence(s)','absence(s)','غياب'),'ok');
 }});
 </script>
 </body>
