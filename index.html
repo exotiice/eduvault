@@ -974,7 +974,7 @@ const occDate=c=>{if(c.date)return c.date;const t=new Date().toDateString();if(t
   const i=Math.max(0,DAYS.indexOf(c.day))+(c.week&&c.week!=='all'&&c.week!==curWeek()?7:0);return iso(new Date(_occM.getFullYear(),_occM.getMonth(),_occM.getDate()+i))};
 const absCount=mid=>A.timetable.reduce((n,c)=>n+(c.moduleId===mid&&c.abs?c.abs.length:0),0);
 const isAbs=c=>!!(c.abs&&c.abs.indexOf(occDate(c))>=0);
-const isCx=c=>!c.date&&skipped(c,occDate(c));
+const isCx=c=>skipped(c,occDate(c));
 const earlyOf=c=>c.early&&c.early[occDate(c)]||'';
 const earlyStat=mid=>{let n=0,m=0;A.timetable.forEach(c=>{if(c.moduleId!==mid||!c.early)return;Object.keys(c.early).forEach(k=>{n++;m+=Math.max(0,tmin(c.endTime)-tmin(c.early[k]))})});return{n,m}};
 const cxTag=c=>(isCx(c)?` <span class="ty ty-cx" title="${esc((c.skipWhy&&c.skipWhy[occDate(c)])||'')}">🚫 ${Lg('Annulée','Cancelled','ملغاة')}</span>`:'')+(earlyOf(c)?` <span class="ty ty-td">🚪 ${esc(earlyOf(c))}</span>`:'');
@@ -986,7 +986,7 @@ const xTag=c=>tyTag(c)+(c.date?` <span class="pr h">${Lg('Supp.','Extra','إضا
 function rDa(){
   const ids=curIds();
   const t=Date.now(),n=new Date(),hol=isHol(iso(n)),nm=n.getHours()*60+n.getMinutes(),tm=x=>{const[h,m]=x.split(':');return+h*60+ +m};
-  const cls=A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&(c.date?c.date===iso(n):(!hol&&(c.week==='all'||c.week===curWeek())&&!skipped(c,iso(n))))).sort((a,b)=>a.startTime.localeCompare(b.startTime));
+  const cls=A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&((c.date?c.date===iso(n):(!hol&&(c.week==='all'||c.week===curWeek())))&&!skipped(c,iso(n)))).sort((a,b)=>a.startTime.localeCompare(b.startTime));
   const due=A.tasks.filter(x=>ids.has(x.moduleId)&&!x.completed&&x.type!=='review'&&new Date(x.dueDate).getTime()<t+7*864e5).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
   const nFc=A.flashcards.filter(f=>ids.has(f.moduleId)&&(!f.nextRev||f.nextRev<=t)).length,nx=cls.find(c=>tm(c.endTime)>nm);
   const hist=A.quizHist,avgQ=hist.length?Math.round(hist.reduce((s,x)=>s+x.sc/x.n,0)/hist.length*100):null,focus=Math.round(A.modules.reduce((s,m)=>s+(m.pomo||0),0)/60);
@@ -1908,7 +1908,7 @@ function chkCls(){
   const mins=+(localStorage.getItem('eduVault_clsRem')||10);if(!mins)return;
   const n=new Date();if(isHol(iso(n)))return;
   const nm=n.getHours()*60+n.getMinutes(),ids=curIds(),k=iso(n);
-  A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&(c.date?c.date===k:(c.week==='all'||c.week===curWeek())&&!skipped(c,k))).forEach(c=>{
+  A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===TOD()&&((c.date?c.date===k:(c.week==='all'||c.week===curWeek()))&&!skipped(c,k))).forEach(c=>{
     const[h,m]=c.startTime.split(':'),st=+h*60+ +m,key=k+c.id;
     if(st-nm>0&&st-nm<=mins&&!fired.has(key)){fired.add(key);notify(modName(c.moduleId)+' · dans '+(st-nm)+' min','📍 '+(c.room||'')+' · '+c.startTime)}})}
 setInterval(()=>{chk();chkCls();if(!document.hidden&&(tab==='da'||tab==='tt'))(window.renderSoft||render)()},6e4);chk();chkCls();
@@ -2380,7 +2380,7 @@ function planCompute(v){
   for(let d=new Date(today);d<lastDay;d.setDate(d.getDate()+1)){const wd=(d.getDay()+6)%7;if(!we&&wd>=5)continue;days.push(new Date(d))}
   if(!days.length)return toast(Lg("L'examen est trop proche pour planifier (il faut au moins un jour avant)","The exam is too close to plan (at least one day before is needed)",'الامتحان قريب جدا للتخطيط'),'er');
   const placed={},busyOf=d=>{const k=iso(d),wd=DAYS[(d.getDay()+6)%7],w=weekOfDate(d),out=[];
-    A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===wd&&(c.date?c.date===k:(c.week==='all'||c.week===w)&&!skipped(c,k))).forEach(c=>out.push([tmin(c.startTime)-15,tmin(c.endTime)+15]));
+    A.timetable.filter(c=>ids.has(c.moduleId)&&c.day===wd&&((c.date?c.date===k:(c.week==='all'||c.week===w))&&!skipped(c,k))).forEach(c=>out.push([tmin(c.startTime)-15,tmin(c.endTime)+15]));
     A.tasks.filter(t=>t.id!==exam.id&&t.plan!==exam.id&&!t.completed&&iso(t.dueDate)===k).forEach(t=>{const s=new Date(t.dueDate),m=s.getHours()*60+s.getMinutes();out.push([m-15,m+(+t.dur||60)+15])});
     (placed[k]||[]).forEach(p=>out.push([p[0]-15,p[0]+len+15]));return out.sort((a,b)=>a[0]-b[0])};
   const slotOf=d=>{let f=from;if(iso(d)===iso(now))f=Math.max(f,Math.ceil((now.getHours()*60+now.getMinutes()+30)/15)*15);let cur=f;const fr=[];busyOf(d).forEach(([s,e])=>{if(s>cur&&Math.min(s,to)-cur>=len)fr.push([cur,Math.min(s,to)]);cur=Math.max(cur,e)});if(to-cur>=len)fr.push([cur,to]);
@@ -2596,6 +2596,7 @@ function secData(){
    ${nrow('⬆','data',tr('⬆ Importer').replace(/^⬆\s*/,''),Lg('Restaurer depuis un fichier .json','Restore from a .json file','استعادة من ملف .json'),'imp')}
    ${nrow('📅','data',tr('📅 Export .ics').replace(/^📅\s*/,''),Lg('Cours et échéances vers ton calendrier','Classes and deadlines to your calendar','الحصص والمواعيد إلى تقويمك'),'expics')}
    ${nrow('🗓','data','Google '+Lg('Agenda','Calendar','التقويم'),Lg('Ajouter examens et devoirs à Google Agenda','Add exams and deadlines to Google Calendar','إضافة الامتحانات والواجبات إلى تقويم Google'),'gcal')}
+   ${nrow('📚','data','Google Classroom',Lg('Importer cours, devoirs et supports depuis Classroom','Import classes, assignments and materials from Classroom','استيراد المواد والواجبات والمرفقات من Classroom'),'crl')}
    ${nrow('🏫','study',Lg('École et âge','School and age','المدرسة والعمر'),(A.settings.school||Lg('Non renseigné','Not set','غير محدد')),'school')}
    ${nrow('🎓','study',Lg('Règles de moyenne','Grading rules','قواعد المعدل'),Lg('Compensation, éliminatoire, rattrapage, ECTS','Compensation, eliminatory mark, retake, ECTS','التعويض، الإقصائية، الاستدراك، ECTS'),'rules')}
    ${nrow('🧮','study',Lg('Simulateur de moyenne','Grade simulator','محاكي المعدل'),Lg('Et si j\'avais … à l\'examen ?','What if I scored … on the exam?','ماذا لو حصلت على … في الامتحان؟'),'sim')}
@@ -3505,6 +3506,174 @@ setTimeout(()=>{const g=GC();if(!g.on)return;if(gHave())gSync();else gArm()},250
 window.__gcal={GC,gSync,desired,gHave};
 })();
 </script>
+<script id="classroom-js">
+/* ===== v25 : Google Classroom -> EduVault (lecture seule) =====
+   Cours Classroom -> modules · devoirs avec date limite -> échéances (terminées quand tu les as rendus) ·
+   supports (Drive, liens, YouTube, formulaires) -> documents du module · annonces -> liste dans la fenêtre.
+   Rien n'est écrit dans Classroom (scopes *.readonly). Les données importées vivent dans A (tasks, modules, A.cr)
+   donc elles suivent la sauvegarde Firebase / le chiffrement / Google Agenda comme tout le reste. */
+(function(){
+const API='https://classroom.googleapis.com/v1/',enc=encodeURIComponent,p2=n=>String(n).padStart(2,'0'),
+  GS=['courses.readonly','coursework.me.readonly','courseworkmaterials.readonly','announcements.readonly'].map(s=>'https://www.googleapis.com/auth/classroom.'+s).join(' ');
+const H=o=>{const s=JSON.stringify(o);let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return h};
+const EXAM=/\b(exam|examen|ds|dst|contr[oô]le|partiel|final|midterm)\b|امتحان|فرض/i;
+const CR=()=>{const g=A.cr=A.cr&&typeof A.cr==='object'&&!Array.isArray(A.cr)?A.cr:{};
+  if(!g.courses||typeof g.courses!=='object'||Array.isArray(g.courses))Object.assign(g,{on:false,auto:true,tasks:true,mats:true,ann:true,courses:{},map:{},annL:[],last:0,stats:null});
+  if(!g.map||typeof g.map!=='object')g.map={};if(!Array.isArray(g.annL))g.annL=[];return g};
+
+/* ---------- jeton OAuth (séparé de Drive et de Google Agenda) ---------- */
+let ktok=null,kexp=0,kct=null,kbusy=false,kerr='',kArmed=false,kAsked=false;const SK='eduVault_crtok';
+try{const s=JSON.parse(sessionStorage.getItem(SK)||'null');if(s&&s.exp>Date.now()+60000){ktok=s.t;kexp=s.exp}else sessionStorage.removeItem(SK)}catch(e){}
+const kHave=()=>!!ktok&&Date.now()<kexp;
+function kAuth(pick){return lib('https://accounts.google.com/gsi/client').then(()=>new Promise((ok,ko)=>{
+  kct=kct||google.accounts.oauth2.initTokenClient({client_id:cid(),scope:GS,
+    callback:r=>{if(r.error)return kct._ko&&kct._ko(Error(r.error));ktok=r.access_token;kexp=Date.now()+((+r.expires_in||3600)-90)*1000;
+      try{sessionStorage.setItem(SK,JSON.stringify({t:ktok,exp:kexp}))}catch(e){}kerr='';kct._ok&&kct._ok()},
+    error_callback:e=>kct._ko&&kct._ko(Error((e&&e.type)||'popup'))});
+  kct._ok=ok;kct._ko=ko;kct.requestAccessToken({prompt:pick?'select_account':''})}))}
+function kArm(){ /* la session Google dure 1 h : reconnexion au prochain toucher */
+  if(kArmed||kAsked||!CR().on)return;kArmed=true;kPaint();
+  const run=()=>{['pointerup','keydown'].forEach(t=>document.removeEventListener(t,run,true));kArmed=false;kAsked=true;if(!CR().on||kHave())return;
+    kAuth().then(()=>kSync()).catch(e=>{kerr=kMsg(e);kPaint()})};
+  ['pointerup','keydown'].forEach(t=>document.addEventListener(t,run,true))}
+function kMsg(e){const m=String(e&&e.message||e),r=String(e&&e.reason||'');
+  if(/SERVICE_DISABLED|accessNotConfigured/i.test(r)||/has not been used|is disabled/i.test(m))return Lg("L'API Google Classroom n'est pas activée dans ton projet Google Cloud (voir CLASSROOM-SETUP.md).","The Google Classroom API is not enabled in your Google Cloud project (see CLASSROOM-SETUP.md).","واجهة Google Classroom غير مفعّلة في مشروعك على Google Cloud (راجع CLASSROOM-SETUP.md).");
+  if(/interaction_required/.test(m))return Lg('Reconnexion Google nécessaire : appuie sur « Synchroniser maintenant ».','Google reconnection needed: tap “Sync now”.','يلزم إعادة الاتصال بـ Google: اضغط «مزامنة الآن».');
+  if(/access_denied/.test(m))return Lg('Autorisation refusée. Si tu utilises un compte d\'école, son administrateur bloque peut-être les applis externes.','Permission denied. With a school account, its administrator may block outside apps.','تم رفض الإذن. إذا كان حساب مدرستك فقد يمنع المسؤول التطبيقات الخارجية.');
+  if(/popup/.test(m))return Lg('Fenêtre de connexion bloquée ou fermée.','Sign-in window blocked or closed.','نافذة تسجيل الدخول محظورة أو أُغلقت.');
+  if(e&&e.status===403)return Lg("Accès refusé par Google : reconnecte-toi en acceptant Classroom, ou ton établissement bloque l'accès.","Access refused by Google: reconnect and accept Classroom, or your school blocks access.","رفض Google الوصول: أعد الاتصال ووافق على Classroom، أو أن مؤسستك تمنع الوصول.");
+  return m}
+async function kf(path,n=0){
+  if(!kHave()){const e=Error('no-token');e.status=401;throw e}
+  const r=await fetch(API+path,{headers:{Authorization:'Bearer '+ktok}});let j=null;try{j=await r.json()}catch(e){}
+  if(r.ok)return j||{};
+  const er=(j&&j.error)||{},reason=(er.errors&&er.errors[0]&&er.errors[0].reason)||((er.details||[]).find(d=>d&&d.reason)||{}).reason||er.status||'',e=Error(er.message||('HTTP '+r.status));e.status=r.status;e.reason=reason;
+  if(r.status===401){ktok=null;kexp=0;try{sessionStorage.removeItem(SK)}catch(x){}}
+  if((r.status===429||r.status>=500)&&n<3){await new Promise(z=>setTimeout(z,500*Math.pow(2,n)+Math.random()*250));return kf(path,n+1)}
+  throw e}
+async function kall(path,key){const out=[];let pt='';
+  for(let i=0;i<10;i++){const r=await kf(path+(pt?'&pageToken='+enc(pt):''));out.push(...((r&&r[key])||[]));pt=(r&&r.nextPageToken)||'';if(!pt)break}
+  return out}
+
+/* ---------- conversion : Classroom -> EduVault ---------- */
+/* dueDate/dueTime de Classroom sont en UTC ; sans heure = fin de journée */
+function dueLocal(w){const d=w&&w.dueDate;if(!d||!d.year||!d.month||!d.day)return'';
+  if(!w.dueTime)return d.year+'-'+p2(d.month)+'-'+p2(d.day)+'T23:59';
+  const u=new Date(Date.UTC(d.year,d.month-1,d.day,w.dueTime.hours||0,w.dueTime.minutes||0)),x=u;
+  return x.getFullYear()+'-'+p2(x.getMonth()+1)+'-'+p2(x.getDate())+'T'+p2(x.getHours())+':'+p2(x.getMinutes())}
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9؀-ۿ]+/g,' ').trim();
+function sameName(a,b){a=norm(a);b=norm(b);if(!a||!b)return false;return a===b||(Math.min(a.length,b.length)>=5&&(a.includes(b)||b.includes(a)))}
+function ensureMod(cid){const g=CR(),c=g.courses[cid];let m=A.modules.find(x=>x.id===c.mod);
+  if(!m){m=A.modules.find(x=>x.semester===A.activeSemester&&sameName(x.name,c.n))||A.modules.find(x=>sameName(x.name,c.n));
+    if(!m){m={id:uid('m'),semester:A.activeSemester,name:String(c.n||'Classroom').slice(0,120),prof:'',coeff:1,color:nextModColor(),ccc:0,ctp:0,cex:1,ncc:null,ntp:null,nex:null,absences:0,pomo:0,resources:[]};A.modules.push(m)}
+    c.mod=m.id}
+  return m}
+function matInfo(x){if(!x)return null;
+  if(x.driveFile&&x.driveFile.driveFile){const f=x.driveFile.driveFile;return f.alternateLink?{k:'d'+f.id,t:f.title||'Drive',u:f.alternateLink}:null}
+  if(x.link&&x.link.url)return{k:'l'+H(x.link.url),t:x.link.title||x.link.url,u:x.link.url};
+  if(x.youtubeVideo&&x.youtubeVideo.alternateLink)return{k:'y'+x.youtubeVideo.id,t:x.youtubeVideo.title||'YouTube',u:x.youtubeVideo.alternateLink};
+  if(x.form&&x.form.formUrl)return{k:'f'+H(x.form.formUrl),t:x.form.title||'Formulaire',u:x.form.formUrl};
+  return null}
+/* d = {work, subs, mats, anns} d'un cours déjà téléchargé ; retourne true si EduVault a changé */
+function apply(cid,d,st){const g=CR(),c=g.courses[cid];let ch=false;const mod=ensureMod(cid);
+  const sub={};(d.subs||[]).forEach(s=>{sub[s.courseWorkId]=s.state});
+  const addMats=(list,cat,pre)=>{(list||[]).forEach(x=>{const r=matInfo(x);if(!r)return;const key='r_'+pre+r.k;
+    if(g.map[key])return; /* déjà importé (ou supprimé à la main : on ne le remet pas) */
+    mod.resources=mod.resources||[];const id=uid('r');mod.resources.push({id,title:String(r.t).slice(0,80),type:cat,isLocal:false,url:r.u,cr:1});g.map[key]={id};st.r++;ch=true})};
+  (d.work||[]).forEach(w=>{
+    const due=dueLocal(w),key='w_'+cid+'_'+w.id;
+    if(g.tasks!==false){
+      if(!due)st.nd++;
+      else{const state=sub[w.id]||'NEW',done=state==='TURNED_IN'||state==='RETURNED',title=String(w.title||'Classroom').slice(0,120),h=H([title,due]);
+        let m=g.map[key];const t=m&&A.tasks.find(x=>x.id===m.id);
+        if(m&&!t){m.x=1} /* supprimé à la main dans EduVault : on ne le recrée pas */
+        else if(!m){if(new Date(due).getTime()<Date.now()-30*864e5){st.nd++;return}const nt={id:uid('t'),moduleId:mod.id,type:EXAM.test(title)?'exam':'homework',title,dueDate:due,completed:done,crKey:key,crUrl:w.alternateLink||''};A.tasks.push(nt);g.map[key]={id:nt.id,h,s:state};st.c++;ch=true}
+        else{m.x=0;
+          if(m.h!==h){t.title=title;t.dueDate=due;m.h=h;st.u++;ch=true}
+          if(m.s!==state){if(done&&!t.completed){t.completed=true;ch=true;st.u++}m.s=state}}}}
+    if(g.mats!==false)addMats(w.materials,'td','w'+w.id+'_')});
+  if(g.mats!==false)(d.mats||[]).forEach(cm=>addMats(cm.materials,'cours','m'+cm.id+'_'));
+  if(g.ann!==false&&Array.isArray(d.anns)){
+    const keep=g.annL.filter(a=>a.c!==cid),add=d.anns.filter(a=>a&&a.text).map(a=>({c:cid,n:c.n,t:String(a.text).slice(0,300),ts:Date.parse(a.updateTime||a.creationTime)||0,u:a.alternateLink||''}));
+    const next=keep.concat(add).sort((a,b)=>b.ts-a.ts).slice(0,30);if(H(next)!==H(g.annL)){g.annL=next;st.a++;ch=true}}
+  return ch}
+
+/* ---------- moteur de synchronisation ---------- */
+async function kSync(manual){
+  const g=CR();if(!g.on||kbusy)return;
+  if(!kHave()){kArm();return}
+  kbusy=true;kerr='';kPaint();const st={c:0,u:0,r:0,a:0,nd:0,e:0};let ch=false;
+  try{
+    const cl=await kall('courses?studentId=me&courseStates=ACTIVE&pageSize=100&fields='+enc('nextPageToken,courses(id,name,section)'),'courses'),seen=new Set(cl.map(c=>c.id));
+    cl.forEach(c=>{const o=g.courses[c.id];if(o){if(o.n!==c.name||o.s!==(c.section||'')){o.n=c.name;o.s=c.section||'';ch=true}o.gone=false}else{g.courses[c.id]={n:c.name,s:c.section||'',on:false,mod:'',isNew:true};ch=true}});
+    Object.keys(g.courses).forEach(id=>{if(!seen.has(id))g.courses[id].gone=true});
+    const slow=manual||Date.now()-(g.lm||0)>60*6e4,F=(n,f)=>'&fields='+enc('nextPageToken,'+n+'('+f+')'),jobs=Object.keys(g.courses).filter(id=>g.courses[id].on&&!g.courses[id].gone);
+    const run=async id=>{const c=g.courses[id];
+      try{const d={};
+        const [w,mt,an]=await Promise.all([
+          g.tasks!==false?kall('courses/'+id+'/courseWork?pageSize=100&courseWorkStates=PUBLISHED'+F('courseWork','id,title,dueDate,dueTime,alternateLink,materials'),'courseWork'):[],
+          g.mats!==false&&slow?kall('courses/'+id+'/courseWorkMaterials?pageSize=100&courseWorkMaterialStates=PUBLISHED'+F('courseWorkMaterial','id,materials'),'courseWorkMaterial'):[],
+          g.ann!==false&&slow?kf('courses/'+id+'/announcements?pageSize=8&announcementStates=PUBLISHED&orderBy='+enc('updateTime desc')+'&fields='+enc('announcements(text,updateTime,creationTime,alternateLink)')).then(r=>r.announcements||[]):null]);
+        d.work=w;d.mats=mt;d.anns=an;
+        d.subs=g.tasks!==false&&w.length?await kall('courses/'+id+'/courseWork/-/studentSubmissions?userId=me&pageSize=100'+F('studentSubmissions','courseWorkId,state'),'studentSubmissions'):[];
+        if(apply(id,d,st))ch=true;if(c.err){c.err='';ch=true}}
+      catch(e){if(e.status===401)throw e;c.err=kMsg(e);st.e++;ch=true}};
+    for(let i=0;i<jobs.length;i+=3)await Promise.all(jobs.slice(i,i+3).map(run)); /* 3 cours à la fois */
+    if(slow)g.lm=Date.now();
+    g.last=Date.now();g.stats=st;
+  }catch(e){kerr=kMsg(e);if(e.status===401)kArm()}
+  kbusy=false;if(ch)save();kPaint();if(ch)try{render()}catch(e){}}
+setInterval(()=>{const g=CR();if(document.visibilityState==='visible'&&g.on&&g.auto&&Date.now()-(g.last||0)>15*6e4)kSync()},60000);
+document.addEventListener('visibilitychange',()=>{const g=CR();if(document.visibilityState==='visible'&&g.on&&g.auto&&Date.now()-(g.last||0)>5*6e4)kSync()});
+addEventListener('online',()=>{const g=CR();if(g.on&&g.auto)setTimeout(()=>kSync(),3000)});
+
+/* ---------- fenêtre « Google Classroom » ---------- */
+function kState(){const g=CR();if(!g.on)return'off';if(kbusy)return'busy';if(kerr)return'err';if(!kHave())return'wait';return'ok'}
+function kStatusHTML(){const g=CR(),s=kState(),L={off:['⚪',Lg('Non connecté','Not connected','غير متصل')],busy:['🔵',Lg('Synchronisation…','Syncing…','جارٍ المزامنة…')],err:['🔴',kerr],wait:['🟠',Lg('Lié · reconnexion au prochain toucher','Linked · reconnects on next tap','مرتبط · إعادة الاتصال عند اللمس التالي')],ok:['🟢',Lg('Connecté · synchro automatique','Connected · auto-sync','متصل · مزامنة تلقائية')]}[s],st=g.stats;
+  return`<b>${L[0]} ${esc(L[1])}</b>${g.on&&g.last?`<small class="mu">${Lg('Dernière synchro','Last sync','آخر مزامنة')} : ${new Date(g.last).toLocaleString(LOC())}${st?` · +${st.c} ~${st.u} 📎${st.r}${st.e?' · ⚠ '+st.e:''}`:''}</small>`:''}`}
+function kPaint(){const e=document.getElementById('crst');if(e)e.innerHTML=kStatusHTML()}
+const kchk=(k,lab)=>`<label class="gcr"><input type="checkbox" ${CR()[k]!==false?'checked':''} onchange="act.crSet('${k}',this.checked)"> <span>${lab}</span></label>`;
+Object.assign(act,{
+  crl:()=>{const g=CR(),ids=Object.keys(g.courses),
+    mo=c=>`<option value="">➕ ${Lg('Nouveau module','New module','مادة جديدة')}</option>`+A.modules.map(m=>`<option value="${esc(m.id)}"${c.mod===m.id?' selected':''}>${esc(m.name)}${m.semester?' · '+esc(m.semester):''}</option>`).join(''),
+    rows=ids.map(id=>{const c=g.courses[id];return`<div class="rs" style="${c.gone?'opacity:.55':''}"><label class="gcr" style="margin:0 0 4px"><input type="checkbox" ${c.on?'checked':''} onchange="act.crOn('${esc(id)}',this.checked)"><span><b>${esc(c.n)}</b>${c.s?' · '+esc(c.s):''}${c.isNew?' 🆕':''}${c.gone?' ('+Lg('archivé','archived','مؤرشف')+')':''}</span></label><select style="width:100%" onchange="act.crMod('${esc(id)}',this.value)">${mo(c)}</select>${c.err?`<small style="color:var(--er)">${esc(c.err)}</small>`:''}</div>`}).join(''),
+    up=A.tasks.filter(t=>t.crKey&&!t.completed&&t.dueDate&&new Date(t.dueDate).getTime()>=Date.now()-864e5).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)).slice(0,8),
+    an=g.annL.slice(0,6);
+    dlgShow(`<h3>📚 Google Classroom</h3><div id="crst" class="gcst">${kStatusHTML()}</div>
+    ${g.on?`<p class="mu" style="margin:8px 0">${Lg("Classroom → EduVault, en lecture seule (rien n'est modifié dans Classroom). Choisis les cours à importer et le module qui les reçoit. Les devoirs deviennent des échéances (cochées quand tu les as rendus) et les supports des documents du module.","Classroom → EduVault, read-only (nothing is changed in Classroom). Pick the classes to import and the module that receives them. Assignments become deadlines (ticked once turned in) and materials become module documents.","Classroom → EduVault للقراءة فقط (لا يتغير شيء في Classroom). اختر المواد المراد استيرادها والمادة التي تستقبلها. تصبح الواجبات مواعيد (تُحدَّد عند التسليم) وتصبح المرفقات وثائق للمادة.")}</p>
+      ${ids.length?`<div class="gcl">${rows}</div>`:`<p class="mu e">${Lg('Aucun cours trouvé (cours actifs où tu es élève).','No class found (active classes where you are a student).','لم يُعثر على مواد (المواد النشطة التي أنت تلميذ فيها).')}</p>`}
+      ${ids.length&&!ids.some(i=>g.courses[i].on)?`<p class="bad">${Lg('Coche au moins un cours puis « Synchroniser maintenant ».','Tick at least one class then “Sync now”.','حدّد مادة واحدة على الأقل ثم «زامن الآن».')}</p>`:''}
+      ${kchk('auto',Lg('Synchronisation automatique (toutes les 15 min)','Automatic sync (every 15 min)','مزامنة تلقائية (كل 15 دقيقة)'))}${kchk('tasks',Lg('Devoirs → échéances','Assignments → deadlines','الواجبات ← مواعيد'))}${kchk('mats',Lg('Supports → documents du module','Materials → module documents','المرفقات ← وثائق المادة'))}${kchk('ann',Lg('Annonces','Announcements','الإعلانات'))}
+      <div class="row"><button class="b p" data-a="crNow">⟳ ${Lg('Synchroniser maintenant','Sync now','زامن الآن')}</button><button class="b" data-a="crStop">${Lg('Arrêter la synchro','Stop syncing','إيقاف المزامنة')}</button><button class="b" data-a="crSwitch">🔁 ${Lg('Changer de compte Google','Switch Google account','تغيير حساب Google')}</button></div>
+      ${up.length?`<details style="margin-top:8px" open><summary class="mu">${Lg('À rendre (depuis Classroom)','Due (from Classroom)','المطلوب تسليمه (من Classroom)')}</summary><div class="gcl">${up.map(t=>`<div class="rs" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="min-width:0"><b>${t.type==='exam'?'🚨 ':'📝 '}${esc(t.title)}</b><small class="mu">${esc(modName(t.moduleId))} · ${new Date(t.dueDate).toLocaleString(LOC())}</small></span>${/^https:\/\/classroom\.google\.com\//.test(t.crUrl||'')?`<a class="b" href="${esc(t.crUrl)}" target="_blank" rel="noopener">↗</a>`:''}</div>`).join('')}</div></details>`:''}
+      ${an.length?`<details style="margin-top:8px"><summary class="mu">${Lg('Dernières annonces','Latest announcements','آخر الإعلانات')}</summary><div class="gcl">${an.map(a=>`<div class="rs"><b>${esc(a.n)}</b> <small class="mu">${a.ts?new Date(a.ts).toLocaleDateString(LOC()):''}</small><div style="white-space:pre-wrap;word-break:break-word">${esc(a.t)}</div>${/^https:\/\/classroom\.google\.com\//.test(a.u||'')?`<a href="${esc(a.u)}" target="_blank" rel="noopener">↗ Classroom</a>`:''}</div>`).join('')}</div></details>`:''}
+      <div class="row"><button class="b" style="color:var(--er)" data-a="crWipe">🗑 ${Lg("Retirer tout ce qui vient de Classroom","Remove everything imported from Classroom","إزالة كل ما جاء من Classroom")}</button></div>`
+    :`<p class="mu" style="margin:8px 0">${Lg("Connecte ton compte Google (celui de ton école, si tes cours sont dessus) : EduVault lira tes cours, devoirs, supports et annonces Classroom, en lecture seule, et les gardera à jour. Les échéances importées partent aussi dans Google Agenda si cette synchro est active.","Connect your Google account (your school one, if your classes are on it): EduVault will read your Classroom classes, assignments, materials and announcements, read-only, and keep them up to date. Imported deadlines also go to Google Calendar if that sync is on.","اربط حساب Google (حساب مدرستك إن كانت موادك عليه): سيقرأ EduVault موادك وواجباتك ومرفقاتك وإعلاناتك من Classroom للقراءة فقط ويبقيها محدّثة. تُرسل المواعيد المستوردة أيضا إلى Google Calendar إن كانت مزامنته مفعّلة.")}</p>
+      ${kerr?`<p class="bad">${esc(kerr)}</p>`:''}<div class="row"><button class="b p" data-a="crConnect">${Lg('Connecter Google Classroom','Connect Google Classroom','ربط Google Classroom')}</button></div>`}
+    <div class="row"><button class="b" onclick="$('dlg').close()">${tr('Fermer')}</button></div>`)},
+  crConnect:async()=>{try{toast(Lg('Connexion à Google…','Connecting to Google…','جارٍ الاتصال بـ Google…'));await kAuth(true);const g=CR();g.on=true;g.last=0;kAsked=true;save();
+      await kSync(true);
+      if(!kerr){Object.keys(g.courses).forEach(id=>{const c=g.courses[id];if(c.isNew&&!c.on){const m=A.modules.find(x=>sameName(x.name,c.n));if(m){c.on=true;c.mod=m.id;c.isNew=false}}});save();
+        if(Object.keys(g.courses).some(i=>g.courses[i].on))await kSync(true)}
+      act.crl()}catch(e){kerr=kMsg(e);CR().on=false;toast(kerr,'er');act.crl()}},
+  crOn:(id,v)=>{const c=CR().courses[id];if(!c)return;c.on=!!v;c.isNew=false;save();if(v)kSync(true).then(()=>act.crl())},
+  crMod:(id,v)=>{const c=CR().courses[id];if(!c)return;c.mod=v;c.isNew=false;save()},
+  crSet:(k,v)=>{const g=CR();g[k]=v;save();if(k!=='auto')setTimeout(()=>kSync(true),400)},
+  crSwitch:async()=>{try{toast(Lg('Choisis le compte Google…','Choose a Google account…','اختر حساب Google…'));
+      ktok=null;kexp=0;try{sessionStorage.removeItem(SK)}catch(e){}
+      await kAuth(true);const g=CR();g.on=true;g.last=0;kAsked=true;kerr='';save();
+      await kSync(true);
+      if(!kerr)toast(Lg('Compte changé : coche les cours à importer. Les éléments déjà importés restent.','Account switched: tick the classes to import. Already imported items stay.','تم تغيير الحساب: حدّد المواد المراد استيرادها. العناصر المستوردة سابقا تبقى.'),'ok');
+      act.crl()}catch(e){kerr=kMsg(e);toast(kerr,'er');act.crl()}},
+  crNow:async()=>{if(!kHave()){try{await kAuth()}catch(e){kerr=kMsg(e);kPaint();return}}await kSync(true);act.crl()},
+  crStop:()=>{CR().on=false;save();act.crl();toast(Lg("Synchronisation arrêtée (les éléments importés restent dans EduVault)","Sync stopped (imported items stay in EduVault)","تم إيقاف المزامنة (تبقى العناصر المستوردة في EduVault)"))},
+  crWipe:()=>{if(!confirm(Lg("Retirer d'EduVault les échéances et documents importés depuis Classroom ? (Classroom n'est pas touché ; tes autres données non plus)","Remove the deadlines and documents imported from Classroom from EduVault? (Classroom and your other data are untouched)","إزالة المواعيد والوثائق المستوردة من Classroom من EduVault؟ (Classroom وبقية بياناتك لا تتأثر)")))return;
+    const g=CR();A.tasks=A.tasks.filter(t=>!t.crKey);A.modules.forEach(m=>{m.resources=(m.resources||[]).filter(r=>!r.cr)});g.map={};g.annL=[];g.stats=null;g.last=0;save();render();act.crl();toast(Lg('Éléments Classroom retirés','Classroom items removed','تمت إزالة عناصر Classroom'),'ok')}
+});
+setTimeout(()=>{const g=CR();if(!g.on)return;if(kHave())kSync();else kArm()},3500);
+window.__cr={CR,apply,dueLocal,sameName,kSync,kf,kAuth};
+})();
+</script>
 
 <script>
 /* ===== v21 : école & âge, règles de moyenne + simulateur, visionneuse complète, partage/raccourcis/installation,
@@ -4105,7 +4274,7 @@ setTimeout(()=>{const lim=iso(new Date(Date.now()-30*864e5)),n=A.timetable.lengt
   const dur=m=>m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):'');
   const dayCls=(d,wk)=>{
     const hol=isHol(iso(d)),name=DAYS[(d.getDay()+6)%7];
-    return A.timetable.filter(c=>curIds().has(c.moduleId)&&c.day===name&&(c.date?c.date===iso(d):(!hol&&(c.week==='all'||c.week===wk)&&!skipped(c,iso(d))))).sort((a,b)=>a.startTime.localeCompare(b.startTime));
+    return A.timetable.filter(c=>curIds().has(c.moduleId)&&c.day===name&&((c.date?c.date===iso(d):(!hol&&(c.week==='all'||c.week===wk)))&&!skipped(c,iso(d)))).sort((a,b)=>a.startTime.localeCompare(b.startTime));
   };
   const row=(c,label)=>`<div class="cl" data-a="cls" data-i="${c.id}" style="${tint(modCol(c.moduleId))}"><small class="br">${label}</small><b>${esc(modName(c.moduleId))}${xTag(c)}</b><small class="mu">📍 ${esc(c.room||'')}${profBit(c)}</small></div>`;
   function plus(){
