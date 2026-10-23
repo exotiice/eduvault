@@ -1,8 +1,208 @@
 {
  "v": 1,
  "baseline": true,
- "checked": "2026-10-14T11:26:49Z",
+ "checked": "2026-10-23T17:06:43Z",
  "docs": [
+  {
+   "t": "📥 Emplois TP",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb93461e8d8.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "6914f8bf007ed29a",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe A",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6cad90cbf.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "12a9135c1614080c",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6cbac5828.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "381f41f85ce3c9ce",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe C",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6ccaa7bb4.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "af8d5e916f0ce174",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Emplois TP",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb813344c31.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "615e19e27b58f3a5",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe A",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6cee25355.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "7161e58cb03a83b3",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb7b19f1768.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "4b5c7205e8621bc3",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe C",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d07d6aa9.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "5c59c7d3b7a414b3",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d1cab12b.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "8ce7f5712eb695f8",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d2aae3d9.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "83cc41579f0c3a92",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d389fc19.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "7aa51b376034e354",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d463755b.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "f761bdd1f24f220a",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d5534a3b.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "d37e5cb4d9d5bfd0",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe A",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b3cb9d4a.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "8756bdd4fc3593fb",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b4a12789.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "e9c041c358171df3",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe A",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b58b8d70.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "0ff14d6d54a6a33a",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b67ed5ee.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "57627758e92b0ae4",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b76eab48.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "8070d362a1c5e63c",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b852f1f6.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "95b77ff6bab5c557",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe A",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b992e3f3.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "56774bca8f971cc3",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7ba75f6d0.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "81149fed38cd9960",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe A",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7bb5f1cbf.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "e7a0e275174382d7",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7bc87d241.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "423c2d96dabd71d9",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7be36b88f.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "06937fb70dc019d0",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7bfb63c35.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "9b81a262ebd8e569",
+   "first": "2026-10-23T17:06:43Z",
+   "changed": ""
+  },
   {
    "t": "📥 Télécharger",
    "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V2/6acbcad5ee8b6.pdf",
@@ -126,6 +326,12 @@
  ],
  "news": [
   {
+   "t": "📥 Répartition",
+   "u": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "first": "2026-10-23T17:06:43Z"
+  },
+  {
    "t": "Les admis de la liste d'attente n°...",
    "u": "https://eniad.ump.ma/fr/actualite/les-admis-de-la-liste-dattente-n-2-concours-dacces-en-premiere-annee-du-cycle-ingenieur-20262027",
    "page": "https://eniad.ump.ma/fr/actualite",
@@ -245,13 +451,13 @@
  "tables": {
   "ROC1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "ed090bbfe4f360ec",
-   "src": "https://eniad.ump.ma/storage/files/1/A S PRINTEMPS/V2/6ace2b3b62830.pdf",
+   "hash": "7aea25cc74eac262",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d5534a3b.pdf",
    "sessions": [
     {
      "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
      "p": "Mohamed BADIY",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
      "s": "08:15",
@@ -260,20 +466,31 @@
      "w": "all"
     },
     {
-     "m": "STATISTIQUES DESCRIPTIVES, INFÉRENTIELLES ET EXPLORATOIRES",
-     "p": "Mourad El idrissi",
-     "g": "IA1 · ROC1 · SID1",
-     "t": "COURS",
+     "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
+     "p": "Mohamed BADIY",
+     "g": "",
+     "t": "TP",
      "d": "LUNDI",
      "s": "10:15",
-     "e": "11:45",
-     "r": "AMPHI-02",
+     "e": "12:15",
+     "r": "AR14",
+     "w": "all"
+    },
+    {
+     "m": "STATISTIQUES DESCRIPTIVES, INFÉRENTIELLES ET EXPLORATOIRES",
+     "p": "Mourad El Idrissi",
+     "g": "",
+     "t": "COURS",
+     "d": "LUNDI",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "AMPHI-03",
      "w": "all"
     },
     {
      "m": "PERCEPTION ET CAPTEURS POUR OBJETS ET ROBOTS CONNECTÉS",
      "p": "BOUTOUBA Mohamed",
-     "g": "ROC1",
+     "g": "",
      "t": "COURS",
      "d": "MARDI",
      "s": "08:15",
@@ -282,9 +499,31 @@
      "w": "all"
     },
     {
+     "m": "PERCEPTION ET CAPTEURS POUR OBJETS ET ROBOTS CONNECTÉS",
+     "p": "BOUTOUBA Mohamed",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "AR14",
+     "w": "all"
+    },
+    {
+     "m": "SYSTEME D’EXPLOITATION ET PROGRAMMATION SYSTEMES",
+     "p": "Sara Ghouass",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AR14",
+     "w": "all"
+    },
+    {
      "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
      "p": "Manale BOUGHANJA",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "08:15",
@@ -293,9 +532,20 @@
      "w": "all"
     },
     {
+     "m": "DÉVELOPPEMENT D’APPLICATIONS WEB",
+     "p": "Fatima-zahra HAJA",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "AR14",
+     "w": "all"
+    },
+    {
      "m": "PROGRAMMATION EMBARQUÉE",
      "p": "Wassim KHIATI",
-     "g": "ROC1",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "13:30",
@@ -304,9 +554,20 @@
      "w": "all"
     },
     {
+     "m": "PROGRAMMATION EMBARQUÉE",
+     "p": "Wassim KHIATI",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AR14",
+     "w": "all"
+    },
+    {
      "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
      "p": "Zakaria KADDARI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "10:15",
@@ -315,9 +576,20 @@
      "w": "all"
     },
     {
+     "m": "ANGLAIS 1",
+     "p": "Abderrahim FATMI",
+     "g": "",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
      "m": "COMPTABILITE ET CALCUL DES COUTS",
-     "p": "À affecter",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "p": "jihane Nejjari",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "08:15",
@@ -328,28 +600,17 @@
     {
      "m": "FRANÇAIS 1",
      "p": "Hayat BENTALEB",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "13:30",
      "e": "15:00",
      "r": "AMPHI-01",
      "w": "all"
-    },
-    {
-     "m": "ANGLAIS 1",
-     "p": "Abderrahim FATMI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
-     "t": "COURS",
-     "d": "VENDREDI",
-     "s": "15:15",
-     "e": "16:45",
-     "r": "AMPHI-03",
-     "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   },
   "EPSI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -547,13 +808,13 @@
   },
   "IA1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "8742d8d93cf125dd",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V1/6ac693b8f3b23.pdf",
+   "hash": "1b760a2e4f55fead",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d1cab12b.pdf",
    "sessions": [
     {
      "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
      "p": "Mohamed BADIY",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
      "s": "08:15",
@@ -563,19 +824,52 @@
     },
     {
      "m": "STATISTIQUES DESCRIPTIVES, INFÉRENTIELLES ET EXPLORATOIRES",
-     "p": "Mourad El idrissi",
-     "g": "IA1 · ROC1 · SID1",
+     "p": "Mourad El Idrissi",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION ORIENTE OBJET EN PYTHON",
+     "p": "Mohammed Aissi",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
      "s": "10:15",
-     "e": "11:45",
-     "r": "AMPHI-02",
+     "e": "12:15",
+     "r": "AE13",
+     "w": "all"
+    },
+    {
+     "m": "SYSTEME D’EXPLOITATION ET PROGRAMMATION SYSTEMES",
+     "p": "Manale BOUGHANJA",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE13",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
+     "p": "Mohamed BADIY",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AE13",
      "w": "all"
     },
     {
      "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
      "p": "Manale BOUGHANJA",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "08:15",
@@ -586,7 +880,7 @@
     {
      "m": "PROGRAMMATION ORIENTE OBJET EN PYTHON",
      "p": "Mohammed Aissi",
-     "g": "GI1 · IA1 · IRSI1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "10:15",
@@ -595,9 +889,20 @@
      "w": "all"
     },
     {
+     "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
+     "p": "Fatima-zahra HAJA",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE13",
+     "w": "all"
+    },
+    {
      "m": "INGÉNIERIE DES BASES DE DONNÉES AVANCÉE",
      "p": "Houda BENHAR",
-     "g": "GI1 · IA1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "08:15",
@@ -608,7 +913,7 @@
     {
      "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
      "p": "Zakaria KADDARI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "10:15",
@@ -617,9 +922,31 @@
      "w": "all"
     },
     {
+     "m": "INGENIERIE DES BASES DE DONNEES AVANCEE",
+     "p": "Houda BENHAR",
+     "g": "",
+     "t": "TP",
+     "d": "JEUDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE13",
+     "w": "all"
+    },
+    {
+     "m": "ANGLAIS 1",
+     "p": "Abderrahim FATMI",
+     "g": "",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
      "m": "COMPTABILITE ET CALCUL DES COUTS",
-     "p": "À affecter",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "p": "jihane Nejjari",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "08:15",
@@ -630,38 +957,27 @@
     {
      "m": "FRANÇAIS 1",
      "p": "Hayat BENTALEB",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "13:30",
      "e": "15:00",
      "r": "AMPHI-01",
      "w": "all"
-    },
-    {
-     "m": "ANGLAIS 1",
-     "p": "Abderrahim FATMI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
-     "t": "COURS",
-     "d": "VENDREDI",
-     "s": "15:15",
-     "e": "16:45",
-     "r": "AMPHI-03",
-     "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   },
   "GI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "3303ef887842fe6b",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V1/6ac693c7d016c.pdf",
+   "hash": "a41ed8e39fb32a16",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d2aae3d9.pdf",
    "sessions": [
     {
      "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
      "p": "Mohamed BADIY",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
      "s": "08:15",
@@ -672,18 +988,51 @@
     {
      "m": "STATISTIQUES DESCRIPTIVES, INFÉRENTIELLES ET EXPLORATOIRES",
      "p": "Bouchra LABLOUL",
-     "g": "GI1 · IRSI1",
+     "g": "",
      "t": "COURS",
-     "d": "MARDI",
+     "d": "LUNDI",
      "s": "10:15",
      "e": "11:45",
-     "r": "AMPHI-01",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
+     "p": "Mohamed BADIY",
+     "g": "",
+     "t": "TP",
+     "d": "LUNDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE14",
      "w": "all"
     },
     {
      "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
      "p": "Manale BOUGHANJA",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "AE14",
+     "w": "all"
+    },
+    {
+     "m": "INGÉNIERIE DES BASES DE DONNÉES AVANCÉE",
+     "p": "Houda BENHAR",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AE14",
+     "w": "all"
+    },
+    {
+     "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
+     "p": "Manale BOUGHANJA",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "08:15",
@@ -694,7 +1043,7 @@
     {
      "m": "PROGRAMMATION ORIENTE OBJET EN PYTHON",
      "p": "Mohammed Aissi",
-     "g": "GI1 · IA1 · IRSI1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "10:15",
@@ -703,9 +1052,20 @@
      "w": "all"
     },
     {
+     "m": "PROGRAMMATION ORIENTE OBJET EN PYTHON",
+     "p": "Mohammed Aissi",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE14",
+     "w": "all"
+    },
+    {
      "m": "INGÉNIERIE DES BASES DE DONNÉES AVANCÉE",
      "p": "Houda BENHAR",
-     "g": "GI1 · IA1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "08:15",
@@ -716,7 +1076,7 @@
     {
      "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
      "p": "Zakaria KADDARI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "10:15",
@@ -725,9 +1085,31 @@
      "w": "all"
     },
     {
+     "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
+     "p": "Fatima-zahra HAJA",
+     "g": "",
+     "t": "TP",
+     "d": "JEUDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE14",
+     "w": "all"
+    },
+    {
+     "m": "ANGLAIS 1",
+     "p": "Abderrahim FATMI",
+     "g": "",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
      "m": "COMPTABILITE ET CALCUL DES COUTS",
-     "p": "À affecter",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "p": "jihane Nejjari",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "08:15",
@@ -738,38 +1120,27 @@
     {
      "m": "FRANÇAIS 1",
      "p": "Hayat BENTALEB",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "13:30",
      "e": "15:00",
      "r": "AMPHI-01",
      "w": "all"
-    },
-    {
-     "m": "ANGLAIS 1",
-     "p": "Abderrahim FATMI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
-     "t": "COURS",
-     "d": "VENDREDI",
-     "s": "15:15",
-     "e": "16:45",
-     "r": "AMPHI-03",
-     "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   },
   "IRSI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "184c1c5beb92277f",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V1/6ac693d74030e.pdf",
+   "hash": "ba632b2af62d9b71",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d389fc19.pdf",
    "sessions": [
     {
      "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
      "p": "Mohamed BADIY",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
      "s": "08:15",
@@ -778,9 +1149,42 @@
      "w": "all"
     },
     {
+     "m": "STATISTIQUES DESCRIPTIVES, INFÉRENTIELLES ET EXPLORATOIRES",
+     "p": "Bouchra LABLOUL",
+     "g": "",
+     "t": "COURS",
+     "d": "LUNDI",
+     "s": "10:15",
+     "e": "11:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION ORIENTEE OBJET EN PYTHON",
+     "p": "Mohammed SAJAI",
+     "g": "",
+     "t": "TP",
+     "d": "LUNDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE12",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
+     "p": "Mohamed BADIY",
+     "g": "",
+     "t": "TP",
+     "d": "LUNDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AE12",
+     "w": "all"
+    },
+    {
      "m": "RESEAUX INFORMATIQUE",
      "p": "Amina KHARBACH",
-     "g": "IRSI1",
+     "g": "",
      "t": "COURS",
      "d": "MARDI",
      "s": "08:15",
@@ -789,20 +1193,9 @@
      "w": "all"
     },
     {
-     "m": "STATISTIQUES DESCRIPTIVES, INFÉRENTIELLES ET EXPLORATOIRES",
-     "p": "Bouchra LABLOUL",
-     "g": "GI1 · IRSI1",
-     "t": "COURS",
-     "d": "MARDI",
-     "s": "10:15",
-     "e": "11:45",
-     "r": "AMPHI-01",
-     "w": "all"
-    },
-    {
      "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
      "p": "Manale BOUGHANJA",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "08:15",
@@ -813,7 +1206,7 @@
     {
      "m": "PROGRAMMATION ORIENTE OBJET EN PYTHON",
      "p": "Mohammed Aissi",
-     "g": "GI1 · IA1 · IRSI1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "10:15",
@@ -822,9 +1215,31 @@
      "w": "all"
     },
     {
+     "m": "SYSTEME D'EXPLOITATION ET PROGRAMMATION SYSTEMES",
+     "p": "Sara Ghouass",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE12",
+     "w": "all"
+    },
+    {
+     "m": "DEVELOPPEMENT D'APPLICATIONS WEB",
+     "p": "Fatima-zahra HAJA",
+     "g": "",
+     "t": "TP",
+     "d": "JEUDI",
+     "s": "08:00",
+     "e": "10:00",
+     "r": "AE12",
+     "w": "all"
+    },
+    {
      "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
      "p": "Zakaria KADDARI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "10:15",
@@ -833,9 +1248,20 @@
      "w": "all"
     },
     {
+     "m": "ANGLAIS 1",
+     "p": "Abderrahim FATMI",
+     "g": "",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
      "m": "COMPTABILITE ET CALCUL DES COUTS",
-     "p": "À affecter",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "p": "jihane Nejjari",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "08:15",
@@ -846,38 +1272,27 @@
     {
      "m": "FRANÇAIS 1",
      "p": "Hayat BENTALEB",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "13:30",
      "e": "15:00",
      "r": "AMPHI-01",
      "w": "all"
-    },
-    {
-     "m": "ANGLAIS 1",
-     "p": "Abderrahim FATMI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
-     "t": "COURS",
-     "d": "VENDREDI",
-     "s": "15:15",
-     "e": "16:45",
-     "r": "AMPHI-03",
-     "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   },
   "SID1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "8742d8d93cf125dd",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V1/6ac693e57c0a6.pdf",
+   "hash": "a65dd078c3aaaf6c",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V3/6adb6d463755b.pdf",
    "sessions": [
     {
      "m": "PROGRAMMATION ORIENTE OBJET EN JAVA",
      "p": "Mohamed BADIY",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
      "s": "08:15",
@@ -887,41 +1302,85 @@
     },
     {
      "m": "STATISTIQUES DESCRIPTIVES, INFÉRENTIELLES ET EXPLORATOIRES",
-     "p": "Mourad El idrissi",
-     "g": "IA1 · ROC1 · SID1",
+     "p": "Mourad El Idrissi",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
-     "s": "10:15",
-     "e": "11:45",
-     "r": "AMPHI-02",
-     "w": "all"
-    },
-    {
-     "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
-     "p": "Manale BOUGHANJA",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
-     "t": "COURS",
-     "d": "MERCREDI",
-     "s": "08:15",
-     "e": "09:45",
-     "r": "AMPHI-04",
-     "w": "all"
-    },
-    {
-     "m": "PROGRAMMATION ORIENTE OBJET EN PYTHON",
-     "p": "Mohammed Aissi",
-     "g": "GI1 · IA1 · IRSI1 · SID1",
-     "t": "COURS",
-     "d": "MERCREDI",
-     "s": "10:15",
-     "e": "11:45",
+     "s": "13:30",
+     "e": "15:00",
      "r": "AMPHI-03",
      "w": "all"
     },
     {
      "m": "INGÉNIERIE DES BASES DE DONNÉES AVANCÉE",
      "p": "Houda BENHAR",
-     "g": "GI1 · IA1 · SID1",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "08:00",
+     "e": "10:00",
+     "r": "AR13",
+     "w": "all"
+    },
+    {
+     "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
+     "p": "Sara Ghouass",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "AR13",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION ORIENTÉE OBJET EN JAVA",
+     "p": "Mohamed BADIY",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AR13",
+     "w": "all"
+    },
+    {
+     "m": "SYSTÈMES D’EXPLOITATION ET PROGRAMMATION SYSTÈME",
+     "p": "Manale BOUGHANJA",
+     "g": "",
+     "t": "COURS",
+     "d": "MERCREDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AMPHI-04",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION ORIENTE OBJET EN PYTHON",
+     "p": "Mohammed Aissi",
+     "g": "",
+     "t": "COURS",
+     "d": "MERCREDI",
+     "s": "10:15",
+     "e": "11:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
+     "m": "PROGRAMMATION ORIENTÉE OBJET EN PYTHON",
+     "p": "Mohammed Aissi",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AR13",
+     "w": "all"
+    },
+    {
+     "m": "INGÉNIERIE DES BASES DE DONNÉES AVANCÉE",
+     "p": "Houda BENHAR",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "08:15",
@@ -932,7 +1391,7 @@
     {
      "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
      "p": "Zakaria KADDARI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "10:15",
@@ -941,9 +1400,31 @@
      "w": "all"
     },
     {
+     "m": "DEVELOPPEMENT D’APPLICATIONS WEB",
+     "p": "Zakaria KADDARI",
+     "g": "",
+     "t": "TP",
+     "d": "JEUDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AR13",
+     "w": "all"
+    },
+    {
+     "m": "ANGLAIS 1",
+     "p": "Abderrahim FATMI",
+     "g": "",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
      "m": "COMPTABILITE ET CALCUL DES COUTS",
-     "p": "À affecter",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "p": "jihane Nejjari",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "08:15",
@@ -954,28 +1435,17 @@
     {
      "m": "FRANÇAIS 1",
      "p": "Hayat BENTALEB",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "13:30",
      "e": "15:00",
      "r": "AMPHI-01",
      "w": "all"
-    },
-    {
-     "m": "ANGLAIS 1",
-     "p": "Abderrahim FATMI",
-     "g": "GI1 · IA1 · IRSI1 · ROC1 · SID1",
-     "t": "COURS",
-     "d": "VENDREDI",
-     "s": "15:15",
-     "e": "16:45",
-     "r": "AMPHI-03",
-     "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   },
   "IA2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1195,24 +1665,35 @@
   },
   "IRSI2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "d50fbcfa2d6d25d3",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V2/6acbcceb0fb5b.pdf",
+   "hash": "c511ac31179fb487",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b76eab48.pdf",
    "sessions": [
     {
-     "m": "RESEAUX DE COMMUNICATION IOT",
-     "p": "Sara Handouf",
-     "g": "IRSI2",
+     "m": "CRYPTOGRAPHIE : PROTOCOLES ET APPLICATIONS",
+     "p": "Bouchra LABLOUL",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
-     "s": "08:15",
-     "e": "09:45",
-     "r": "AR01",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "BR03",
+     "w": "all"
+    },
+    {
+     "m": "CRYPTOGRAPHIE : PROTOCOLES ET APPLICATIONS",
+     "p": "Bouchra LABLOUL",
+     "g": "",
+     "t": "TP",
+     "d": "LUNDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AE05",
      "w": "all"
     },
     {
      "m": "ADMINISTRATION ET SECURITE DES SERVICES",
-     "p": "À affecter",
-     "g": "IRSI2",
+     "p": "Ismail CHAHID",
+     "g": "",
      "t": "COURS",
      "d": "MARDI",
      "s": "08:15",
@@ -1221,20 +1702,42 @@
      "w": "all"
     },
     {
+     "m": "ADMINISTRATION ET SECURITE DES SERVICES",
+     "p": "Ismail CHAHID",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "AE05",
+     "w": "all"
+    },
+    {
      "m": "INTERCONNEXION DES RESEAUX AVANCEE",
-     "p": "Nossaiba Tazi",
-     "g": "IRSI2",
+     "p": "Nossaiba TAZI",
+     "g": "",
      "t": "COURS",
      "d": "MARDI",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "BR03",
+     "w": "all"
+    },
+    {
+     "m": "INTERCONNEXION DES RESEAUX AVANCEE",
+     "p": "Nossaiba TAZI",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
      "s": "15:15",
-     "e": "16:45",
-     "r": "AR01",
+     "e": "17:15",
+     "r": "AE05",
      "w": "all"
     },
     {
      "m": "MACHINE LEARNING",
      "p": "Mohamed Khalifa BOUTAHIR",
-     "g": "GI2 · IRSI2",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "08:15",
@@ -1243,20 +1746,31 @@
      "w": "all"
     },
     {
-     "m": "CRYPTOGRAPHIE : PROTOCOLES ET APPLICATIONS",
-     "p": "Bouchra LABLOUL",
-     "g": "IRSI2",
+     "m": "RESEAUX DE COMMUNICATION IOT",
+     "p": "Sara Handouf",
+     "g": "",
      "t": "COURS",
-     "d": "JEUDI",
-     "s": "08:15",
-     "e": "09:45",
-     "r": "BR03",
+     "d": "MERCREDI",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "AMPHI-03",
+     "w": "all"
+    },
+    {
+     "m": "RESEAUX DE COMMUNICATION IOT",
+     "p": "À affecter",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AE05",
      "w": "all"
     },
     {
      "m": "GESTION AGILE DE PROJET INFORMATIQUE",
      "p": "Youssef MELLAH",
-     "g": "GI2 · IRSI2",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "13:30",
@@ -1265,9 +1779,31 @@
      "w": "all"
     },
     {
+     "m": "MACHINE LEARNING",
+     "p": "Sajida Mhammedi",
+     "g": "",
+     "t": "TP",
+     "d": "JEUDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AE05",
+     "w": "all"
+    },
+    {
+     "m": "GESTION AGILE DE PROJET INFORMATIQUE",
+     "p": "Ayoub Bouziane",
+     "g": "",
+     "t": "TP",
+     "d": "VENDREDI",
+     "s": "08:00",
+     "e": "10:00",
+     "r": "AE05",
+     "w": "all"
+    },
+    {
      "m": "MANAGEMENT ET MARKETING",
-     "p": "À affecter",
-     "g": "GI2 · IRSI2",
+     "p": "Imane JED",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "10:15",
@@ -1277,8 +1813,8 @@
     },
     {
      "m": "ANGLAIS 3",
-     "p": "À affecter",
-     "g": "GI2 · IRSI2",
+     "p": "Abir Sabri",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "13:30",
@@ -1289,7 +1825,7 @@
     {
      "m": "FRANÇAIS 3",
      "p": "Hayat BENTALEB",
-     "g": "GI2 · IRSI2",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "15:15",
@@ -1298,18 +1834,18 @@
      "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   },
   "ROC2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "31805a26c128f0aa",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V2/6acbccfd99f98.pdf",
+   "hash": "e88536fe77e5ebca",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b852f1f6.pdf",
    "sessions": [
     {
      "m": "PROGRAMMATION EN ROBOTIQUE ET CONCEPTION 3D",
      "p": "BOUTOUBA Mohamed",
-     "g": "ROC2",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
      "s": "08:15",
@@ -1320,7 +1856,18 @@
     {
      "m": "DÉVELOPPEMENT MOBILE MULTIPLATEFORME",
      "p": "Mohamed BOUDCHICHE",
-     "g": "IA2 · ROC2",
+     "g": "",
+     "t": "TP",
+     "d": "LUNDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "AE06",
+     "w": "all"
+    },
+    {
+     "m": "DÉVELOPPEMENT MOBILE MULTIPLATEFORME",
+     "p": "Mohamed BOUDCHICHE",
+     "g": "",
      "t": "COURS",
      "d": "MARDI",
      "s": "08:15",
@@ -1331,7 +1878,7 @@
     {
      "m": "VISION ARTIFICIELLE",
      "p": "Ali EL HABCHI",
-     "g": "IA2 · ROC2",
+     "g": "",
      "t": "COURS",
      "d": "MARDI",
      "s": "10:15",
@@ -1341,8 +1888,30 @@
     },
     {
      "m": "RESEAUX DE COMMUNICATION IOT",
+     "p": "Zineb BAKRAOUY",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "08:00",
+     "e": "10:00",
+     "r": "AE06",
+     "w": "all"
+    },
+    {
+     "m": "VISION ARTIFICIELLE",
+     "p": "Ali EL HABCHI",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "AE06",
+     "w": "all"
+    },
+    {
+     "m": "RESEAUX DE COMMUNICATION IOT",
      "p": "Sara Handouf",
-     "g": "IA2 · ROC2",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "13:30",
@@ -1353,7 +1922,7 @@
     {
      "m": "MACHINE LEARNING",
      "p": "Sajida Mhammedi",
-     "g": "ROC2",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "08:15",
@@ -1362,9 +1931,20 @@
      "w": "all"
     },
     {
-     "m": "FRANCAIS 3",
+     "m": "MACHINE LEARNING",
+     "p": "Sajida Mhammedi",
+     "g": "",
+     "t": "TP",
+     "d": "JEUDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "AE06",
+     "w": "all"
+    },
+    {
+     "m": "FRANÇAIS 3",
      "p": "Hayat BENTALEB",
-     "g": "IA2 · ROC2",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "13:30",
@@ -1375,7 +1955,7 @@
     {
      "m": "GESTION AGILE DE PROJET INFORMATIQUE",
      "p": "Youssef MELLAH",
-     "g": "IA2 · ROC2",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "15:15",
@@ -1384,9 +1964,20 @@
      "w": "all"
     },
     {
+     "m": "ANGLAIS 3",
+     "p": "Abir Sabri",
+     "g": "",
+     "t": "COURS",
+     "d": "VENDREDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AMPHI-05",
+     "w": "all"
+    },
+    {
      "m": "MANAGEMENT ET MARKETING",
-     "p": "À affecter",
-     "g": "IA2 · ROC2",
+     "p": "jihane Nejjari",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "10:15",
@@ -1395,19 +1986,19 @@
      "w": "all"
     },
     {
-     "m": "ANGLAIS 3",
-     "p": "À affecter",
-     "g": "IA2 · ROC2",
-     "t": "COURS",
+     "m": "GESTION AGILE DE PROJET INFORMATIQUE",
+     "p": "Ayoub Bouziane",
+     "g": "",
+     "t": "TP",
      "d": "VENDREDI",
-     "s": "13:30",
+     "s": "13:00",
      "e": "15:00",
-     "r": "AMPHI-03",
+     "r": "AE06",
      "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   },
   "IA3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1616,24 +2207,35 @@
   },
   "IRSI3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "b68a52b3e8fdd0d7",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V2/6acbcd3e778d6.pdf",
+   "hash": "2c414becde33952c",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7be36b88f.pdf",
    "sessions": [
     {
      "m": "TECHNOLOGIE BLOCKCHAIN",
      "p": "Mohamed FARTITCHOU",
-     "g": "IRSI3",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
      "s": "13:30",
      "e": "15:00",
-     "r": "Salle à affecter",
+     "r": "BR02",
+     "w": "all"
+    },
+    {
+     "m": "TECHNOLOGIE BLOCKCHAIN",
+     "p": "Mohamed FARTITCHOU",
+     "g": "",
+     "t": "TP",
+     "d": "LUNDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "BR08",
      "w": "all"
     },
     {
      "m": "CYBERSECURITE",
      "p": "Zineb BAKRAOUY",
-     "g": "IRSI3",
+     "g": "",
      "t": "COURS",
      "d": "MARDI",
      "s": "08:15",
@@ -1642,31 +2244,20 @@
      "w": "all"
     },
     {
-     "m": "ATELIER FIREWALL",
-     "p": "Amina KHARBACH",
-     "g": "IRSI3",
-     "t": "COURS",
-     "d": "MERCREDI",
-     "s": "08:15",
-     "e": "09:45",
-     "r": "BR02",
-     "w": "all"
-    },
-    {
-     "m": "ATELIER ETHICAL HACKING",
-     "p": "Amina KHARBACH",
-     "g": "IRSI3",
-     "t": "COURS",
-     "d": "MERCREDI",
+     "m": "CYBERSECURITE",
+     "p": "Zineb BAKRAOUY",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
      "s": "10:15",
-     "e": "11:45",
-     "r": "BR03",
+     "e": "12:15",
+     "r": "BR08",
      "w": "all"
     },
     {
      "m": "GOUVERNANCE DE LA SECURITE ET ANALYSE DES RISQUES",
      "p": "Sara Handouf",
-     "g": "IRSI3",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "08:15",
@@ -1675,20 +2266,9 @@
      "w": "all"
     },
     {
-     "m": "ATELIER PENTESTING WEB",
-     "p": "À affecter",
-     "g": "GI3 · IRSI3",
-     "t": "COURS",
-     "d": "JEUDI",
-     "s": "10:15",
-     "e": "11:45",
-     "r": "AMPHI-02",
-     "w": "all"
-    },
-    {
      "m": "ANGLIAS 5",
      "p": "Abderrahim FATMI",
-     "g": "GI3 · IRSI3",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "13:30",
@@ -1698,8 +2278,8 @@
     },
     {
      "m": "FRANÇAIS 5",
-     "p": "Khalid Mhamedi",
-     "g": "GI3 · IRSI3",
+     "p": "Khalid Mhamdi",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "15:15",
@@ -1708,29 +2288,40 @@
      "w": "all"
     },
     {
+     "m": "GOUVERNANCE DE LA SECURITE ET ANALYSE DES RISQUES",
+     "p": "Sara Handouf",
+     "g": "",
+     "t": "TP",
+     "d": "VENDREDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "BR08",
+     "w": "all"
+    },
+    {
      "m": "ETHIQUES ET DROITS",
      "p": "À affecter",
-     "g": "IRSI3",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
-     "s": "08:15",
-     "e": "09:45",
-     "r": "AMPHI-05",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-01",
      "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   },
   "ROC3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "8dbf8b19efc6d722",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V2/6ace2b57eac36.pdf",
+   "hash": "ebf0a29e1869fb55",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7bfb63c35.pdf",
    "sessions": [
     {
      "m": "ROBOT OPERATING SYSTEM",
      "p": "Mohammed SAJAI",
-     "g": "ROC3",
+     "g": "",
      "t": "COURS",
      "d": "LUNDI",
      "s": "08:15",
@@ -1739,20 +2330,20 @@
      "w": "all"
     },
     {
-     "m": "ATELIER ROBOTIQUE AVANCÉE (COBOTIQUE, MOBILITÉ)",
-     "p": "Mohammed Aissi",
-     "g": "ROC3",
-     "t": "COURS",
+     "m": "ROBOT OPERATING SYSTEM",
+     "p": "Mohammed SAJAI",
+     "g": "",
+     "t": "TP",
      "d": "LUNDI",
-     "s": "13:30",
-     "e": "15:00",
+     "s": "10:15",
+     "e": "12:15",
      "r": "BR01",
      "w": "all"
     },
     {
      "m": "INGENIERIE BIG DATA",
      "p": "Nabil ALAMI",
-     "g": "IA3 · ROC3",
+     "g": "",
      "t": "COURS",
      "d": "MARDI",
      "s": "08:15",
@@ -1761,9 +2352,20 @@
      "w": "all"
     },
     {
+     "m": "INGÉNIERIE BIG DATA",
+     "p": "Sara Ghouass",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "BR01",
+     "w": "all"
+    },
+    {
      "m": "CLOUD COMPUTING ET VIRTUALISATION",
      "p": "Mohamed FARTITCHOU",
-     "g": "IA3 · ROC3",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "08:15",
@@ -1772,9 +2374,20 @@
      "w": "all"
     },
     {
+     "m": "CLOUD COMPUTING ET VIRTUALISATION",
+     "p": "Mohamed FARTITCHOU",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "BR01",
+     "w": "all"
+    },
+    {
      "m": "REALITE VIRTUEL ET REALITE AUGMENTEE",
      "p": "Mohammed SAJAI",
-     "g": "ROC3",
+     "g": "",
      "t": "COURS",
      "d": "MERCREDI",
      "s": "13:30",
@@ -1783,9 +2396,20 @@
      "w": "all"
     },
     {
+     "m": "REALITE VIRTUEL ET REALITE AUGMENTEE",
+     "p": "Mohammed SAJAI",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "BR01",
+     "w": "all"
+    },
+    {
      "m": "IA EMBARQUÉE & EDGE AI",
      "p": "Wassim KHIATI",
-     "g": "ROC3",
+     "g": "",
      "t": "COURS",
      "d": "JEUDI",
      "s": "08:15",
@@ -1794,9 +2418,20 @@
      "w": "all"
     },
     {
+     "m": "IA EMBARQUÉE & EDGE AI",
+     "p": "Wassim KHIATI",
+     "g": "",
+     "t": "TP",
+     "d": "JEUDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "BR01",
+     "w": "all"
+    },
+    {
      "m": "FRANÇAIS 5",
-     "p": "Khalid Mhamedi",
-     "g": "IA3 · ROC3",
+     "p": "Khalid Mhamdi",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "08:15",
@@ -1807,7 +2442,7 @@
     {
      "m": "ANGLIAS 5",
      "p": "Abderrahim FATMI",
-     "g": "IA3 · ROC3",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "10:15",
@@ -1818,7 +2453,7 @@
     {
      "m": "ETHIQUES ET DROITS",
      "p": "À affecter",
-     "g": "IA3 · ROC3",
+     "g": "",
      "t": "COURS",
      "d": "VENDREDI",
      "s": "13:30",
@@ -1827,8 +2462,160 @@
      "w": "all"
     }
    ],
-   "changed": "2026-10-14T11:26:49Z",
-   "checked": "2026-10-14T11:26:49Z"
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
+  },
+  "INCONNU": {
+   "sem": "Année Universitaire 2026-2027 - Session Automne",
+   "hash": "d3d7f6042a070b4f",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7bc87d241.pdf",
+   "sessions": [
+    {
+     "m": "CLOUD COMPUTING ET VIRTUALISATION",
+     "p": "Mohamed FARTITCHOU",
+     "g": "",
+     "t": "COURS",
+     "d": "LUNDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AR03",
+     "w": "all"
+    },
+    {
+     "m": "URBANISATION DES SYSTÈMES D’INFORMATION",
+     "p": "Redouane Lhiadi",
+     "g": "",
+     "t": "TP",
+     "d": "LUNDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "BR06",
+     "w": "all"
+    },
+    {
+     "m": "URBANISATION DES SYSTÈMES D’INFORMATION",
+     "p": "Redouane Lhiadi",
+     "g": "",
+     "t": "COURS",
+     "d": "LUNDI",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "AR02",
+     "w": "all"
+    },
+    {
+     "m": "CLOUD COMPUTING ET VIRTUALISATION",
+     "p": "À affecter",
+     "g": "",
+     "t": "TP",
+     "d": "LUNDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "BR06",
+     "w": "all"
+    },
+    {
+     "m": "INTERCONNEXION RESEAUX ET SECURITE RESEAUX",
+     "p": "Zineb BAKRAOUY",
+     "g": "",
+     "t": "COURS",
+     "d": "MARDI",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "AR02",
+     "w": "all"
+    },
+    {
+     "m": "INGÉNIERIE BIG DATA",
+     "p": "Nabil ALAMI",
+     "g": "",
+     "t": "COURS",
+     "d": "MERCREDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AR01",
+     "w": "all"
+    },
+    {
+     "m": "INTERCONNEXION RESEAUX ET SECURITE RESEAUX",
+     "p": "Zineb BAKRAOUY",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "BR06",
+     "w": "all"
+    },
+    {
+     "m": "INGÉNIERIE BIG DATA",
+     "p": "Nabil ALAMI",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "AE08-Salle IA",
+     "w": "all"
+    },
+    {
+     "m": "ANGLIAS 5",
+     "p": "Abderrahim FATMI",
+     "g": "",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "13:30",
+     "e": "15:00",
+     "r": "AMPHI-04",
+     "w": "all"
+    },
+    {
+     "m": "FRANÇAIS 5",
+     "p": "Khalid Mhamdi",
+     "g": "",
+     "t": "COURS",
+     "d": "JEUDI",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-04",
+     "w": "all"
+    },
+    {
+     "m": "ARCHITECTURE LOGICIELLE ET DESIGN PATTERNS",
+     "p": "Wassim KHIATI",
+     "g": "",
+     "t": "COURS",
+     "d": "VENDREDI",
+     "s": "08:15",
+     "e": "09:45",
+     "r": "AR04",
+     "w": "all"
+    },
+    {
+     "m": "ARCHITECTURE LOGICIELLE ET DESIGN PATTERNS",
+     "p": "Wassim KHIATI",
+     "g": "",
+     "t": "TP",
+     "d": "VENDREDI",
+     "s": "13:00",
+     "e": "15:00",
+     "r": "BR06",
+     "w": "all"
+    },
+    {
+     "m": "ETHIQUES ET DROITS",
+     "p": "À affecter",
+     "g": "",
+     "t": "COURS",
+     "d": "VENDREDI",
+     "s": "15:15",
+     "e": "16:45",
+     "r": "AMPHI-01",
+     "w": "all"
+    }
+   ],
+   "changed": "2026-10-23T17:06:43Z",
+   "checked": "2026-10-23T17:06:43Z"
   }
  },
  "pages": [
