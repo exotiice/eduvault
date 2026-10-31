@@ -1,7 +1,7 @@
 {
  "v": 1,
  "baseline": true,
- "checked": "2026-10-30T22:19:39Z",
+ "checked": "2026-10-31T05:40:09Z",
  "docs": [
   {
    "t": "📥 Répartition",
@@ -738,7 +738,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "EPSI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1095,7 +1095,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "GI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1258,7 +1258,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "IRSI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1410,7 +1410,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "SID1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1573,7 +1573,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "IA2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1963,7 +1963,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "ROC2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2126,7 +2126,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "IA3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2439,7 +2439,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "ROC3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2591,7 +2591,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "checked": "2026-10-31T05:40:09Z"
   },
   "INCONNU": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2742,8 +2742,8 @@
      "w": "all"
     }
    ],
-   "changed": "2026-10-30T22:19:39Z",
-   "checked": "2026-10-30T22:19:39Z"
+   "changed": "2026-10-31T05:40:09Z",
+   "checked": "2026-10-31T05:40:09Z"
   }
  },
  "pages": [
