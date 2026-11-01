@@ -1,8 +1,88 @@
 {
  "v": 1,
  "baseline": true,
- "checked": "2026-11-01T13:23:36Z",
+ "checked": "2026-11-01T19:39:39Z",
  "docs": [
+  {
+   "t": "📥 Emplois TP",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae78538333a9.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "5281c0b18900ac98",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe A",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae784dd865aa.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "2953db53aced7afc",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae784f2c347a.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "53d9393b34f7d75f",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe C",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae7850c1988a.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "dc70c5fe10db5698",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Emplois TP",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae7854d8a41e.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "3a49679045ff644e",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Groupe C",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae7856e146db.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "c617d4c1b8f30538",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae783feb514a.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "3091aaf2e78df690",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe A",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae784376efa4.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "848bcd6487737eaa",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae7844b90e13.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "c4859ce725237ec1",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
+  {
+   "t": "📥 Télécharger Groupe B",
+   "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae7841d06045.pdf",
+   "page": "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027",
+   "h": "e4fc5a0db84f0690",
+   "first": "2026-11-01T19:39:39Z",
+   "changed": ""
+  },
   {
    "t": "📥 Répartition",
    "u": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/1 - REPART/6ade5acc17db5.pdf",
@@ -738,7 +818,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "checked": "2026-11-01T19:39:39Z"
   },
   "EPSI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1095,7 +1175,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "checked": "2026-11-01T19:39:39Z"
   },
   "GI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1258,7 +1338,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "checked": "2026-11-01T19:39:39Z"
   },
   "IRSI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1410,7 +1490,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "checked": "2026-11-01T19:39:39Z"
   },
   "SID1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1573,7 +1653,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "checked": "2026-11-01T19:39:39Z"
   },
   "IA2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1793,8 +1873,8 @@
   },
   "IRSI2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "c511ac31179fb487",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7b76eab48.pdf",
+   "hash": "19a149f66d761833",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae783feb514a.pdf",
    "sessions": [
     {
      "m": "CRYPTOGRAPHIE : PROTOCOLES ET APPLICATIONS",
@@ -1875,6 +1955,17 @@
     },
     {
      "m": "RESEAUX DE COMMUNICATION IOT",
+     "p": "Youussef ECH-CHOUDANY",
+     "g": "",
+     "t": "TP",
+     "d": "MERCREDI",
+     "s": "10:15",
+     "e": "12:15",
+     "r": "AE05",
+     "w": "all"
+    },
+    {
+     "m": "RESEAUX DE COMMUNICATION IOT",
      "p": "Sara Handouf",
      "g": "",
      "t": "COURS",
@@ -1882,17 +1973,6 @@
      "s": "13:30",
      "e": "15:00",
      "r": "AMPHI-03",
-     "w": "all"
-    },
-    {
-     "m": "RESEAUX DE COMMUNICATION IOT",
-     "p": "À affecter",
-     "g": "",
-     "t": "TP",
-     "d": "MERCREDI",
-     "s": "15:15",
-     "e": "17:15",
-     "r": "AE05",
      "w": "all"
     },
     {
@@ -1962,8 +2042,8 @@
      "w": "all"
     }
    ],
-   "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "changed": "2026-11-01T19:39:39Z",
+   "checked": "2026-11-01T19:39:39Z"
   },
   "ROC2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2126,7 +2206,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "checked": "2026-11-01T19:39:39Z"
   },
   "IA3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2439,7 +2519,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "checked": "2026-11-01T19:39:39Z"
   },
   "ROC3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2591,12 +2671,12 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "checked": "2026-11-01T19:39:39Z"
   },
   "INCONNU": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
-   "hash": "d3d7f6042a070b4f",
-   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V4/6adb7bc87d241.pdf",
+   "hash": "b53f42013b07faef",
+   "src": "https://eniad.ump.ma/storage/files/1/A1- ET 2026-2027/V5/6ae7841d06045.pdf",
    "sessions": [
     {
      "m": "CLOUD COMPUTING ET VIRTUALISATION",
@@ -2632,17 +2712,6 @@
      "w": "all"
     },
     {
-     "m": "CLOUD COMPUTING ET VIRTUALISATION",
-     "p": "À affecter",
-     "g": "",
-     "t": "TP",
-     "d": "LUNDI",
-     "s": "15:15",
-     "e": "17:15",
-     "r": "BR06",
-     "w": "all"
-    },
-    {
      "m": "INTERCONNEXION RESEAUX ET SECURITE RESEAUX",
      "p": "Zineb BAKRAOUY",
      "g": "",
@@ -2651,6 +2720,17 @@
      "s": "13:30",
      "e": "15:00",
      "r": "AR02",
+     "w": "all"
+    },
+    {
+     "m": "CLOUD COMPUTING ET VIRTUALISATION",
+     "p": "Youussef ECH-CHOUDANY",
+     "g": "",
+     "t": "TP",
+     "d": "MARDI",
+     "s": "15:15",
+     "e": "17:15",
+     "r": "BR06",
      "w": "all"
     },
     {
@@ -2742,8 +2822,8 @@
      "w": "all"
     }
    ],
-   "changed": "2026-11-01T13:23:36Z",
-   "checked": "2026-11-01T13:23:36Z"
+   "changed": "2026-11-01T19:39:39Z",
+   "checked": "2026-11-01T19:39:39Z"
   }
  },
  "pages": [
