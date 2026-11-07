@@ -5334,7 +5334,7 @@ Object.assign(act,{absCls:i=>{
 (function(){
 const API='https://www.googleapis.com/drive/v3/',SC='https://www.googleapis.com/auth/drive.metadata.readonly',SK='eduVault_dintok';
 const nz=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9؀-ۿ]+/g,' ').trim();
-const DI=()=>{const s=A.settings=A.settings||{};if(!s.drvIn||typeof s.drvIn!=='object')s.drvIn={root:'',name:'',auto:false,last:0,ign:[]};if(!Array.isArray(s.drvIn.ign))s.drvIn.ign=[];return s.drvIn};
+const DI=()=>{const s=A.settings=A.settings||{};if(!s.drvIn||typeof s.drvIn!=='object')s.drvIn={root:'',name:'',auto:false,last:0,ign:[],map:{}};if(!Array.isArray(s.drvIn.ign))s.drvIn.ign=[];if(!s.drvIn.map||typeof s.drvIn.map!=='object')s.drvIn.map={};return s.drvIn};
 let tk=null,exp=0,ct=null,busy=false,pend=[],autoTried=false;
 try{const s=JSON.parse(sessionStorage.getItem(SK)||'null');if(s&&s.exp>Date.now()+60000){tk=s.t;exp=s.exp}}catch(e){}
 const have=()=>!!tk&&Date.now()<exp;
@@ -5356,10 +5356,10 @@ async function scan(root){
       do{const r=await gf('files?q='+encodeURIComponent(`(${q}) and trashed=false`)+'&fields='+encodeURIComponent('nextPageToken,files(id,name,mimeType,webViewLink,parents,modifiedTime)')+'&pageSize=200&supportsAllDrives=true&includeItemsFromAllDrives=true'+(pt?'&pageToken='+encodeURIComponent(pt):''));
         pt=r.nextPageToken||'';
         (r.files||[]).forEach(f=>{const par=ch.find(x=>(f.parents||[]).includes(x.id))||ch[0];
-          if(f.mimeType==='application/vnd.google-apps.folder')nxt.push({id:f.id,path:par.path.concat(f.name)});else files.push({f,path:par.path})})}while(pt)}
+          if(f.mimeType==='application/vnd.google-apps.folder')nxt.push({id:f.id,path:par.path.concat(f.name)});else files.push({f,path:par.path,fid:par.id})})}while(pt)}
     lvl=nxt}
   return files}
-function matchMod(path,name){let best=null,sc=0;const segs=path.map(nz).filter(Boolean),fn=nz(name);
+function matchMod(path,name,fid){const dd=DI();if(fid&&dd.map[fid]){const mm=A.modules.find(x=>x.id===dd.map[fid]);if(mm)return mm}let best=null,sc=0;const segs=[dd.name].concat(path).map(nz).filter(Boolean),fn=nz(name);
   A.modules.forEach(m=>{const n=nz(m.name);if(n.length<2)return;let s=0;
     segs.forEach(g=>{if(g===n)s=Math.max(s,4);else if(n.length>=3&&(g.includes(n)||(g.length>=3&&n.includes(g))))s=Math.max(s,3)});
     if(!s&&n.length>=3&&fn.includes(n))s=2;if(s>sc){sc=s;best=m}});return best}
@@ -5368,22 +5368,24 @@ function matchCat(path,name){const t=' '+nz(path.join(' ')+' '+name)+' ';
   if(/ (examen|examens|exam|ds|dst|controle|controles|partiel|concours|corrige) /.test(t))return'examen';
   if(/ (td|tp|tds|tps|exercice|exercices|serie|series) /.test(t))return'td';if(/ (resume|resumes|fiche|fiches|synthese|cheat) /.test(t))return'resume';return'cours'}
 const known=()=>{const s=new Set();A.modules.forEach(m=>(m.resources||[]).forEach(r=>{if(r.inId)s.add(r.inId);const x=/\/d\/([\w-]+)/.exec(r.url||'');if(x)s.add(x[1])}));return s};
+const dup=f=>A.modules.some(m=>(m.resources||[]).some(r=>(r.fname&&r.fname===f.name)||nz(r.title)===nz(stem(f.name))));
 const stem=n=>String(n).replace(/\.[A-Za-z0-9]{1,5}$/,'');
 const mk=(f,type)=>({id:uid('r'),title:stem(f.name).slice(0,140),type,url:f.webViewLink||('https://drive.google.com/file/d/'+f.id+'/view'),isLocal:false,inId:f.id,fname:f.name,mime:f.mimeType,fromDrive:true});
 async function sync(opts){opts=opts||{};const d=DI();if(!d.root)return act.dIn();if(busy)return;busy=true;
   try{if(!have()){if(opts.quiet){try{await auth(true)}catch(e){busy=false;return}}else{toast(Lg('Connexion à Google Drive…','Connecting to Google Drive…','الاتصال بـ Google Drive…'));await auth(false)}}
     if(!d.name){try{d.name=(await gf('files/'+d.root+'?fields=name&supportsAllDrives=true')).name}catch(e){}}
-    const files=await scan(d.root),kn=known(),ign=new Set(d.ign),fresh=files.filter(x=>!kn.has(x.f.id)&&!ign.has(x.f.id));
+    const files=await scan(d.root),kn=known(),ign=new Set(d.ign),fresh=files.filter(x=>!kn.has(x.f.id)&&!ign.has(x.f.id)&&!dup(x.f));
     let n=0;pend=[];
-    fresh.forEach(x=>{const m=matchMod(x.path,x.f.name),cat=matchCat(x.path,x.f.name);if(m){(m.resources=m.resources||[]).push(mk(x.f,cat));n++}else pend.push({f:x.f,cat})});
+    fresh.forEach(x=>{const m=matchMod(x.path,x.f.name,x.fid),cat=matchCat(x.path,x.f.name);if(m){(m.resources=m.resources||[]).push(mk(x.f,cat));n++}else pend.push({f:x.f,cat,fid:x.fid,fl:x.path[x.path.length-1]||d.name||'Drive'})});
     d.last=Date.now();upd();
     if(opts.quiet&&!n&&!pend.length)return;
     toast(n?Lg(n+' nouveau(x) document(s) ajouté(s) depuis Drive',n+' new document(s) added from Drive',n+' ملف جديد من Drive'):(pend.length?Lg(pend.length+' fichier(s) à classer','file(s) to sort',pend.length+' ملف للتصنيف'):Lg('Drive à jour ✔','Drive up to date ✔','Drive محدّث ✔')),'ok');
     if(pend.length)sortDlg()}
   catch(e){if(!opts.quiet)toast(Lg('Synchronisation Drive impossible : ','Drive sync failed: ','تعذر مزامنة Drive: ')+e.message,'er')}finally{busy=false}}
-function sortDlg(){if(!pend.length)return;const mods=A.modules;
-  dlgShow(`<h3>📥 ${Lg('Fichiers à classer','Files to sort','ملفات للتصنيف')}</h3><p class="mu">${Lg('Choisis la matière de chaque fichier (laisse « — » pour l\'ignorer).','Pick the subject of each file (leave “—” to ignore it).','اختر مادة كل ملف (اتركه "—" لتجاهله).')}</p>
-  ${pend.map((o,i)=>`<div class="rs"><b style="word-break:break-word">${esc(o.f.name)}</b><div class="row" style="margin:6px 0 0"><select data-ixm="${i}"><option value="">—</option>${mods.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select><select data-ixc="${i}">${CATS.map(c=>`<option value="${c[0]}"${c[0]===o.cat?' selected':''}>${esc(c[1])}</option>`).join('')}</select></div></div>`).join('')}
+function sortDlg(){if(!pend.length)return;const mods=A.modules,gs=[];pend.forEach(o=>{if(!gs.find(g=>g.fid===o.fid))gs.push({fid:o.fid,fl:o.fl})});
+  dlgShow(`<h3>📥 ${Lg('Fichiers à classer','Files to sort','ملفات للتصنيف')}</h3><p class="mu"><small>${Lg("Choisis la matière de chaque dossier : tous ses fichiers iront dans ce module, et les prochains fichiers déposés dans ce dossier y seront classés automatiquement.","Pick the subject of each folder: all its files go to that module, and future files dropped in that folder are sorted there automatically.","اختر مادة كل مجلد: ستذهب ملفاته إليها وكذلك الملفات القادمة تلقائيا.")}</small></p>
+  ${gs.map(g=>`<div class="rs"><b>📁 ${esc(g.fl)}</b><select data-ixg="${esc(g.fid)}" style="margin:6px 0"><option value="">— ${Lg('pas maintenant','not now','ليس الآن')} —</option>${mods.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>
+    ${pend.map((o,i)=>o.fid!==g.fid?'':`<div class="row" style="margin:4px 0;align-items:center"><span style="flex:1;min-width:0;word-break:break-word"><small>${esc(o.f.name)}</small></span><select data-ixc="${i}" style="max-width:46%">${CATS.map(c=>`<option value="${c[0]}"${c[0]===o.cat?' selected':''}>${esc(c[1])}</option>`).join('')}</select></div>`).join('')}</div>`).join('')}
   <div class="row"><button class="b" onclick="$('dlg').close()">${tr('Annuler')}</button><button class="b" data-a="dInIgn">${Lg('Tout ignorer','Ignore all','تجاهل الكل')}</button><button class="b p" data-a="dInAdd">${Lg('Ajouter','Add','إضافة')}</button></div>`)}
 function cfg(){const d=DI();
   dlgShow(`<h3>📥 ${Lg('Dossier Google Drive → Cours','Google Drive folder → Courses','مجلد Google Drive ← المواد')}</h3>
@@ -5398,8 +5400,9 @@ Object.assign(act,{
     if(id!==d.root){d.root=id;d.name='';d.ign=[]}d.auto=!!($('dinAuto')||{}).checked;$('dlg').close();upd();sync()},
   dInOff:()=>{const d=DI();d.root='';d.name='';d.last=0;d.ign=[];$('dlg').close();upd();toast(Lg('Dossier Drive retiré (tes documents restent)','Drive folder removed (your documents stay)','أُزيل المجلد (تبقى مستنداتك)'),'ok')},
   dInIgn:()=>{DI().ign.push(...pend.map(o=>o.f.id));pend=[];$('dlg').close();upd()},
-  dInAdd:()=>{const d=$('dlg');let n=0;pend.forEach((o,i)=>{const mid=(d.querySelector('[data-ixm="'+i+'"]')||{}).value,cat=(d.querySelector('[data-ixc="'+i+'"]')||{}).value||o.cat,m=A.modules.find(x=>x.id===mid);
-      if(m){(m.resources=m.resources||[]).push(mk(o.f,cat));n++}else DI().ign.push(o.f.id)});pend=[];d.close();upd();toast(Lg(n+' document(s) ajouté(s)',n+' document(s) added',n+' ملف أضيف'),'ok')}});
+  dInAdd:()=>{const d=$('dlg'),dd=DI();let n=0;const mp={};d.querySelectorAll('[data-ixg]').forEach(e=>{if(e.value)mp[e.getAttribute('data-ixg')]=e.value});
+    pend.forEach((o,i)=>{const m=A.modules.find(x=>x.id===mp[o.fid]);if(!m)return;const cat=(d.querySelector('[data-ixc="'+i+'"]')||{}).value||o.cat;(m.resources=m.resources||[]).push(mk(o.f,cat));n++});
+    Object.keys(mp).forEach(k=>{dd.map[k]=mp[k]});pend=[];d.close();upd();toast(Lg(n+' document(s) ajouté(s)',n+' document(s) added',n+' ملف أضيف'),'ok')}});
 /* synchro automatique : au premier toucher de la session, si activée et dernière synchro > 3 h */
 document.addEventListener('pointerup',function run(){const d=DI();if(autoTried||!d.root||!d.auto)return;autoTried=true;document.removeEventListener('pointerup',run,true);
   if(Date.now()-(d.last||0)<3*3600000)return;sync({quiet:true})},true);
