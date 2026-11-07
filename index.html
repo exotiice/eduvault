@@ -1075,7 +1075,7 @@ function mgrid(){
     CATS.map(([k,t])=>{const r=(m.resources||[]).filter(x=>x.type===k);return`<div class="rs"><small class="mu"><b>${t} (${r.length})</b></small>${r.map(x=>resRow(m,x)).join('')}</div>`}).join('')+(()=>{const o=(m.resources||[]).filter(x=>!CATS.some(c=>c[0]===x.type));return o.length?`<div class="rs"><small class="mu"><b>📁 Autres (${o.length})</b></small>${o.map(x=>resRow(m,x)).join('')}</div>`:''})()+'</div>'
   }).join(''):(q?`<p class="mu e" style="grid-column:1/-1">Aucun module dans ${A.activeSemester}</p>`:emptyBox('📚',Lg('Aucun module en '+A.activeSemester,'No module in '+A.activeSemester,'لا توجد مواد في '+A.activeSemester),Lg('Ajoute tes matières pour suivre tes notes, tes cours et tes fiches.','Add your subjects to track grades, courses and cards.','أضف موادك لتتبع النقط والدروس والبطاقات.'),[['+ '+Lg('Ajouter un module','Add a module','إضافة مادة'),'addMod',1]]));
 }
-function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="go" data-i="rd" title="${Lg('Rapports & comptes rendus','Reports & write-ups','التقارير')}">📄</button><button class="b" data-a="recolor" title="${tr('🎨 Varier les couleurs')}">🎨</button><button class="b" data-a="memo" title="${Lg('Aide-mémoire','Cheat sheet','ملخص سريع')}">📌</button><button class="b" data-a="sim" title="${Lg('Simulateur de notes','Grade simulator','محاكي النقط')}">🎯</button><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
+function rMo(){const sv=calcSem();return pills()+`<div class="top"><div><h2>${tr('Modules & Cours')}</h2><small class="br">Moyenne ${A.activeSemester} : ${sv==='-'?'-':sv+'/20 '+(sv>=10?'✅':'❌')}</small></div><div><button class="b" data-a="go" data-i="rd" title="${Lg('Rapports & comptes rendus','Reports & write-ups','التقارير')}">📄</button><button class="b" data-a="dInSync" title="${Lg('Importer depuis mon dossier Drive','Import from my Drive folder','استيراد من مجلد Drive')}">📥</button><button class="b" data-a="recolor" title="${tr('🎨 Varier les couleurs')}">🎨</button><button class="b" data-a="memo" title="${Lg('Aide-mémoire','Cheat sheet','ملخص سريع')}">📌</button><button class="b" data-a="sim" title="${Lg('Simulateur de notes','Grade simulator','محاكي النقط')}">🎯</button><button class="b" data-a="bilan">${tr('📊 Bilan annuel')}</button><button class="b p" data-a="addMod">${tr('+ Module')}</button></div></div><input type="search" placeholder="Filtrer les modules..." value="${esc(q)}" oninput="q=this.value;$('mg').innerHTML=mgrid()" style="margin:0 0 12px"><div class="g" id="mg">${mgrid()}</div>`}
 function rFc(){
   const t=Date.now(),ms=mods(),ids=ms.map(m=>m.id);
   const all=A.flashcards.filter(f=>ids.includes(f.moduleId)&&(cardMod==='all'||f.moduleId===cardMod));
@@ -2622,6 +2622,7 @@ function secData(){
    ${nrow('⬆','data',tr('⬆ Importer').replace(/^⬆\s*/,''),Lg('Restaurer depuis un fichier .json','Restore from a .json file','استعادة من ملف .json'),'imp')}
    ${nrow('📅','data',tr('📅 Export .ics').replace(/^📅\s*/,''),Lg('Cours et échéances vers ton calendrier','Classes and deadlines to your calendar','الحصص والمواعيد إلى تقويمك'),'expics')}
    ${nrow('🗓','data','Google '+Lg('Agenda','Calendar','التقويم'),Lg('Ajouter examens et devoirs à Google Agenda','Add exams and deadlines to Google Calendar','إضافة الامتحانات والواجبات إلى تقويم Google'),'gcal')}
+   ${nrow('📥','data',Lg('Dossier Google Drive → Cours','Google Drive folder → Courses','مجلد Google Drive ← المواد'),A.settings.drvIn&&A.settings.drvIn.root?Lg('Connecté · '+(A.settings.drvIn.name||'dossier'),'Connected · '+(A.settings.drvIn.name||'folder'),'متصل'):Lg('Dépose un fichier dans Drive, il apparaît ici','Drop a file in Drive, it shows up here','ضع ملفا في Drive ليظهر هنا'),'dIn')}
    ${nrow('📚','data','Google Classroom',Lg('Importer cours, devoirs et supports depuis Classroom','Import classes, assignments and materials from Classroom','استيراد المواد والواجبات والمرفقات من Classroom'),'crl')}
    ${nrow('🏫','study',Lg('École et âge','School and age','المدرسة والعمر'),(A.settings.school||Lg('Non renseigné','Not set','غير محدد')),'school')}
    ${nrow('🎓','study',Lg('Règles de moyenne','Grading rules','قواعد المعدل'),Lg('Compensation, éliminatoire, rattrapage, ECTS','Compensation, eliminatory mark, retake, ECTS','التعويض، الإقصائية، الاستدراك، ECTS'),'rules')}
@@ -5323,6 +5324,86 @@ Object.assign(act,{absCls:i=>{
   if(c.abs.indexOf(k)>=0)c.abs=c.abs.filter(x=>x!==k);else c.abs.push(k);
   upd();toast('✋ '+modName(c.moduleId)+' : '+absCount(c.moduleId)+' '+Lg('absence(s)','absence(s)','غياب'),'ok');
 }});
+</script>
+<script id="drive-inbox-js">
+/* ===== Dossier Google Drive -> Cours (lecture seule) =====
+   Tu déposes un fichier dans ton dossier Drive (un sous-dossier par matière, ou le nom de la matière dans le nom du fichier) :
+   il apparaît dans les documents du module avec la bonne catégorie (Cours, TD/TP, Examens, Rapports, Comptes rendus...).
+   Seul le droit « voir les noms et liens des fichiers » (drive.metadata.readonly) est demandé : EduVault ne lit ni ne modifie ton contenu,
+   et ne supprime jamais rien dans ton Drive (supprimer le document dans l'app ne touche pas au fichier Drive). */
+(function(){
+const API='https://www.googleapis.com/drive/v3/',SC='https://www.googleapis.com/auth/drive.metadata.readonly',SK='eduVault_dintok';
+const nz=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9؀-ۿ]+/g,' ').trim();
+const DI=()=>{const s=A.settings=A.settings||{};if(!s.drvIn||typeof s.drvIn!=='object')s.drvIn={root:'',name:'',auto:false,last:0,ign:[]};if(!Array.isArray(s.drvIn.ign))s.drvIn.ign=[];return s.drvIn};
+let tk=null,exp=0,ct=null,busy=false,pend=[],autoTried=false;
+try{const s=JSON.parse(sessionStorage.getItem(SK)||'null');if(s&&s.exp>Date.now()+60000){tk=s.t;exp=s.exp}}catch(e){}
+const have=()=>!!tk&&Date.now()<exp;
+function auth(silent){return lib('https://accounts.google.com/gsi/client').then(()=>new Promise((ok,ko)=>{
+  ct=ct||google.accounts.oauth2.initTokenClient({client_id:cid(),scope:SC,
+    callback:r=>{if(r.error)return ct._ko&&ct._ko(Error(r.error));tk=r.access_token;exp=Date.now()+((+r.expires_in||3600)-90)*1000;try{sessionStorage.setItem(SK,JSON.stringify({t:tk,exp}))}catch(e){}ct._ok&&ct._ok()},
+    error_callback:e=>ct._ko&&ct._ko(Error((e&&e.type)||'popup'))});
+  ct._ok=ok;ct._ko=ko;ct.requestAccessToken({prompt:silent?'none':''})}))}
+async function gf(path){const r=await fetch(API+path,{headers:{Authorization:'Bearer '+tk}});
+  if(!r.ok){const e=await r.json().catch(()=>({}));const m=(e.error&&e.error.message)||('HTTP '+r.status);
+    if(r.status===401){tk=null;try{sessionStorage.removeItem(SK)}catch(x){}}
+    if(/has not been used|is disabled|accessNotConfigured/i.test(m))throw Error(Lg("Active l'API « Google Drive » dans ton projet Google Cloud, puis réessaie.","Enable the Google Drive API in your Google Cloud project, then retry.","فعّل Google Drive API في مشروع Google Cloud ثم أعد المحاولة."));
+    throw Error(m)}return r.json()}
+const rootId=v=>{v=String(v||'').trim();const m=v.match(/\/folders\/([\w-]{10,})/)||v.match(/[?&]id=([\w-]{10,})/);return m?m[1]:(/^[\w-]{10,}$/.test(v)?v:'')};
+async function scan(root){
+  const files=[];let lvl=[{id:root,path:[]}];
+  for(let d=0;d<4&&lvl.length;d++){const nxt=[];
+    for(let i=0;i<lvl.length;i+=12){const ch=lvl.slice(i,i+12),q=ch.map(x=>`'${x.id}' in parents`).join(' or ');let pt='';
+      do{const r=await gf('files?q='+encodeURIComponent(`(${q}) and trashed=false`)+'&fields='+encodeURIComponent('nextPageToken,files(id,name,mimeType,webViewLink,parents,modifiedTime)')+'&pageSize=200&supportsAllDrives=true&includeItemsFromAllDrives=true'+(pt?'&pageToken='+encodeURIComponent(pt):''));
+        pt=r.nextPageToken||'';
+        (r.files||[]).forEach(f=>{const par=ch.find(x=>(f.parents||[]).includes(x.id))||ch[0];
+          if(f.mimeType==='application/vnd.google-apps.folder')nxt.push({id:f.id,path:par.path.concat(f.name)});else files.push({f,path:par.path})})}while(pt)}
+    lvl=nxt}
+  return files}
+function matchMod(path,name){let best=null,sc=0;const segs=path.map(nz).filter(Boolean),fn=nz(name);
+  A.modules.forEach(m=>{const n=nz(m.name);if(n.length<2)return;let s=0;
+    segs.forEach(g=>{if(g===n)s=Math.max(s,4);else if(n.length>=3&&(g.includes(n)||(g.length>=3&&n.includes(g))))s=Math.max(s,3)});
+    if(!s&&n.length>=3&&fn.includes(n))s=2;if(s>sc){sc=s;best=m}});return best}
+function matchCat(path,name){const t=' '+nz(path.join(' ')+' '+name)+' ';
+  if(/ (compte rendu|comptes rendus|cr) /.test(t))return'cr';if(/ (rapport|rapports|report|pfe) /.test(t))return'rapport';
+  if(/ (examen|examens|exam|ds|dst|controle|controles|partiel|concours|corrige) /.test(t))return'examen';
+  if(/ (td|tp|tds|tps|exercice|exercices|serie|series) /.test(t))return'td';if(/ (resume|resumes|fiche|fiches|synthese|cheat) /.test(t))return'resume';return'cours'}
+const known=()=>{const s=new Set();A.modules.forEach(m=>(m.resources||[]).forEach(r=>{if(r.inId)s.add(r.inId);const x=/\/d\/([\w-]+)/.exec(r.url||'');if(x)s.add(x[1])}));return s};
+const stem=n=>String(n).replace(/\.[A-Za-z0-9]{1,5}$/,'');
+const mk=(f,type)=>({id:uid('r'),title:stem(f.name).slice(0,140),type,url:f.webViewLink||('https://drive.google.com/file/d/'+f.id+'/view'),isLocal:false,inId:f.id,fname:f.name,mime:f.mimeType,fromDrive:true});
+async function sync(opts){opts=opts||{};const d=DI();if(!d.root)return act.dIn();if(busy)return;busy=true;
+  try{if(!have()){if(opts.quiet){try{await auth(true)}catch(e){busy=false;return}}else{toast(Lg('Connexion à Google Drive…','Connecting to Google Drive…','الاتصال بـ Google Drive…'));await auth(false)}}
+    if(!d.name){try{d.name=(await gf('files/'+d.root+'?fields=name&supportsAllDrives=true')).name}catch(e){}}
+    const files=await scan(d.root),kn=known(),ign=new Set(d.ign),fresh=files.filter(x=>!kn.has(x.f.id)&&!ign.has(x.f.id));
+    let n=0;pend=[];
+    fresh.forEach(x=>{const m=matchMod(x.path,x.f.name),cat=matchCat(x.path,x.f.name);if(m){(m.resources=m.resources||[]).push(mk(x.f,cat));n++}else pend.push({f:x.f,cat})});
+    d.last=Date.now();upd();
+    if(opts.quiet&&!n&&!pend.length)return;
+    toast(n?Lg(n+' nouveau(x) document(s) ajouté(s) depuis Drive',n+' new document(s) added from Drive',n+' ملف جديد من Drive'):(pend.length?Lg(pend.length+' fichier(s) à classer','file(s) to sort',pend.length+' ملف للتصنيف'):Lg('Drive à jour ✔','Drive up to date ✔','Drive محدّث ✔')),'ok');
+    if(pend.length)sortDlg()}
+  catch(e){if(!opts.quiet)toast(Lg('Synchronisation Drive impossible : ','Drive sync failed: ','تعذر مزامنة Drive: ')+e.message,'er')}finally{busy=false}}
+function sortDlg(){if(!pend.length)return;const mods=A.modules;
+  dlgShow(`<h3>📥 ${Lg('Fichiers à classer','Files to sort','ملفات للتصنيف')}</h3><p class="mu">${Lg('Choisis la matière de chaque fichier (laisse « — » pour l\'ignorer).','Pick the subject of each file (leave “—” to ignore it).','اختر مادة كل ملف (اتركه "—" لتجاهله).')}</p>
+  ${pend.map((o,i)=>`<div class="rs"><b style="word-break:break-word">${esc(o.f.name)}</b><div class="row" style="margin:6px 0 0"><select data-ixm="${i}"><option value="">—</option>${mods.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select><select data-ixc="${i}">${CATS.map(c=>`<option value="${c[0]}"${c[0]===o.cat?' selected':''}>${esc(c[1])}</option>`).join('')}</select></div></div>`).join('')}
+  <div class="row"><button class="b" onclick="$('dlg').close()">${tr('Annuler')}</button><button class="b" data-a="dInIgn">${Lg('Tout ignorer','Ignore all','تجاهل الكل')}</button><button class="b p" data-a="dInAdd">${Lg('Ajouter','Add','إضافة')}</button></div>`)}
+function cfg(){const d=DI();
+  dlgShow(`<h3>📥 ${Lg('Dossier Google Drive → Cours','Google Drive folder → Courses','مجلد Google Drive ← المواد')}</h3>
+  <p class="mu"><small>${Lg("1) Crée un dossier dans Drive (ex. « EduVault »), avec un sous-dossier par matière portant le même nom que dans l'app. 2) Colle ici son lien. 3) Dépose tes fichiers dans Drive : ils apparaissent dans Cours. Les mots « rapport », « CR », « TD », « TP », « examen », « résumé » dans le nom ou le sous-dossier choisissent la catégorie.","1) Create a Drive folder (e.g. “EduVault”) with one subfolder per subject, named like in the app. 2) Paste its link here. 3) Drop files in Drive: they show up in Courses. Words like “report”, “TD”, “TP”, “exam” in the name or subfolder pick the category.","1) أنشئ مجلدا في Drive بمجلد فرعي لكل مادة بنفس اسمها في التطبيق. 2) الصق رابطه هنا. 3) ضع ملفاتك في Drive وستظهر في المواد.")}</small></p>
+  <label>${Lg('Lien (ou ID) du dossier Drive','Drive folder link (or ID)','رابط (أو ID) مجلد Drive')}<input id="dinRoot" value="${d.root?esc('https://drive.google.com/drive/folders/'+d.root):''}" placeholder="https://drive.google.com/drive/folders/…"></label>
+  ${d.name?`<small class="mu">📁 ${esc(d.name)}${d.last?' · '+Lg('dernière synchro ','last sync ','آخر مزامنة ')+esc(new Date(d.last).toLocaleString(LOC())):''}</small>`:''}
+  <label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="dinAuto" style="width:20px;height:20px;flex:none" ${d.auto?'checked':''}><span>${Lg("Synchroniser automatiquement à l'ouverture","Sync automatically on open","مزامنة تلقائية عند الفتح")}</span></label>
+  <div class="row"><button class="b" onclick="$('dlg').close()">${tr('Fermer')}</button>${d.root?`<button class="b" data-a="dInOff">${Lg('Retirer','Remove','إزالة')}</button>`:''}<button class="b p" data-a="dInSave">${d.root?Lg('Enregistrer et synchroniser','Save and sync','حفظ ومزامنة'):Lg('Connecter','Connect','ربط')}</button></div>`)}
+Object.assign(act,{
+  dIn:()=>cfg(),dInSync:()=>sync(),
+  dInSave:()=>{const d=DI(),id=rootId(($('dinRoot')||{}).value);if(!id)return toast(Lg('Lien de dossier Drive invalide','Invalid Drive folder link','رابط مجلد غير صالح'),'er');
+    if(id!==d.root){d.root=id;d.name='';d.ign=[]}d.auto=!!($('dinAuto')||{}).checked;$('dlg').close();upd();sync()},
+  dInOff:()=>{const d=DI();d.root='';d.name='';d.last=0;d.ign=[];$('dlg').close();upd();toast(Lg('Dossier Drive retiré (tes documents restent)','Drive folder removed (your documents stay)','أُزيل المجلد (تبقى مستنداتك)'),'ok')},
+  dInIgn:()=>{DI().ign.push(...pend.map(o=>o.f.id));pend=[];$('dlg').close();upd()},
+  dInAdd:()=>{const d=$('dlg');let n=0;pend.forEach((o,i)=>{const mid=(d.querySelector('[data-ixm="'+i+'"]')||{}).value,cat=(d.querySelector('[data-ixc="'+i+'"]')||{}).value||o.cat,m=A.modules.find(x=>x.id===mid);
+      if(m){(m.resources=m.resources||[]).push(mk(o.f,cat));n++}else DI().ign.push(o.f.id)});pend=[];d.close();upd();toast(Lg(n+' document(s) ajouté(s)',n+' document(s) added',n+' ملف أضيف'),'ok')}});
+/* synchro automatique : au premier toucher de la session, si activée et dernière synchro > 3 h */
+document.addEventListener('pointerup',function run(){const d=DI();if(autoTried||!d.root||!d.auto)return;autoTried=true;document.removeEventListener('pointerup',run,true);
+  if(Date.now()-(d.last||0)<3*3600000)return;sync({quiet:true})},true);
+})();
 </script>
 </body>
 </html>
