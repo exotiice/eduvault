@@ -669,11 +669,13 @@
   }
  ],
  "status": {
-  "ok": 6,
+  "ok": 0,
   "err": [
-   "0 lien lu sur https://eniad.ump.ma/fr/emploi-du-temps (titre : \"École Nationale de l'Intelligence Artificielle et du Digital\", page de blocage ?)",
-   "0 lien lu sur https://eniad.ump.ma/fr/calendrier-des-examens (titre : \"École Nationale de l'Intelligence Artificielle et du Digital\", page de blocage ?)",
-   "0 lien lu sur https://eniad.ump.ma/fr/resultats (titre : \"École Nationale de l'Intelligence Artificielle et du Digital\", page de blocage ?)"
+   "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027 (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))",
+   "https://eniad.ump.ma/fr/emploi-du-temps: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/emploi-du-temps (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))",
+   "https://eniad.ump.ma/fr/calendrier-des-examens: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/calendrier-des-examens (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))",
+   "https://eniad.ump.ma/fr/actualite: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/actualite (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))",
+   "https://eniad.ump.ma/fr/notes: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/notes (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))"
   ]
  },
  "tables": {
