@@ -1,7 +1,7 @@
 {
  "v": 1,
  "baseline": true,
- "checked": "2026-11-15T22:47:53Z",
+ "checked": "2026-11-16T19:36:07Z",
  "docs": [
   {
    "t": "📥 Emplois TP",
@@ -669,13 +669,11 @@
   }
  ],
  "status": {
-  "ok": 0,
+  "ok": 6,
   "err": [
-   "https://eniad.ump.ma/fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/emploi-du-temps/emplois-du-temps-semestre-automne-20262027 (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))",
-   "https://eniad.ump.ma/fr/emploi-du-temps: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/emploi-du-temps (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))",
-   "https://eniad.ump.ma/fr/calendrier-des-examens: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/calendrier-des-examens (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))",
-   "https://eniad.ump.ma/fr/actualite: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/actualite (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))",
-   "https://eniad.ump.ma/fr/notes: HTTPSConnectionPool(host='eniad.ump.ma', port=443): Max retries exceeded with url: /fr/notes (Caused by NameResolutionError(\"HTTPSConnection(host='eniad.ump.ma', port=443): Failed to resolve 'eniad.ump.ma' ([Errno -3] Temporary failure in name resolution)\"))"
+   "0 lien lu sur https://eniad.ump.ma/fr/emploi-du-temps (titre : \"École Nationale de l'Intelligence Artificielle et du Digital\", page de blocage ?)",
+   "0 lien lu sur https://eniad.ump.ma/fr/calendrier-des-examens (titre : \"École Nationale de l'Intelligence Artificielle et du Digital\", page de blocage ?)",
+   "0 lien lu sur https://eniad.ump.ma/fr/resultats (titre : \"École Nationale de l'Intelligence Artificielle et du Digital\", page de blocage ?)"
   ]
  },
  "tables": {
@@ -840,7 +838,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "EPSI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1197,7 +1195,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "GI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1360,7 +1358,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "IRSI1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1512,7 +1510,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "SID1": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -1675,7 +1673,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "IA2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2065,7 +2063,7 @@
     }
    ],
    "changed": "2026-11-01T19:39:39Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "ROC2": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2228,7 +2226,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "IA3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2541,7 +2539,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "ROC3": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2693,7 +2691,7 @@
     }
    ],
    "changed": "2026-10-23T17:06:43Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "checked": "2026-11-16T19:36:07Z"
   },
   "INCONNU": {
    "sem": "Année Universitaire 2026-2027 - Session Automne",
@@ -2844,8 +2842,8 @@
      "w": "all"
     }
    ],
-   "changed": "2026-11-15T22:47:53Z",
-   "checked": "2026-11-15T22:47:53Z"
+   "changed": "2026-11-16T19:36:07Z",
+   "checked": "2026-11-16T19:36:07Z"
   }
  },
  "pages": [
